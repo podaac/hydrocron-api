@@ -63,20 +63,27 @@ def format_json(cur, feature_id, exact, time):
         data['time'] = str(time) + " ms."
         #data['search on'] = {"featureID": feature_id}
         data['type'] = "FeatureCollection"
-        data['features'] = {}
-        data['features']['timeseries'] = {}
-        hits = 0
+        data['features'] = []
+        i = 0
         for t in results:
             if ((t['time'] != '-999999999999') and (t['width'] != '-999999999999')):
-                hits += 1
-                data['features']['timeseries'][datetime.fromtimestamp(float(t['time'])+736387205).strftime("%Y-%m-%d %H:%M:%S")] = float(t['width'])
-        data['hits'] = hits
+                feature = {}
+                feature['properties'] = {}
+                feature['geometry'] = {}
+                feature['type'] = "Feature"
+                feature['geometry']['coordinates'] = []
+                geometry = t['geometry'].replace("LINESTRING (","").replace(")","")
+                for p in geometry.split(", "):
+                    (x, y) = p.split(" ")
+                    feature['geometry']['coordinates'].append([float(x),float(y)])
+                i += 1
+                feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+736387205).strftime("%Y-%m-%d %H:%M:%S")
+                feature['properties']['reach_id'] = float(feature_id)
+                feature['properties']['wse'] = float(t['wse'])
+                feature['properties']['area_total'] = float(t['area_total'])
+                data['features'].append(feature)
 
-
-
-
-        
-
+        data['hits'] = i
 
     return data
 
@@ -106,28 +113,45 @@ def format_json_subset(cur, polygon, exact, time):
         data['error'] = f'413: Query exceeds 6MB with {int(len(results.split(",")))} hits.'
 
     else:
+
+
+
+
         data['status'] = "200 OK"
         data['time'] = str(time) + " ms."
         #data['search on'] = {"featureID": feature_id}
         data['type'] = "FeatureCollection"
-        data['features'] = {}
-        data['features']['timeseries'] = {}
-        hits = 0
+        data['features'] = []
+        i = 0
         for t in results:
+            flag_polygon = False
             if ((t['time'] != '-999999999999') and (t['width'] != '-999999999999')):
+                feature = {}
+                feature['properties'] = {}
+                feature['geometry'] = {}
+                feature['type'] = "Feature"
+                feature['geometry']['coordinates'] = []
                 geometry = t['geometry'].replace("LINESTRING (","").replace(")","")
                 for p in geometry.split(", "):
                     (x, y) = p.split(" ")
                     point = Point(x, y)
                     if (polygon.contains(point)):
-                        hits += 1
-                        data['features']['timeseries'][datetime.fromtimestamp(float(t['time'])+736387205).strftime("%Y-%m-%d %H:%M:%S")] = float(t['width'])
+                        feature['geometry']['coordinates'].append([float(x),float(y)])
+                        feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+736387205).strftime("%Y-%m-%d %H:%M:%S")
+                        feature['properties']['reach_id'] = float(t['reach_id'])
+                        feature['properties']['wse'] = float(t['wse'])
+                        feature['properties']['area_total'] = float(t['area_total'])
+                        flag_polygon = True
+                if (flag_polygon):
+                    data['features'].append(feature)
+                    i += 1
 
-        data['hits'] = hits
+        data['hits'] = i
+
     return data
 
 
-def gettimeseries_get(feature, feature_id, start_time1, end_time1, start_time, end_time, cycleavg=None, dataFormat=None):  # noqa: E501
+def gettimeseries_get(feature, feature_id, start_time, end_time, cycleavg=None, dataFormat=None):  # noqa: E501
     """Get Timeseries for a particular Reach, Node, or LakeID
 
     Get Timeseries for a particular Reach, Node, or LakeID # noqa: E501
@@ -136,10 +160,6 @@ def gettimeseries_get(feature, feature_id, start_time1, end_time1, start_time, e
     :type feature: str
     :param feature_id: ID of the feature to retrieve
     :type feature_id: str
-    :param start_time1: Start time of the timeseries
-    :type start_time1: str
-    :param end_time1: End time of the timeseries
-    :type end_time1: str
     :param start_time: Start time of the timeseries
     :type start_time: str
     :param end_time: End time of the timeseries
@@ -152,14 +172,22 @@ def gettimeseries_get(feature, feature_id, start_time1, end_time1, start_time, e
     :rtype: None
     """
 
-    # HARDCODED FOR FAST TESTING
-    feature = "reach"
-    feature_id = "73254700251"
-    start_time1 = "2015-12-10 02:15:33"
-    end_time1 = "2015-12-10 02:16:27"
 
-    st = float(time.mktime(datetime.strptime(start_time1, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
-    et = float(time.mktime(datetime.strptime(end_time1, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
+    # If I'm too lazy to type in the UI
+    if (feature_id == "CBBTTTSNNNNNN"):
+        feature_id = "73254700251"
+    if (feature == "Reach"): 
+        feature = "reach"
+    if (start_time == "2023-02-24T00:00:00+00:00"):
+        start_time = "2015-12-10 02:15:33"
+    if (end_time == "2023-02-24T12:59:59+00:00"):
+        end_time = "2015-12-10 02:16:27"
+    
+
+    start_time = start_time.replace("T"," ")[0:19]
+    end_time = end_time.replace("T"," ")[0:19]
+    st = float(time.mktime(datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
+    et = float(time.mktime(datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
 
     try:
         conn = pymysql.connect(
@@ -179,7 +207,7 @@ def gettimeseries_get(feature, feature_id, start_time1, end_time1, start_time, e
         end = time.time()
         data = format_json(cur, feature_id, True, round((end - start) * 1000, 3))
 
-        df = pd.DataFrame([data['features']['timeseries']])
+        df = pd.DataFrame([data['features']])
         df.to_csv('gettimeseries.csv', encoding='utf-8', index=False)
 
     return data
@@ -203,14 +231,28 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
     :rtype: None
     """
 
-    # HARDCODED FOR FAST TESTING
-    subsetpolygon = '{"type":"Polygon","coordinates":[[[-84.40150919561162, 30.476522188737036], [-84.44783281318452, 30.476522188737036], [-84.44783281318452, 30.45876696478751], [-84.40150919561162, 30.45876696478751] ]]}'
+    print(subsetpolygon)
+    print(start_time)
+    print(end_time)
+
+    # If I'm too lazy to type in the UI
+    if (subsetpolygon == '[]'):
+        subsetpolygon = '{"type":"Polygon","coordinates":[[[-84.40150919561162, 30.476522188737036], [-84.44783281318452, 30.476522188737036], [-84.44783281318452, 30.45876696478751], [-84.40150919561162, 30.45876696478751] ]]}'
+    #subsetpolygon = '{"type":"Polygon","coordinates":[[[-100.0, -100], [100.0, 100.0], [100.0, -100.0], [-100.0, 100.0] ]]}'
+
+    if (start_time == "2023-02-24T00:00:00+00:00"):
+        start_time = "2015-12-10 02:15:33"
+    if (end_time == "2023-02-24T12:59:59+00:00"):
+        end_time = "2015-12-10 02:16:27"
+    
+    # TODO: Nodes and Lakes
     feature = "reach"
-    start_time = "2015-12-10 02:15:33"
-    end_time = "2015-12-10 02:16:27"
+
 
     polygon = Polygon(json.loads(subsetpolygon)['coordinates'][0])
 
+    start_time = start_time.replace("T"," ")[0:19]
+    end_time = end_time.replace("T"," ")[0:19]
     st = float(time.mktime(datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
     et = float(time.mktime(datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
 
@@ -233,7 +275,7 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
         end = time.time()
         data = format_json_subset(cur, polygon, True, round((end - start) * 1000, 3))
 
-        df = pd.DataFrame([data['features']['timeseries']])
+        df = pd.DataFrame([data['features']])
         df.to_csv('getsubset.csv', encoding='utf-8', index=False)
 
     return data

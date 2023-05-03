@@ -34,8 +34,6 @@ class TestDefaultController(BaseTestCase):
         """
         query_string = [('feature', 'feature_example'),
                         ('feature_id', 'feature_id_example'),
-                        ('start_time1', '2013-10-20T19:20:30+01:00'),
-                        ('end_time1', '2013-10-20T19:20:30+01:00'),
                         ('cycleavg', false),
                         ('format', 'csv'),
                         ('start_time', '2013-10-20T19:20:30+01:00'),
