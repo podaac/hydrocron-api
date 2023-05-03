@@ -1,0 +1,170 @@
+openapi: 3.0.0
+info:
+  title: "Get time series data from SWOT observations for reaches, nodes, and/or lakes"
+  description: "Get time series data from SWOT observations for reaches, nodes, and/or\
+    \ lakes"
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/hydrocron/HydroAPI/1.0.0
+  description: "Get time series data from SWOT observations for reaches, nodes, and/or\
+    \ lakes"
+- url: https://hdyroapi.swot.podaac/HydroAPI/1.0.0
+  description: SwaggerHub API Auto Mocking
+security:
+- application:
+  - read
+  - write
+paths:
+  /Gettimeseries:
+    get:
+      summary: "Get Timeseries for a particular Reach, Node, or LakeID"
+      description: "Get Timeseries for a particular Reach, Node, or LakeID"
+      operationId: gettimeseries_get
+      parameters:
+      - name: feature
+        in: query
+        description: Data requested for Reach or Node or Lake
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: Reach
+      - name: featureID
+        in: query
+        description: ID of the feature to retrieve
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: CBBTTTSNNNNNN
+      - name: startTime1
+        in: query
+        description: Start time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2023-02-24T00:00:00Z
+      - name: endTime1
+        in: query
+        description: End time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2023-02-24T12:59:59Z
+      - name: cycleavg
+        in: query
+        description: Perform cycle average on the time series
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+        example: "true"
+      - name: format
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: csv
+        example: csv
+      - name: startTime
+        in: query
+        description: Start time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2023-02-24T00:00:00Z
+      - name: endTime
+        in: query
+        description: End time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2023-02-24T12:59:59Z
+      responses:
+        "200":
+          description: OK
+      security: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /Getsubset:
+    get:
+      summary: Subset by time series for a given spatial region
+      description: "Get Timeseries for a particular Reach, Node, or LakeID"
+      operationId: getsubset_get
+      parameters:
+      - name: subsetpolygon
+        in: query
+        description: GEOJSON of the subset area
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: "[]"
+      - name: startTime
+        in: query
+        description: Start time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2023-02-24T00:00:00Z
+      - name: endTime
+        in: query
+        description: End time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2023-02-24T12:59:59Z
+      - name: format
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: csv
+        example: csv
+      responses:
+        "200":
+          description: OK
+      security: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas: {}
+  securitySchemes:
+    application:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://example.com/oauth/token
+          scopes:
+            write: allows modifying resources
+            read: allows reading resources
+      x-tokenInfoFunc: swagger_server.controllers.authorization_controller.check_application
+      x-scopeValidateFunc: swagger_server.controllers.authorization_controller.validate_scope_application
+
