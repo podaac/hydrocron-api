@@ -66,7 +66,8 @@ def format_json(cur, feature_id, exact, time):
         data['features'] = []
         i = 0
         for t in results:
-            if ((t['time'] != '-999999999999') and (t['width'] != '-999999999999')):
+            if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
+                print(t['time_str'])
                 feature = {}
                 feature['properties'] = {}
                 feature['geometry'] = {}
@@ -77,7 +78,7 @@ def format_json(cur, feature_id, exact, time):
                     (x, y) = p.split(" ")
                     feature['geometry']['coordinates'].append([float(x),float(y)])
                 i += 1
-                feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+736387205).strftime("%Y-%m-%d %H:%M:%S")
+                feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
                 feature['properties']['reach_id'] = float(feature_id)
                 feature['properties']['wse'] = float(t['wse'])
                 feature['properties']['area_total'] = float(t['area_total'])
@@ -125,19 +126,23 @@ def format_json_subset(cur, polygon, exact, time):
         i = 0
         for t in results:
             flag_polygon = False
-            if ((t['time'] != '-999999999999') and (t['width'] != '-999999999999')):
+            if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
+                print(t['time_str'])
                 feature = {}
                 feature['properties'] = {}
                 feature['geometry'] = {}
                 feature['type'] = "Feature"
                 feature['geometry']['coordinates'] = []
                 geometry = t['geometry'].replace("LINESTRING (","").replace(")","")
+                print(geometry[0:100])
+                #print(polygon)
+
                 for p in geometry.split(", "):
                     (x, y) = p.split(" ")
                     point = Point(x, y)
                     if (polygon.contains(point)):
                         feature['geometry']['coordinates'].append([float(x),float(y)])
-                        feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+736387205).strftime("%Y-%m-%d %H:%M:%S")
+                        feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
                         feature['properties']['reach_id'] = float(t['reach_id'])
                         feature['properties']['wse'] = float(t['wse'])
                         feature['properties']['area_total'] = float(t['area_total'])
@@ -145,6 +150,8 @@ def format_json_subset(cur, polygon, exact, time):
                 if (flag_polygon):
                     data['features'].append(feature)
                     i += 1
+                    print(geometry)
+                    print(polygon)
 
         data['hits'] = i
 
@@ -179,15 +186,15 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, cycleavg=None, 
     if (feature == "Reach"): 
         feature = "reach"
     if (start_time == "2023-02-24T00:00:00+00:00"):
-        start_time = "2015-12-10 02:15:33"
+        start_time = "2022-08-09 10:15:28"
     if (end_time == "2023-02-24T12:59:59+00:00"):
-        end_time = "2015-12-10 02:16:27"
+        end_time = "2022-08-09 10:16:30"
     
 
     start_time = start_time.replace("T"," ")[0:19]
     end_time = end_time.replace("T"," ")[0:19]
-    st = float(time.mktime(datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
-    et = float(time.mktime(datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
+    st = float(time.mktime(datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").timetuple())-946710000)
+    et = float(time.mktime(datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S").timetuple())-946710000)
 
     try:
         conn = pymysql.connect(
@@ -204,6 +211,8 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, cycleavg=None, 
     with conn.cursor() as cur:
         start = time.time()
         cur.execute(f"select * from {feature} where reach_id = {feature_id} and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        print(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+
         end = time.time()
         data = format_json(cur, feature_id, True, round((end - start) * 1000, 3))
 
@@ -231,19 +240,17 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
     :rtype: None
     """
 
-    print(subsetpolygon)
-    print(start_time)
-    print(end_time)
 
     # If I'm too lazy to type in the UI
     if (subsetpolygon == '[]'):
-        subsetpolygon = '{"type":"Polygon","coordinates":[[[-84.40150919561162, 30.476522188737036], [-84.44783281318452, 30.476522188737036], [-84.44783281318452, 30.45876696478751], [-84.40150919561162, 30.45876696478751] ]]}'
-    #subsetpolygon = '{"type":"Polygon","coordinates":[[[-100.0, -100], [100.0, 100.0], [100.0, -100.0], [-100.0, 100.0] ]]}'
+        #subsetpolygon = '{"type":"Polygon","coordinates":[[[-84.40150919561162, 30.476522188737036], [-84.44783281318452, 30.476522188737036], [-84.44783281318452, 30.45876696478751], [-84.40150919561162, 30.45876696478751] ]]}'
+        #subsetpolygon = '{"type":"Polygon","coordinates":[[[-100.0, -100], [100.0, 100.0], [100.0, -100.0], [-100.0, 100.0] ]]}'
+        subsetpolygon = '{"type":"Polygon","coordinates":[[[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575] ]]}'
 
     if (start_time == "2023-02-24T00:00:00+00:00"):
-        start_time = "2015-12-10 02:15:33"
+        start_time = "2022-08-09 10:15:28"
     if (end_time == "2023-02-24T12:59:59+00:00"):
-        end_time = "2015-12-10 02:16:27"
+        end_time = "2022-08-09 10:16:38"
     
     # TODO: Nodes and Lakes
     feature = "reach"
@@ -251,10 +258,15 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
 
     polygon = Polygon(json.loads(subsetpolygon)['coordinates'][0])
 
+    print(polygon)
+    print(start_time)
+    print(end_time)
+
+
     start_time = start_time.replace("T"," ")[0:19]
     end_time = end_time.replace("T"," ")[0:19]
-    st = float(time.mktime(datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
-    et = float(time.mktime(datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S").timetuple())-736387205)
+    st = float(time.mktime(datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S").timetuple())-946710000)
+    et = float(time.mktime(datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S").timetuple())-946710000)
 
     try:
         conn = pymysql.connect(
@@ -272,6 +284,8 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
         start = time.time()
         # TODO: Expand to nodes and lakes
         cur.execute(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        print(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+
         end = time.time()
         data = format_json_subset(cur, polygon, True, round((end - start) * 1000, 3))
 
