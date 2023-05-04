@@ -67,7 +67,6 @@ def format_json(cur, feature_id, exact, time):
         i = 0
         for t in results:
             if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
-                print(t['time_str'])
                 feature = {}
                 feature['properties'] = {}
                 feature['geometry'] = {}
@@ -127,15 +126,12 @@ def format_json_subset(cur, polygon, exact, time):
         for t in results:
             flag_polygon = False
             if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
-                print(t['time_str'])
                 feature = {}
                 feature['properties'] = {}
                 feature['geometry'] = {}
                 feature['type'] = "Feature"
                 feature['geometry']['coordinates'] = []
                 geometry = t['geometry'].replace("LINESTRING (","").replace(")","")
-                print(geometry[0:100])
-                #print(polygon)
 
                 for p in geometry.split(", "):
                     (x, y) = p.split(" ")
@@ -150,9 +146,6 @@ def format_json_subset(cur, polygon, exact, time):
                 if (flag_polygon):
                     data['features'].append(feature)
                     i += 1
-                    print(geometry)
-                    print(polygon)
-
         data['hits'] = i
 
     return data
@@ -186,9 +179,9 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, cycleavg=None, 
     if (feature == "Reach"): 
         feature = "reach"
     if (start_time == "2023-02-24T00:00:00+00:00"):
-        start_time = "2022-08-09 10:15:28"
+        start_time = "2022-08-09 10:15:33"
     if (end_time == "2023-02-24T12:59:59+00:00"):
-        end_time = "2022-08-09 10:16:30"
+        end_time = "2022-08-09 10:16:38"
     
 
     start_time = start_time.replace("T"," ")[0:19]
@@ -248,7 +241,7 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
         subsetpolygon = '{"type":"Polygon","coordinates":[[[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575] ]]}'
 
     if (start_time == "2023-02-24T00:00:00+00:00"):
-        start_time = "2022-08-09 10:15:28"
+        start_time = "2022-08-09 10:15:33"
     if (end_time == "2023-02-24T12:59:59+00:00"):
         end_time = "2022-08-09 10:16:38"
     
@@ -257,11 +250,6 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
 
 
     polygon = Polygon(json.loads(subsetpolygon)['coordinates'][0])
-
-    print(polygon)
-    print(start_time)
-    print(end_time)
-
 
     start_time = start_time.replace("T"," ")[0:19]
     end_time = end_time.replace("T"," ")[0:19]
