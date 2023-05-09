@@ -33,7 +33,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-
 def format_json(cur, feature_id, exact, time):
     """
 
@@ -72,7 +71,7 @@ def format_json(cur, feature_id, exact, time):
                 feature['geometry'] = {}
                 feature['type'] = "Feature"
                 feature['geometry']['coordinates'] = []
-                geometry = t['geometry'].replace("LINESTRING (","").replace(")","")
+                geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
                 for p in geometry.split(", "):
                     (x, y) = p.split(" ")
                     feature['geometry']['coordinates'].append([float(x),float(y)])
@@ -80,15 +79,115 @@ def format_json(cur, feature_id, exact, time):
                 feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
                 feature['properties']['reach_id'] = float(feature_id)
                 feature['properties']['wse'] = float(t['wse'])
-                feature['properties']['area_total'] = float(t['area_total'])
+                feature['properties']['slope'] = float(t['slope'])
                 data['features'].append(feature)
 
         data['hits'] = i
 
     return data
 
+def format_csv(cur, feature_id, exact, time):
+    """
 
-def format_json_subset(cur, polygon, exact, time):
+    Parameters
+    ----------
+    cur
+    swot_id
+    exact
+    time
+
+    Returns
+    -------
+
+    """
+    # Fetch all results from mySQL query
+    results = cur.fetchall()
+
+    data = {}
+
+    if results is None:
+        data['error'] = f"404: Results with the specified Feature ID {feature_id} were not found."
+    elif len(results) > 5750000:
+        data['error'] = f'413: Query exceeds 6MB with {int(len(results.split(",")))} hits.'
+
+    else:
+        csv = "reach_id, time_str, wse, geometry\n"
+        for t in results:
+            if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
+                csv += t['reach_id']
+                csv += ','
+                csv += t['time_str']
+                csv += ','
+                csv += t['wse']
+                csv += ','
+                csv += t['geometry'].replace('; ',', ')
+                csv += '\n'
+
+    return csv
+
+
+def format_subset_json(cur, polygon, exact, time):
+    """
+
+    Parameters
+    ----------
+    cur
+    swot_id
+    exact
+    time
+
+    Returns
+    -------
+
+    """
+    # Fetch all results from mySQL query
+    results = cur.fetchall()
+
+    data = {}
+
+    if results is None:
+        data['error'] = f"404: Results with the specified polygon {polygon} were not found."
+    elif len(results) > 5750000:
+        data['error'] = f'413: Query exceeds 6MB with {int(len(results.split(",")))} hits.'
+
+    else:
+
+        data['status'] = "200 OK"
+        data['time'] = str(time) + " ms."
+        #data['search on'] = {"featureID": feature_id}
+        data['type'] = "FeatureCollection"
+        data['features'] = []
+        i = 0
+        for t in results:
+            flag_polygon = False
+            if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
+                feature = {}
+                feature['properties'] = {}
+                feature['geometry'] = {}
+                feature['type'] = "Feature"
+                feature['geometry']['coordinates'] = []
+                geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
+
+                for p in geometry.split("; "):
+                    (x, y) = p.split(" ")
+                    point = Point(x, y)
+                    if (polygon.contains(point)):
+                        feature['geometry']['coordinates'].append([float(x),float(y)])
+                        feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
+                        feature['properties']['reach_id'] = float(t['reach_id'])
+                        feature['properties']['wse'] = float(t['wse'])
+                        feature['properties']['slope'] = float(t['slope'])
+                        flag_polygon = True
+                if (flag_polygon):
+                    data['features'].append(feature)
+                    i += 1
+        data['hits'] = i
+
+    return data
+
+
+
+def format_subset_csv(cur, polygon, exact, time):
     """
 
     Parameters
@@ -116,40 +215,27 @@ def format_json_subset(cur, polygon, exact, time):
 
 
 
-
-        data['status'] = "200 OK"
-        data['time'] = str(time) + " ms."
-        #data['search on'] = {"featureID": feature_id}
-        data['type'] = "FeatureCollection"
-        data['features'] = []
-        i = 0
+        csv = "reach_id, time_str, wse, geometry\n"
         for t in results:
             flag_polygon = False
             if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
-                feature = {}
-                feature['properties'] = {}
-                feature['geometry'] = {}
-                feature['type'] = "Feature"
-                feature['geometry']['coordinates'] = []
-                geometry = t['geometry'].replace("LINESTRING (","").replace(")","")
-
-                for p in geometry.split(", "):
+                geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
+                for p in geometry.split("; "):
                     (x, y) = p.split(" ")
                     point = Point(x, y)
                     if (polygon.contains(point)):
-                        feature['geometry']['coordinates'].append([float(x),float(y)])
-                        feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
-                        feature['properties']['reach_id'] = float(t['reach_id'])
-                        feature['properties']['wse'] = float(t['wse'])
-                        feature['properties']['area_total'] = float(t['area_total'])
                         flag_polygon = True
                 if (flag_polygon):
-                    data['features'].append(feature)
-                    i += 1
-        data['hits'] = i
+                    csv += t['reach_id']
+                    csv += ','
+                    csv += t['time_str']
+                    csv += ','
+                    csv += t['wse']
+                    csv += ','
+                    csv += t['geometry'].replace('; ',', ')
+                    csv += '\n'
 
-    return data
-
+    return csv
 
 def gettimeseries_get(feature, feature_id, start_time, end_time, cycleavg=None, dataFormat=None):  # noqa: E501
     """Get Timeseries for a particular Reach, Node, or LakeID
@@ -207,10 +293,11 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, cycleavg=None, 
         print(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
 
         end = time.time()
-        data = format_json(cur, feature_id, True, round((end - start) * 1000, 3))
+        data = format_csv(cur, feature_id, True, round((end - start) * 1000, 3))
 
-        df = pd.DataFrame([data['features']])
-        df.to_csv('gettimeseries.csv', encoding='utf-8', index=False)
+        #df = pd.DataFrame([data['features']])
+        #df.to_csv('gettimeseries.csv', encoding='utf-8', index=False)
+        
 
     return data
 
@@ -275,10 +362,10 @@ def getsubset_get(start_time, end_time, subsetpolygon=None, format=None):  # noq
         print(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
 
         end = time.time()
-        data = format_json_subset(cur, polygon, True, round((end - start) * 1000, 3))
+        data = format_subset_csv(cur, polygon, True, round((end - start) * 1000, 3))
 
-        df = pd.DataFrame([data['features']])
-        df.to_csv('getsubset.csv', encoding='utf-8', index=False)
+        #df = pd.DataFrame([data['features']])
+        #df.to_csv('getsubset.csv', encoding='utf-8', index=False)
 
     return data
 

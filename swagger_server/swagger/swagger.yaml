@@ -15,7 +15,7 @@ security:
   - read
   - write
 paths:
-  /Gettimeseries:
+  /timeseries:
     get:
       summary: "Get Timeseries for a particular Reach, Node, or LakeID"
       description: "Get Timeseries for a particular Reach, Node, or LakeID"
@@ -59,16 +59,6 @@ paths:
           type: string
           format: date-time
         example: 2023-02-24T12:59:59Z
-      - name: cycleavg
-        in: query
-        description: Perform cycle average on the time series
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: boolean
-          default: false
-        example: "true"
       - name: format
         in: query
         description: Format of the data returned
@@ -77,14 +67,21 @@ paths:
         explode: true
         schema:
           type: string
+          enum: [ "csv", "json", "geojson"]
           default: csv
         example: csv
       responses:
         "200":
           description: OK
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
       security: []
       x-openapi-router-controller: swagger_server.controllers.default_controller
-  /Getsubset:
+  /timeseriesSubset:
     get:
       summary: Subset by time series for a given spatial region
       description: "Get Timeseries for a particular Reach, Node, or LakeID"
@@ -127,11 +124,18 @@ paths:
         explode: true
         schema:
           type: string
+          enum: [ "csv", "json", "geojson"]
           default: csv
         example: csv
       responses:
         "200":
           description: OK
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
       security: []
       x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
