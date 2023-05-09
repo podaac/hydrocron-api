@@ -269,11 +269,19 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None
         feature_id = "73254700251"
     if (feature == "Reach"): 
         feature = "reach"
-    if (start_time == "2022-08-09T00:00:00+00:00"):
-        start_time = "2022-08-09 10:15:33"
-    if (end_time == "2022-08-09T12:59:59+00:00"):
-        end_time = "2022-08-09 10:16:38"
+    '''
+    if (start_time == "2022-08-04T00:00:00+00:00"):
+        start_time = "2022-08-04 10:15:33"
+    if (end_time == "2022-08-22T12:59:59+00:00"):
+        end_time = "2022-08-22 10:16:38"
+    '''
     
+    print(feature_id)
+    print(feature)
+    print(start_time)
+    print(end_time)
+    print(fileFormat)
+
 
     start_time = start_time.replace("T"," ")[0:19]
     end_time = end_time.replace("T"," ")[0:19]
@@ -294,7 +302,12 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None
 
     with conn.cursor() as cur:
         start = time.time()
-        print(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        print(datetime.fromtimestamp(float(et)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
+        print(datetime.fromtimestamp(float(st)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
+        print(datetime.fromtimestamp(float(0)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
+        print(datetime.fromtimestamp(float(714511643)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
+        print('714511643.8')
+        print(f"select * from {feature} where reach_id = {feature_id} and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
         cur.execute(f"select * from {feature} where reach_id = {feature_id} and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
 
         end = time.time()
@@ -358,10 +371,12 @@ def getsubset_get(subsetpolygon, start_time, end_time, fileFormat=None):  # noqa
         }
         '''
 
-    if (start_time == "2022-08-09T00:00:00+00:00"):
-        start_time = "2022-08-09 10:15:33"
-    if (end_time == "2022-08-09T12:59:59+00:00"):
-        end_time = "2022-08-09 10:16:38"
+    '''
+    if (start_time == "2022-08-04T00:00:00+00:00"):
+        start_time = "2022-08-04 10:15:33"
+    if (end_time == "2022-08-22T12:59:59+00:00"):
+        end_time = "2022-08-22 10:16:38"
+    '''
     
     # TODO: Nodes and Lakes
     feature = "reach"

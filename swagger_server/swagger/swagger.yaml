@@ -48,7 +48,7 @@ paths:
         schema:
           type: string
           format: date-time
-        example: 2022-08-09T00:00:00Z
+        example: 2022-08-04T00:00:00Z
       - name: endTime
         in: query
         description: End time of the timeseries
@@ -58,7 +58,7 @@ paths:
         schema:
           type: string
           format: date-time
-        example: 2022-08-09T12:59:59Z
+        example: 2022-08-23T00:00:00Z
       - name: fileFormat
         in: query
         description: Format of the data returned
@@ -105,7 +105,7 @@ paths:
         schema:
           type: string
           format: date-time
-        example: 2022-08-09T00:00:00Z
+        example: 2022-08-04T00:00:00Z
       - name: endTime
         in: query
         description: End time of the timeseries
@@ -115,7 +115,7 @@ paths:
         schema:
           type: string
           format: date-time
-        example: 2022-08-09T12:59:59Z
+        example: 2022-08-23T00:00:00Z
       - name: fileFormat
         in: query
         description: Format of the data returned
