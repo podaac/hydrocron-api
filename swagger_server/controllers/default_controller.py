@@ -269,9 +269,9 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None
         feature_id = "73254700251"
     if (feature == "Reach"): 
         feature = "reach"
-    if (start_time == "2023-02-24T00:00:00+00:00"):
+    if (start_time == "2022-08-09T00:00:00+00:00"):
         start_time = "2022-08-09 10:15:33"
-    if (end_time == "2023-02-24T12:59:59+00:00"):
+    if (end_time == "2022-08-09T12:59:59+00:00"):
         end_time = "2022-08-09 10:16:38"
     
 
@@ -299,9 +299,6 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None
 
         end = time.time()
         data = format_json(cur, feature_id, True, round((end - start) * 1000, 3))
-
-        #df = pd.DataFrame([data['features']])
-        #df.to_csv('gettimeseries.csv', encoding='utf-8', index=False)
         
 
     return data
@@ -327,7 +324,6 @@ def getsubset_get(subsetpolygon, start_time, end_time, fileFormat=None):  # noqa
 
 
     # If I'm too lazy to type in the UI
-    print(subsetpolygon)
     if (subsetpolygon == '[]'):
         #subsetpolygon = '{"type":"Polygon","coordinates":[[[-84.40150919561162, 30.476522188737036], [-84.44783281318452, 30.476522188737036], [-84.44783281318452, 30.45876696478751], [-84.40150919561162, 30.45876696478751] ]]}'
         #subsetpolygon = '{"type":"Polygon","coordinates":[[[-100.0, -100], [100.0, 100.0], [100.0, -100.0], [-100.0, 100.0] ]]}'
@@ -362,9 +358,9 @@ def getsubset_get(subsetpolygon, start_time, end_time, fileFormat=None):  # noqa
         }
         '''
 
-    if (start_time == "2023-02-24T00:00:00+00:00"):
+    if (start_time == "2022-08-09T00:00:00+00:00"):
         start_time = "2022-08-09 10:15:33"
-    if (end_time == "2023-02-24T12:59:59+00:00"):
+    if (end_time == "2022-08-09T12:59:59+00:00"):
         end_time = "2022-08-09 10:16:38"
     
     # TODO: Nodes and Lakes
@@ -399,9 +395,6 @@ def getsubset_get(subsetpolygon, start_time, end_time, fileFormat=None):  # noqa
 
         end = time.time()
         data = format_subset_json(cur, polygon, True, round((end - start) * 1000, 3))
-
-        #df = pd.DataFrame([data['features']])
-        #df.to_csv('getsubset.csv', encoding='utf-8', index=False)
 
     return data
 
