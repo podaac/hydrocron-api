@@ -8,12 +8,6 @@ servers:
 - url: https://virtserver.swaggerhub.com/hydrocron/HydroAPI/1.0.0
   description: "Get time series data from SWOT observations for reaches, nodes, and/or\
     \ lakes"
-- url: https://hdyroapi.swot.podaac/HydroAPI/1.0.0
-  description: SwaggerHub API Auto Mocking
-security:
-- application:
-  - read
-  - write
 paths:
   /timeseries:
     get:
@@ -79,7 +73,6 @@ paths:
                 type: array
                 items:
                   type: string
-      security: []
       x-openapi-router-controller: swagger_server.controllers.default_controller
   /timeseriesSubset:
     get:
@@ -136,7 +129,6 @@ paths:
                 type: array
                 items:
                   type: string
-      security: []
       x-openapi-router-controller: swagger_server.controllers.default_controller
 components:
   schemas: {}
