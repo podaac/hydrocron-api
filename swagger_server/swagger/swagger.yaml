@@ -23,6 +23,7 @@ paths:
         explode: true
         schema:
           type: string
+          enum: [ "Reach", "Lake", "Node"]
         example: Reach
       - name: featureID
         in: query

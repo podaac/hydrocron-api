@@ -308,7 +308,7 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output):  # noq
         print(datetime.fromtimestamp(float(0)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print(datetime.fromtimestamp(float(714511643)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print('714511643.8')
-        print(f"select * from {feature} where reach_id like %{feature_id}% and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        print(f"select * from {feature} where reach_id like '%{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
         cur.execute(f"select * from {feature} where reach_id like '%{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
 
         end = time.time()
