@@ -242,7 +242,7 @@ def format_subset_csv(cur, polygon, exact, time):
 
     return csv
 
-def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None):  # noqa: E501
+def gettimeseries_get(feature, feature_id, start_time, end_time, output):  # noqa: E501
     """Get Timeseries for a particular Reach, Node, or LakeID
 
     Get Timeseries for a particular Reach, Node, or LakeID # noqa: E501
@@ -257,8 +257,8 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None
     :type end_time: str
     :param cycleavg: Perform cycle average on the time series
     :type cycleavg: bool
-    :param format: Format of the data returned
-    :type format: str
+    :param output: Format of the data returned
+    :type output: str
 
     :rtype: None
     """
@@ -280,7 +280,8 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None
     print(feature)
     print(start_time)
     print(end_time)
-    print(fileFormat)
+    #print(fileType)
+    print(output)
 
 
     start_time = start_time.replace("T"," ")[0:19]
@@ -307,18 +308,23 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, fileFormat=None
         print(datetime.fromtimestamp(float(0)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print(datetime.fromtimestamp(float(714511643)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print('714511643.8')
-        print(f"select * from {feature} where reach_id = {feature_id} and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
-        cur.execute(f"select * from {feature} where reach_id = {feature_id} and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        print(f"select * from {feature} where reach_id like %{feature_id}% and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        cur.execute(f"select * from {feature} where reach_id like '%{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
 
         end = time.time()
-        data = format_json(cur, feature_id, True, round((end - start) * 1000, 3))
+
+        data = ""
+        if (output == 'geojson'):
+            data = format_json(cur, feature_id, True, round((end - start) * 1000, 3))
+        if (output == 'csv'):
+            data = format_csv(cur, feature_id, True, round((end - start) * 1000, 3))
         
 
     return data
 
 
 
-def getsubset_get(subsetpolygon, start_time, end_time, fileFormat=None):  # noqa: E501
+def getsubset_get(subsetpolygon, start_time, end_time, output):  # noqa: E501
     """Subset by time series for a given spatial region
 
     Get Timeseries for a particular Reach, Node, or LakeID # noqa: E501
@@ -370,18 +376,11 @@ def getsubset_get(subsetpolygon, start_time, end_time, fileFormat=None):  # noqa
           "type": "FeatureCollection"
         }
         '''
-
-    '''
-    if (start_time == "2022-08-04T00:00:00+00:00"):
-        start_time = "2022-08-04 10:15:33"
-    if (end_time == "2022-08-22T12:59:59+00:00"):
-        end_time = "2022-08-22 10:16:38"
-    '''
     
     # TODO: Nodes and Lakes
     feature = "reach"
     print(subsetpolygon)
-    print(fileFormat)
+    print(output)
 
     polygon = Polygon(json.loads(subsetpolygon)['features'][0]['geometry']['coordinates'])
 
@@ -409,7 +408,11 @@ def getsubset_get(subsetpolygon, start_time, end_time, fileFormat=None):  # noqa
         cur.execute(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
 
         end = time.time()
-        data = format_subset_json(cur, polygon, True, round((end - start) * 1000, 3))
+        data = ""
+        if (output == 'geojson'):
+            data = format_subset_json(cur, polygon, True, round((end - start) * 1000, 3))
+        if (output == 'csv'):
+            data = format_subset_csv(cur, polygon, True, round((end - start) * 1000, 3))
 
     return data
 

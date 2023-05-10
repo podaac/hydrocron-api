@@ -24,7 +24,7 @@ paths:
       - name: feature
         in: query
         description: Data requested for Reach or Node or Lake
-        required: true
+        required: false
         style: form
         explode: true
         schema:
@@ -32,13 +32,13 @@ paths:
         example: Reach
       - name: featureID
         in: query
-        description: ID of the feature to retrieve
+        description: ID of the feature to retrieve in format CBBTTTSNNNNNN
         required: true
         style: form
         explode: true
         schema:
           type: string
-        example: CBBTTTSNNNNNN
+        example: 73254700251
       - name: startTime
         in: query
         description: Start time of the timeseries
@@ -59,7 +59,7 @@ paths:
           type: string
           format: date-time
         example: 2022-08-23T00:00:00Z
-      - name: fileFormat
+      - name: output
         in: query
         description: Format of the data returned
         required: false
@@ -67,7 +67,7 @@ paths:
         explode: true
         schema:
           type: string
-          enum: [ "csv", "json", "geojson"]
+          enum: [ "csv", "geojson"]
           default: csv
         example: csv
       responses:
@@ -95,7 +95,7 @@ paths:
         explode: true
         schema:
           type: string
-        example: "[]"
+        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575], [-83.767, 33.533]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
       - name: startTime
         in: query
         description: Start time of the timeseries
@@ -116,7 +116,7 @@ paths:
           type: string
           format: date-time
         example: 2022-08-23T00:00:00Z
-      - name: fileFormat
+      - name: output
         in: query
         description: Format of the data returned
         required: false
@@ -124,7 +124,7 @@ paths:
         explode: true
         schema:
           type: string
-          enum: [ "csv", "json", "geojson"]
+          enum: [ "csv", "geojson"]
           default: csv
         example: csv
       responses:
