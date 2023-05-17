@@ -63,8 +63,18 @@ paths:
         schema:
           type: string
           enum: [ "csv", "geojson"]
-          default: csv
-        example: csv
+          default: geojson
+        example: geojson
+      - name: fields
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: feature_id, time_str, wse, geometry
+        example: feature_id, time_str, wse, geometry
       responses:
         "200":
           description: OK
@@ -119,8 +129,18 @@ paths:
         schema:
           type: string
           enum: [ "csv", "geojson"]
-          default: csv
-        example: csv
+          default: geojson
+        example: geojson
+      - name: fields
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: feature_id, time_str, wse, geometry
+        example: feature_id, time_str, wse, geometry
       responses:
         "200":
           description: OK

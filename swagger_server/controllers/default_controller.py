@@ -88,7 +88,7 @@ def format_json(cur, feature_id, exact, time):
 
     return data
 
-def format_csv(cur, feature_id, exact, time):
+def format_csv(cur, feature_id, exact, time, fields):
     """
 
     Parameters
@@ -107,23 +107,41 @@ def format_csv(cur, feature_id, exact, time):
 
     data = {}
 
+    print(fields)
     if results is None:
         data['error'] = f"404: Results with the specified Feature ID {feature_id} were not found."
     elif len(results) > 5750000:
         data['error'] = f'413: Query exceeds 6MB with {int(len(results.split(",")))} hits.'
 
     else:
-        csv = "reach_id, time_str, wse, geometry\n"
+        #csv = "reach_id, time_str, wse, geometry\n"
+        csv = fields + '\n'
+        fieldsSet = fields.split(", ")
+        print(fieldsSet)
+        if 'time_str' in fieldsSet:
+            print('yes1 time_str')
         for t in results:
             if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
-                csv += t['reach_id']
-                csv += ','
-                csv += t['time_str']
-                csv += ','
-                csv += t['wse']
-                csv += ','
-                csv += t['geometry'].replace('; ',', ')
+                if 'feature_id' in fieldsSet:
+                    print('yes reach_id')
+                    csv += t['reach_id']
+                    csv += ','
+                    print(csv)
+                if 'time_str' in fieldsSet:
+                    print('yes time_str')
+                    csv += t['time_str']
+                    csv += ','
+                    print(csv)
+                if 'wse' in fieldsSet:
+                    csv += t['wse']
+                    csv += ','
+                    print(csv)
+                if 'geometry' in fieldsSet:
+                    csv += t['geometry'].replace('; ',', ')
+                    csv += ','
+                    print(csv)
                 csv += '\n'
+                print(csv)
 
     return csv
 
@@ -171,6 +189,7 @@ def format_subset_json(cur, polygon, exact, time):
                 feature['type'] = "Feature"
                 feature['geometry']['type'] = "LineString"
                 feature['geometry']['coordinates'] = []
+                '''
                 geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
                 for p in geometry.split("; "):
                     (x, y) = p.split(" ")
@@ -183,6 +202,18 @@ def format_subset_json(cur, polygon, exact, time):
                         feature['properties']['slope'] = float(t['slope'])
                         flag_polygon = True
                 if (flag_polygon):
+                '''
+                point = Point(float(t['p_lon']), float(t['p_lat']))
+                if polygon.contains(point):
+                    geometry = t['geometry'].replace('"LINESTRING (', '').replace(')"', '')
+                    for p in geometry.split("; "):
+                        (x, y) = p.split(" ")
+                        feature['geometry']['coordinates'].append([float(x), float(y)])
+                        feature['properties']['time'] = datetime.fromtimestamp(
+                            float(t['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
+                        feature['properties']['reach_id'] = float(t['reach_id'])
+                        feature['properties']['wse'] = float(t['wse'])
+                        feature['properties']['slope'] = float(t['slope'])
                     data['features'].append(feature)
                     print(str(i)+"/"+str(total))
                     i += 1
@@ -192,7 +223,7 @@ def format_subset_json(cur, polygon, exact, time):
 
 
 
-def format_subset_csv(cur, polygon, exact, time):
+def format_subset_csv(cur, polygon, exact, time, fields):
     """
 
     Parameters
@@ -217,32 +248,38 @@ def format_subset_csv(cur, polygon, exact, time):
         data['error'] = f'413: Query exceeds 6MB with {int(len(results.split(",")))} hits.'
 
     else:
-
-
-
-        csv = "reach_id, time_str, wse, geometry\n"
+        csv = fields + '\n'
+        fieldsSet = fields.split(", ")
+        print(fieldsSet)
         for t in results:
             flag_polygon = False
             if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
-                geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
-                for p in geometry.split("; "):
-                    (x, y) = p.split(" ")
-                    point = Point(x, y)
-                    if (polygon.contains(point)):
-                        flag_polygon = True
-                if (flag_polygon):
-                    csv += t['reach_id']
-                    csv += ','
-                    csv += t['time_str']
-                    csv += ','
-                    csv += t['wse']
-                    csv += ','
-                    csv += t['geometry'].replace('; ',', ')
+                point = Point(float(t['p_lon']), float(t['p_lat']))
+                if polygon.contains(point):
+                    if 'feature_id' in fieldsSet:
+                        print('yes reach_id')
+                        csv += t['reach_id']
+                        csv += ','
+                        print(csv)
+                    if 'time_str' in fieldsSet:
+                        print('yes time_str')
+                        csv += t['time_str']
+                        csv += ','
+                        print(csv)
+                    if 'wse' in fieldsSet:
+                        csv += t['wse']
+                        csv += ','
+                        print(csv)
+                    if 'geometry' in fieldsSet:
+                        csv += t['geometry'].replace('; ',', ')
+                        csv += ','
+                        print(csv)
                     csv += '\n'
+        print(csv)
 
     return csv
 
-def gettimeseries_get(feature, feature_id, start_time, end_time, output):  # noqa: E501
+def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields):  # noqa: E501
     """Get Timeseries for a particular Reach, Node, or LakeID
 
     Get Timeseries for a particular Reach, Node, or LakeID # noqa: E501
@@ -308,8 +345,8 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output):  # noq
         print(datetime.fromtimestamp(float(0)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print(datetime.fromtimestamp(float(714511643)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print('714511643.8')
-        print(f"select * from {feature} where reach_id like '%{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
-        cur.execute(f"select * from {feature} where reach_id like '%{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        print(f"select * from {feature} where reach_id like '{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        cur.execute(f"select * from {feature} where reach_id like '{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
 
         end = time.time()
 
@@ -317,14 +354,14 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output):  # noq
         if (output == 'geojson'):
             data = format_json(cur, feature_id, True, round((end - start) * 1000, 3))
         if (output == 'csv'):
-            data = format_csv(cur, feature_id, True, round((end - start) * 1000, 3))
+            data = format_csv(cur, feature_id, True, round((end - start) * 1000, 3), fields)
         
 
     return data
 
 
 
-def getsubset_get(subsetpolygon, start_time, end_time, output):  # noqa: E501
+def getsubset_get(subsetpolygon, start_time, end_time, output, fields):  # noqa: E501
     """Subset by time series for a given spatial region
 
     Get Timeseries for a particular Reach, Node, or LakeID # noqa: E501
@@ -412,7 +449,7 @@ def getsubset_get(subsetpolygon, start_time, end_time, output):  # noqa: E501
         if (output == 'geojson'):
             data = format_subset_json(cur, polygon, True, round((end - start) * 1000, 3))
         if (output == 'csv'):
-            data = format_subset_csv(cur, polygon, True, round((end - start) * 1000, 3))
+            data = format_subset_csv(cur, polygon, True, round((end - start) * 1000, 3), fields)
 
     return data
 
