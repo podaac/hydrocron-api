@@ -71,15 +71,29 @@ def format_json(cur, feature_id, exact, time):
                 feature['properties'] = {}
                 feature['geometry'] = {}
                 feature['type'] = "Feature"
-                feature['geometry']['type'] = "LineString"
                 feature['geometry']['coordinates'] = []
-                geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
+                type = ''
+                if 'POINT' in t['geometry']:
+                    geometry = t['geometry'].replace('POINT (', '').replace(')', '')
+                    geometry = geometry.replace('"', '')
+                    geometry = geometry.replace("'", "")
+                    type = 'Point'
+                if 'LINESTRING' in t['geometry']:
+                    geometry = t['geometry'].replace('"LINESTRING (', '').replace(')"', '')
+                    geometry = geometry.replace('"', '')
+                    geometry = geometry.replace("'", "")
+                    type = 'LineString'
+                feature['geometry']['type'] = type
+                print(geometry)
                 for p in geometry.split("; "):
                     (x, y) = p.split(" ")
-                    feature['geometry']['coordinates'].append([float(x),float(y)])
+                    if type == 'LineString':
+                        feature['geometry']['coordinates'].append([float(x), float(y)])
+                    if type == 'Point':
+                        feature['geometry']['coordinates'] = [float(x), float(y)]
                 i += 1
                 feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
-                feature['properties']['reach_id'] = float(t['reach_id'])
+                feature['properties']['feature_id'] = float(t['reach_id'])
                 feature['properties']['wse'] = float(t['wse'])
                 feature['properties']['slope'] = float(t['slope'])
                 data['features'].append(feature)
@@ -211,7 +225,7 @@ def format_subset_json(cur, polygon, exact, time):
                         feature['geometry']['coordinates'].append([float(x), float(y)])
                         feature['properties']['time'] = datetime.fromtimestamp(
                             float(t['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
-                        feature['properties']['reach_id'] = float(t['reach_id'])
+                        feature['properties']['feature_id'] = float(t['reach_id'])
                         feature['properties']['wse'] = float(t['wse'])
                         feature['properties']['slope'] = float(t['slope'])
                     data['features'].append(feature)
