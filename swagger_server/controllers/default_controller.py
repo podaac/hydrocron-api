@@ -93,7 +93,7 @@ def format_json(cur, feature_id, exact, time):
                         feature['geometry']['coordinates'] = [float(x), float(y)]
                 i += 1
                 feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
-                feature['properties']['feature_id'] = float(t['reach_id'])
+                feature['properties']['feature_id'] = float(t['feature_id'])
                 feature['properties']['wse'] = float(t['wse'])
                 feature['properties']['slope'] = float(t['slope'])
                 data['features'].append(feature)
@@ -128,7 +128,7 @@ def format_csv(cur, feature_id, exact, time, fields):
         data['error'] = f'413: Query exceeds 6MB with {int(len(results.split(",")))} hits.'
 
     else:
-        #csv = "reach_id, time_str, wse, geometry\n"
+        #csv = "feature_id, time_str, wse, geometry\n"
         csv = fields + '\n'
         fieldsSet = fields.split(", ")
         print(fieldsSet)
@@ -137,8 +137,8 @@ def format_csv(cur, feature_id, exact, time, fields):
         for t in results:
             if ((t['time'] != '-999999999999')): #and (t['width'] != '-999999999999')):
                 if 'feature_id' in fieldsSet:
-                    print('yes reach_id')
-                    csv += t['reach_id']
+                    print('yes feature_id')
+                    csv += t['feature_id']
                     csv += ','
                     print(csv)
                 if 'time_str' in fieldsSet:
@@ -201,7 +201,6 @@ def format_subset_json(cur, polygon, exact, time):
                 feature['properties'] = {}
                 feature['geometry'] = {}
                 feature['type'] = "Feature"
-                feature['geometry']['type'] = "LineString"
                 feature['geometry']['coordinates'] = []
                 '''
                 geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
@@ -211,7 +210,7 @@ def format_subset_json(cur, polygon, exact, time):
                     if (polygon.contains(point)):
                         feature['geometry']['coordinates'].append([float(x),float(y)])
                         feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
-                        feature['properties']['reach_id'] = float(t['reach_id'])
+                        feature['properties']['feature_id'] = float(t['feature_id'])
                         feature['properties']['wse'] = float(t['wse'])
                         feature['properties']['slope'] = float(t['slope'])
                         flag_polygon = True
@@ -219,18 +218,71 @@ def format_subset_json(cur, polygon, exact, time):
                 '''
                 point = Point(float(t['p_lon']), float(t['p_lat']))
                 if polygon.contains(point):
-                    geometry = t['geometry'].replace('"LINESTRING (', '').replace(')"', '')
-                    for p in geometry.split("; "):
-                        (x, y) = p.split(" ")
-                        feature['geometry']['coordinates'].append([float(x), float(y)])
-                        feature['properties']['time'] = datetime.fromtimestamp(
-                            float(t['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
-                        feature['properties']['feature_id'] = float(t['reach_id'])
+                    print('---------')
+                    print(t['geometry'])
+                    type = ''
+                    if 'POINT' in t['geometry']:
+                        geometry = t['geometry'].replace('POINT (', '').replace(')', '')
+                        geometry = geometry.replace('"', '')
+                        geometry = geometry.replace("'", "")
+                        type = 'Point'
+                    if 'LINESTRING' in t['geometry']:
+                        geometry = t['geometry'].replace('"LINESTRING (', '').replace(')"', '')
+                        geometry = geometry.replace('"', '')
+                        geometry = geometry.replace("'", "")
+                        type = 'LineString'
+
+                    print(type)
+                    feature['geometry']['type'] = type
+                    if type == 'LineString':
+                        for p in geometry.split("; "):
+                            (x, y) = p.split(" ")
+                            feature['geometry']['coordinates'].append([float(x), float(y)])
+                            feature['properties']['time'] = datetime.fromtimestamp(
+                                float(t['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
+                            feature['properties']['feature_id'] = float(t['feature_id'])
+                            feature['properties']['wse'] = float(t['wse'])
+
+                    if type == 'Point':
+                        feature['geometry']['coordinates'] = [float(t['p_lon']), float(t['p_lat'])]
+                        feature['properties']['time'] = datetime.fromtimestamp(float(t['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
+                        feature['properties']['feature_id'] = float(t['feature_id'])
                         feature['properties']['wse'] = float(t['wse'])
-                        feature['properties']['slope'] = float(t['slope'])
+
                     data['features'].append(feature)
                     print(str(i)+"/"+str(total))
                     i += 1
+
+                '''
+                point = Point(float(t['p_lon']), float(t['p_lat']))
+                if polygon.contains(point):
+                    type = ''
+                    if 'POINT' in t['geometry']:
+                        type = 'Point'
+                    if 'LINESTRING' in t['geometry']:
+                        type = 'LineString'
+                    feature['geometry']['type'] = type
+
+
+                    if type == 'LineString':
+                        feature['geometry']['coordinates'].append([float(t['p_lon']), float(t['p_lat'])])
+                    if type == 'Point':
+                        feature['geometry']['coordinates'] = [float(t['p_lon']), float(t['p_lat'])]
+
+                    feature['properties']['time'] = datetime.fromtimestamp(
+                        float(t['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
+                    feature['properties']['feature_id'] = float(t['feature_id'])
+                    feature['properties']['wse'] = float(t['wse'])
+                    #feature['properties']['slope'] = float(t['slope'])
+                    data['features'].append(feature)
+                    print(str(i)+"/"+str(total))
+                    i += 1
+                '''
+
+
+
+
+
         data['hits'] = i
 
     return data
@@ -271,8 +323,8 @@ def format_subset_csv(cur, polygon, exact, time, fields):
                 point = Point(float(t['p_lon']), float(t['p_lat']))
                 if polygon.contains(point):
                     if 'feature_id' in fieldsSet:
-                        print('yes reach_id')
-                        csv += t['reach_id']
+                        print('yes feature_id')
+                        csv += t['feature_id']
                         csv += ','
                         print(csv)
                     if 'time_str' in fieldsSet:
@@ -316,11 +368,11 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
 
 
     # If I'm too lazy to type in the UI
+    '''
     if (feature_id == "CBBTTTSNNNNNN"):
         feature_id = "73254700251"
     if (feature == "Reach"): 
         feature = "reach"
-    '''
     if (start_time == "2022-08-04T00:00:00+00:00"):
         start_time = "2022-08-04 10:15:33"
     if (end_time == "2022-08-22T12:59:59+00:00"):
@@ -359,8 +411,14 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
         print(datetime.fromtimestamp(float(0)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print(datetime.fromtimestamp(float(714511643)+946710000).strftime("%Y-%m-%d %H:%M:%S"))
         print('714511643.8')
-        print(f"select * from {feature} where reach_id like '{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
-        cur.execute(f"select * from {feature} where reach_id like '{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        print('74297700000000')
+        print(feature)
+        limit = ''
+        if (feature == 'Node'):
+            limit = 'limit 1'
+        print(limit)
+        print(f"select * from {feature} where feature_id like '{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' {limit}"        )
+        cur.execute(f"select * from {feature} where feature_id like '{feature_id}%' and cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' {limit}"        )
 
         end = time.time()
 
@@ -375,7 +433,7 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
 
 
 
-def getsubset_get(subsetpolygon, start_time, end_time, output, fields):  # noqa: E501
+def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):  # noqa: E501
     """Subset by time series for a given spatial region
 
     Get Timeseries for a particular Reach, Node, or LakeID # noqa: E501
@@ -401,7 +459,11 @@ def getsubset_get(subsetpolygon, start_time, end_time, output, fields):  # noqa:
         #subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575], [-83.767, 33.533]],"type": "Polygon"},"properties": {}}],"type": "FeatureCollection"}'
         #subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-85, 40], [-80, 40], [-80, 25], [-85, 30], [-85, 40]],"type": "Polygon"},"properties": {}}],"type": "FeatureCollection"}'
         #subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-125, 40], [-110, 40], [-105, 30], [-120, 30], [-125, 40]],"type": "Polygon"},"properties": {}}],"type": "FeatureCollection"}'
-        subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575], [-83.767, 33.533]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+        #subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575], [-83.767, 33.533]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+
+        #subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575], [-83.767, 33.533]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+        #subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-102.05255374863124,48.29088502467528],[-100.05255374863124,48.29088502467528],[-100.05255374863124,46.29088502467528],[-102.05255374863124,46.29088502467528],[-102.05255374863124,48.29088502467528]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+
         #subsetpolygon = '{"features": [{"type": "Feature","geometry": {"coordinates": [[-84.767, 34.533], [-82.202, 34.533], [-82.202, 32.575], [-84.767, 32.575], [-84.767, 34.533]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
 
         '''
@@ -429,7 +491,8 @@ def getsubset_get(subsetpolygon, start_time, end_time, output, fields):  # noqa:
         '''
     
     # TODO: Nodes and Lakes
-    feature = "reach"
+    #feature = "Node"
+    #feature = "Reach"
     print(subsetpolygon)
     print(output)
 

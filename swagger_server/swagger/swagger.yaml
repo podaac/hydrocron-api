@@ -115,6 +115,16 @@ paths:
       description: "Get Timeseries for a particular Reach, Node, or LakeID"
       operationId: getsubset_get
       parameters:
+      - name: feature
+        in: query
+        description: Data requested for Reach or Node or Lake
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum: [ "Reach", "Lake", "Node"]
+        example: Reach
       - name: subsetpolygon
         in: query
         description: GEOJSON of the subset area
@@ -123,7 +133,7 @@ paths:
         explode: true
         schema:
           type: string
-        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-83.767, 33.533], [-83.202, 33.533], [-83.202, 32.575], [-83.767, 32.575], [-83.767, 33.533]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-102.05255374863124,48.29088502467528],[-100.05255374863124,48.29088502467528],[-100.05255374863124,46.29088502467528],[-102.05255374863124,46.29088502467528],[-102.05255374863124,48.29088502467528]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
       - name: startTime
         in: query
         description: Start time of the timeseries
