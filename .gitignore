@@ -64,4 +64,4 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
-swagger_server/controllers/__pycache__/
+podaac/controllers/__pycache__/

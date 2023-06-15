@@ -108,7 +108,7 @@ paths:
                 type: array
                 items:
                   type: string
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: podaac.controllers.default_controller
   /timeseriesSubset:
     get:
       summary: Subset by time series for a given spatial region
@@ -208,7 +208,7 @@ paths:
                 type: array
                 items:
                   type: string
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: podaac.controllers.default_controller
 components:
   schemas: {}
   securitySchemes:
@@ -220,6 +220,6 @@ components:
           scopes:
             write: allows modifying resources
             read: allows reading resources
-      x-tokenInfoFunc: swagger_server.controllers.authorization_controller.check_application
-      x-scopeValidateFunc: swagger_server.controllers.authorization_controller.validate_scope_application
+      x-tokenInfoFunc: podaac.controllers.authorization_controller.check_application
+      x-scopeValidateFunc: podaac.controllers.authorization_controller.validate_scope_application
 

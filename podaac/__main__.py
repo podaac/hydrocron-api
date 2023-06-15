@@ -2,7 +2,7 @@
 
 import connexion
 
-from swagger_server import encoder
+from podaac import encoder
 
 
 def main():
