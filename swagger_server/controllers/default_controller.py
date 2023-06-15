@@ -218,8 +218,6 @@ def format_subset_json(cur, polygon, exact, time):
                 '''
                 point = Point(float(t['p_lon']), float(t['p_lat']))
                 if polygon.contains(point):
-                    print('---------')
-                    print(t['geometry'])
                     type = ''
                     if 'POINT' in t['geometry']:
                         geometry = t['geometry'].replace('POINT (', '').replace(')', '')
@@ -232,7 +230,6 @@ def format_subset_json(cur, polygon, exact, time):
                         geometry = geometry.replace("'", "")
                         type = 'LineString'
 
-                    print(type)
                     feature['geometry']['type'] = type
                     if type == 'LineString':
                         for p in geometry.split("; "):
@@ -282,7 +279,7 @@ def format_subset_json(cur, polygon, exact, time):
 
 
 
-
+        print('fin')
         data['hits'] = i
 
     return data
@@ -379,12 +376,6 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
         end_time = "2022-08-22 10:16:38"
     '''
     
-    print(feature_id)
-    print(feature)
-    print(start_time)
-    print(end_time)
-    #print(fileType)
-    print(output)
 
 
     start_time = start_time.replace("T"," ")[0:19]
@@ -518,8 +509,11 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
     with conn.cursor() as cur:
         start = time.time()
         # TODO: Expand to nodes and lakes
-        print(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
-        cur.execute(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' "        )
+        limit = ''
+        if (feature == 'Node'):
+            limit = 'limit 1'
+        print(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' {limit}"        )
+        cur.execute(f"select * from {feature} where cast(time as float) >= '{str(st)}' and cast(time as float) <= '{str(et)}' {limit}"        )
 
         end = time.time()
         data = ""
@@ -528,5 +522,6 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
         if (output == 'csv'):
             data = format_subset_csv(cur, polygon, True, round((end - start) * 1000, 3), fields)
 
+        print('fin cur')
     return data
 

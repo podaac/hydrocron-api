@@ -27,7 +27,7 @@ paths:
         example: Reach
       - name: featureID
         in: query
-        description: ID of the feature to retrieve in format CBBTTTSNNNNNN
+        description: ID of the feature to retrieve in format CBBTTTSNNNNNN (i.e. 74297700000000)
         required: true
         style: form
         explode: true
@@ -133,7 +133,7 @@ paths:
         explode: true
         schema:
           type: string
-        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-102.05255374863124,48.29088502467528],[-100.05255374863124,48.29088502467528],[-100.05255374863124,46.29088502467528],[-102.05255374863124,46.29088502467528],[-102.05255374863124,48.29088502467528]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-99.85255374863124,41.39088502467528],[-98.05255374863124,41.39088502467528],[-98.05255374863124,38.99088502467528],[-99.85255374863124,38.99088502467528],[-99.85255374863124,41.39088502467528]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
       - name: startTime
         in: query
         description: Start time of the timeseries
