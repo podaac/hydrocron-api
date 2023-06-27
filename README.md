@@ -12,7 +12,6 @@ Python 3.10+
 To run the server, please execute the following from the root directory:
 
 ```
-pip3 install -r requirements.txt
 python3 -m podaac
 ```
 
@@ -26,12 +25,6 @@ Your Swagger definition lives here:
 
 ```
 http://localhost:8080/hydrocron/HydroAPI/1.0.0/swagger.json
-```
-
-To launch the integration tests, use tox:
-```
-sudo pip install tox
-tox
 ```
 
 ## Running with Docker
