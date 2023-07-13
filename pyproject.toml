@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "plotter-cicd"
+name = "hydrocronapi"
 version = "1.0.0a5"
-description = "Python template project"
-authors = ["Vanesa Gomez Gonzalez <vanesa.gomez.gonzalez@jpl.nasa.gov>"]
+description = "OpenAPI access to Time Series data for SWOT features"
+authors = ["PO.DAAC <podaac@jpl.nasa.gov>"]
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/podaac/hydrocron-api"
@@ -10,29 +10,24 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 exclude = ['contrib', 'docs', 'tests']
-packages = [
-    { include = "plotter", from = "src" },
-]
+packages = [ {include = "hydrocronapi"} ]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-
-
-[tool.poetry.dev-dependencies]
-pytest = "~7"
-flake8 = "^3.8"
-pytest-cov = "~4"
-pylint = "~2"
-Sphinx = "^3.3"
-connexion = "^2.14.2"
-python_dateutil = "^2.6.0"
-setuptools = "^67.6.1"
-swagger-ui-bundle = "^0.0.9"
-pymysql = "^1.0.3"
+six = "^1.16.0"
+boto3 = "^1.28.2"
+pymysql = "^1.1.0"
+pandas = "^2.0.3"
 shapely = "^2.0.1"
+connexion = {version = "^2.14.2", extras = ["swagger-ui"]}
+cryptography = "^41.0.2"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+flask-testing = "^0.8.1"
 
 [tool.poetry.scripts]
+hydrocronapi = "hydrocronapi.__main__:__main__"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -1,11 +1,6 @@
 # coding: utf-8
 
-from __future__ import absolute_import
-
-from flask import json
-from six import BytesIO
-
-from podaac.test import BaseTestCase
+from tests import BaseTestCase
 
 
 class TestDefaultController(BaseTestCase):
@@ -21,7 +16,7 @@ class TestDefaultController(BaseTestCase):
                         ('end_time', '2013-10-20T19:20:30+01:00'),
                         ('format', 'csv')]
         response = self.client.open(
-            '/hydrocron/HydroAPI/1.0.0/Getsubset',
+            '/hydrocron/HydroAPI/1.0.0/timeseriesSubset',
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -32,14 +27,13 @@ class TestDefaultController(BaseTestCase):
 
         Get Timeseries for a particular Reach, Node, or LakeID
         """
-        query_string = [('feature', 'feature_example'),
-                        ('feature_id', 'feature_id_example'),
-                        ('cycleavg', false),
+        query_string = [('feature', 'Reach'),
+                        ('featureID', '73254700251'),
                         ('format', 'csv'),
-                        ('start_time', '2013-10-20T19:20:30+01:00'),
-                        ('end_time', '2013-10-20T19:20:30+01:00')]
+                        ('startTime', '2022-08-04T00:00:00+00:00'),
+                        ('endTime', '2022-08-23T00:00:00+00:00')]
         response = self.client.open(
-            '/hydrocron/HydroAPI/1.0.0/Gettimeseries',
+            '/hydrocron/HydroAPI/1.0.0/timeseries',
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -48,4 +42,5 @@ class TestDefaultController(BaseTestCase):
 
 if __name__ == '__main__':
     import unittest
+
     unittest.main()
