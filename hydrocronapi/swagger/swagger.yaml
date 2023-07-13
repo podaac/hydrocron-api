@@ -133,7 +133,7 @@ paths:
         explode: true
         schema:
           type: string
-        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-99.85255374863124,41.39088502467528],[-98.05255374863124,41.39088502467528],[-98.05255374863124,38.99088502467528],[-99.85255374863124,38.99088502467528],[-99.85255374863124,41.39088502467528]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-95.6499095054704,50.323685647314554],[-95.3499095054704,50.323685647314554],[-95.3499095054704,50.19088502467528],[-95.6499095054704,50.19088502467528],[-95.6499095054704,50.323685647314554]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
       - name: start_time
         in: query
         description: Start time of the timeseries

@@ -48,7 +48,7 @@ def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
 
         # write to the table
         hydrocron_reach_table.add_data(**item_attrs)
-    items = hydrocron_reach_table.run_query()
+    items = hydrocron_reach_table.run_query(partition_key='71224100223')
     return items
 
 
@@ -81,7 +81,7 @@ def get_node_series(start_time: datetime, end_time: datetime) -> Generator:
 
         # write to the table
         hydrocron_reach_table.add_data(**item_attrs)
-    items = hydrocron_reach_table.run_query()
+    items = hydrocron_reach_table.run_query(partition_key='71224100223')
     return items
 
 
