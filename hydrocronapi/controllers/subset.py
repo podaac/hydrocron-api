@@ -81,11 +81,10 @@ def format_subset_json(results: Generator, polygon, exact, time):
 
         data['status'] = "200 OK"
         data['time'] = str(time) + " ms."
-        # data['search on'] = {"featureID": feature_id}
+        # data['search on'] = {"feature_id": feature_id}
         data['type'] = "FeatureCollection"
         data['features'] = []
         i = 0
-        print(len(results))
         total = len(results)
         for t in results:
             flag_polygon = False
@@ -118,14 +117,14 @@ def format_subset_json(results: Generator, polygon, exact, time):
                         geometry = geometry.replace("'", "")
                         feature_type = 'Point'
                     if 'LINESTRING' in t['geometry']:
-                        geometry = t['geometry'].replace('"LINESTRING (', '').replace(')"', '')
+                        geometry = t['geometry'].replace('LINESTRING (', '').replace(')', '')
                         geometry = geometry.replace('"', '')
                         geometry = geometry.replace("'", "")
                         feature_type = 'LineString'
 
                     feature['geometry']['type'] = feature_type
                     if feature_type == 'LineString':
-                        for p in geometry.split("; "):
+                        for p in geometry.split(", "):
                             (x, y) = p.split(" ")
                             feature['geometry']['coordinates'].append([float(x), float(y)])
                             feature['properties']['time'] = datetime.fromtimestamp(
@@ -141,10 +140,8 @@ def format_subset_json(results: Generator, polygon, exact, time):
                         feature['properties']['wse'] = float(t['wse'])
 
                     data['features'].append(feature)
-                    print(str(i) + "/" + str(total))
                     i += 1
 
-        print('fin')
         data['hits'] = i
 
     return data
@@ -177,31 +174,23 @@ def format_subset_csv(results: Generator, polygon, exact, time, fields):
     else:
         csv = fields + '\n'
         fields_set = fields.split(", ")
-        print(fields_set)
         for t in results:
             flag_polygon = False
             if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 point = Point(float(t['p_lon']), float(t['p_lat']))
                 if polygon.contains(point):
                     if 'reach_id' in fields_set:
-                        print('yes feature_id')
                         csv += t['reach_id']
                         csv += ','
-                        print(csv)
                     if 'time_str' in fields_set:
-                        print('yes time_str')
                         csv += t['time_str']
                         csv += ','
-                        print(csv)
                     if 'wse' in fields_set:
-                        csv += t['wse']
+                        csv += str(t['wse'])
                         csv += ','
-                        print(csv)
                     if 'geometry' in fields_set:
                         csv += t['geometry'].replace('; ', ', ')
                         csv += ','
-                        print(csv)
                     csv += '\n'
-        print(csv)
 
     return csv
