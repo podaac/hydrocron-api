@@ -1,11 +1,6 @@
 import logging
-import sys
-import time
 from datetime import datetime
 from typing import Generator
-
-import pymysql
-import pymysql.cursors
 
 import boto3
 import json

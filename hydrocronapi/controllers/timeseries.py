@@ -1,6 +1,5 @@
 import logging
 import time
-from time import mktime
 from datetime import datetime
 from typing import Generator
 
@@ -98,11 +97,11 @@ def format_json(results: Generator, feature_id, start_time, end_time, exact, tim
         i = 0
         #st = float(time.mktime(start_time.timetuple()) - 946710000)
         #et = float(time.mktime(end_time.timetuple()) - 946710000)
-        #TODO: feature_id/reach_id (i.e. 71224100223)
+        #TODO: process type of feature_id (i.e. reach_id or node_id)
 
 
         for t in results:
-            #if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
+            #TODO: Coordinate to filter in the database instance: if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
             if t['reach_id'] == feature_id and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
                 feature['geometry']['coordinates'] = []
