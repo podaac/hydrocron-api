@@ -25,7 +25,7 @@ paths:
           type: string
           enum: [ "Reach", "Lake", "Node"]
         example: Reach
-      - name: featureID
+      - name: feature_id
         in: query
         description: ID of the feature to retrieve in format CBBTTTSNNNNNN (i.e. 74297700000000)
         required: true
@@ -33,8 +33,8 @@ paths:
         explode: true
         schema:
           type: string
-        example: 73254700251
-      - name: startTime
+        example: 71224100223
+      - name: start_time
         in: query
         description: Start time of the timeseries
         required: true
@@ -44,7 +44,7 @@ paths:
           type: string
           format: date-time
         example: 2022-08-04T00:00:00Z
-      - name: endTime
+      - name: end_time
         in: query
         description: End time of the timeseries
         required: true
@@ -134,7 +134,7 @@ paths:
         schema:
           type: string
         example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-99.85255374863124,41.39088502467528],[-98.05255374863124,41.39088502467528],[-98.05255374863124,38.99088502467528],[-99.85255374863124,38.99088502467528],[-99.85255374863124,41.39088502467528]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
-      - name: startTime
+      - name: start_time
         in: query
         description: Start time of the timeseries
         required: true
@@ -144,7 +144,7 @@ paths:
           type: string
           format: date-time
         example: 2022-08-04T00:00:00Z
-      - name: endTime
+      - name: end_time
         in: query
         description: End time of the timeseries
         required: true

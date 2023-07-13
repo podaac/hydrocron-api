@@ -1,5 +1,6 @@
 import logging
 import time
+from time import mktime
 from datetime import datetime
 from typing import Generator
 
@@ -57,14 +58,14 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
 
     data = ""
     if output == 'geojson':
-        data = format_json(results, feature_id, True, round((end - start) * 1000, 3))
+        data = format_json(results, feature_id, start_time, end_time, True, round((end - start) * 1000, 3))
     if output == 'csv':
         data = format_csv(results, feature_id, True, round((end - start) * 1000, 3), fields)
 
     return data
 
 
-def format_json(results: Generator, feature_id, exact, time):
+def format_json(results: Generator, feature_id, start_time, end_time, exact, time):
     """
 
     Parameters
@@ -91,13 +92,18 @@ def format_json(results: Generator, feature_id, exact, time):
     else:
         data['status'] = "200 OK"
         data['time'] = str(time) + " ms."
-        # data['search on'] = {"featureID": feature_id}
+        # data['search on'] = {"feature_id": feature_id}
         data['type'] = "FeatureCollection"
         data['features'] = []
         i = 0
-        print(len(results))
+        #st = float(time.mktime(start_time.timetuple()) - 946710000)
+        #et = float(time.mktime(end_time.timetuple()) - 946710000)
+        #TODO: feature_id/reach_id (i.e. 71224100223)
+
+
         for t in results:
-            if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
+            #if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
+            if t['reach_id'] == feature_id and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
                 feature['geometry']['coordinates'] = []
                 feature_type = ''
@@ -107,13 +113,12 @@ def format_json(results: Generator, feature_id, exact, time):
                     geometry = geometry.replace("'", "")
                     feature_type = 'Point'
                 if 'LINESTRING' in t['geometry']:
-                    geometry = t['geometry'].replace('"LINESTRING (', '').replace(')"', '')
+                    geometry = t['geometry'].replace('LINESTRING (', '').replace(')', '')
                     geometry = geometry.replace('"', '')
                     geometry = geometry.replace("'", "")
                     feature_type = 'LineString'
                 feature['geometry']['type'] = feature_type
-                print(geometry)
-                for p in geometry.split("; "):
+                for p in geometry.split(", "):
                     (x, y) = p.split(" ")
                     if feature_type == 'LineString':
                         feature['geometry']['coordinates'].append([float(x), float(y)])
@@ -151,7 +156,6 @@ def format_csv(results: Generator, feature_id, exact, time, fields):
 
     data = {}
 
-    print(fields)
     if results is None:
         data['error'] = f"404: Results with the specified Feature ID {feature_id} were not found."
     elif len(results) > 5750000:
@@ -161,30 +165,20 @@ def format_csv(results: Generator, feature_id, exact, time, fields):
         # csv = "feature_id, time_str, wse, geometry\n"
         csv = fields + '\n'
         fieldsSet = fields.split(", ")
-        print(fieldsSet)
-        if 'time_str' in fieldsSet:
-            print('yes1 time_str')
         for t in results:
             if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 if 'reach_id' in fieldsSet:
-                    print('yes feature_id')
                     csv += t['reach_id']
                     csv += ','
-                    print(csv)
                 if 'time_str' in fieldsSet:
-                    print('yes time_str')
                     csv += t['time_str']
                     csv += ','
-                    print(csv)
                 if 'wse' in fieldsSet:
-                    csv += t['wse']
+                    csv += str(t['wse'])
                     csv += ','
-                    print(csv)
                 if 'geometry' in fieldsSet:
                     csv += t['geometry'].replace('; ', ', ')
                     csv += ','
-                    print(csv)
                 csv += '\n'
-                print(csv)
 
     return csv

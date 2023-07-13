@@ -28,10 +28,10 @@ class TestDefaultController(BaseTestCase):
         Get Timeseries for a particular Reach, Node, or LakeID
         """
         query_string = [('feature', 'Reach'),
-                        ('featureID', '73254700251'),
+                        ('feature_id', '73254700251'),
                         ('format', 'csv'),
-                        ('startTime', '2022-08-04T00:00:00+00:00'),
-                        ('endTime', '2022-08-23T00:00:00+00:00')]
+                        ('start_time', '2022-08-04T00:00:00+00:00'),
+                        ('end_time', '2022-08-23T00:00:00+00:00')]
         response = self.client.open(
             '/hydrocron/HydroAPI/1.0.0/timeseries',
             method='GET',
