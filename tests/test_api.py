@@ -11,7 +11,10 @@ class TestDefaultController(BaseTestCase):
 
         Subset by time series for a given spatial region
         """
-        query_string = [('subsetpolygon', 'subsetpolygon_example'),
+        subsetpolygon_example = '{"features":[{"type":"Feature","geometry":{"coordinates":[[-95.6499095054704,50.323685647314554],[-95.3499095054704,50.323685647314554],[-95.3499095054704,50.19088502467528],[-95.6499095054704,50.19088502467528],[-95.6499095054704,50.323685647314554]],"type":"LineString"},"properties":{}}],"type":"FeatureCollection"}'
+
+        query_string = [('feature', 'Reach'),
+                        ('subsetpolygon', subsetpolygon_example),
                         ('start_time', '2013-10-20T19:20:30+01:00'),
                         ('end_time', '2013-10-20T19:20:30+01:00'),
                         ('format', 'csv')]
@@ -21,6 +24,7 @@ class TestDefaultController(BaseTestCase):
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
+
 
     def test_gettimeseries_get(self):
         """Test case for gettimeseries_get

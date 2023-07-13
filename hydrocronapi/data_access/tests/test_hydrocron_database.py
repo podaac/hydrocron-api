@@ -15,7 +15,7 @@ from decimal import Decimal
 import geopandas as gpd
 from botocore.exceptions import ClientError
 
-from .hydrocron_database import Hydrocron_DB
+from ..hydrocron_database import Hydrocron_DB
 
 
 test_shapefile_path = 'hydrocron-db/tests/data/SWOT_L2_HR_RiverSP_Reach_548_011_NA_20230610T193337_20230610T193344_PIA1_01/SWOT_L2_HR_RiverSP_Reach_548_011_NA_20230610T193337_20230610T193344_PIA1_01.shp'
@@ -172,8 +172,8 @@ def dynamo_instance():
         A dynamodb local resource
     '''
 
-    session = boto3.session.Session(aws_access_key_id='fake_access_key',
-                                    aws_secret_access_key='fake_secret_access_key',
+    session = boto3.session.Session(aws_access_key_id='a',
+                                    aws_secret_access_key='a',
                                     aws_session_token='fake_session_token',
                                     region_name='us-west-2')
     
