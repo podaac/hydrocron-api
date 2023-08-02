@@ -4,14 +4,7 @@ name: Build
 on:
   # Triggers the workflow on push events
   push:
-    branches: 
-    - main 
-    - develop
-    - 'release/**'
-    - 'feature/**' 
-    - 'issue/**' 
-    - 'issues/**' 
-    - 'dependabot/**'
+    branches: [ develop, release/**, main, feature/**, issue/**, issues/**, dependabot/** ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -19,35 +12,86 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PROJECT_ NAME: podaac/hydrocron-api
 
 jobs:
   # First job in the workflow installs and verifies the software
   build:
-    name: Build, Test, Deploy
+    name: Build, Test, Verify, Publish
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout
-      - name: Checkout project to build and deploy
-        uses: actions/checkout@v2
-
-      ## Read the json file into the environment variables
-      - name: JSON to variables
-        uses: actions/checkout@v2
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
-          filename: 'package.json'
-          prefix: project
+          python-version: 3.10
 
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip3 install pytest pytest-cov
-          pip3 install -r requirements.txt
 
       - name: Setup local DynamoDB
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
+
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.3.2
+      - name: Get version
+        id: get-version
+        run: |
+          echo "::set-output name=current_version::$(poetry version | awk '{print $2}')"
+          echo "pyproject_name=$(poetry version | awk '{print $1}')" >> $GITHUB_ENV
+      - name: Bump pre-alpha version
+        # If triggered by push to a feature branch
+        if: |
+          ${{ startsWith(github.ref, 'refs/heads/issue') }}      ||
+          ${{ startsWith(github.ref, 'refs/heads/dependabot/') }} ||
+          ${{ startsWith(github.ref, 'refs/heads/feature/') }}
+        run: |
+          new_ver="${{ steps.get-version.outputs.current_version }}+$(git rev-parse --short ${GITHUB_SHA})"
+          poetry version $new_ver
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+      - name: Bump alpha version
+        # If triggered by push to the develop branch
+        if: ${{ github.ref == 'refs/heads/develop' }}
+        run: |
+          poetry version prerelease
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+          echo "venue=sit" >> $GITHUB_ENV
+      - name: Bump rc version
+        # If triggered by push to a release branch
+        if: ${{ startsWith(github.ref, 'refs/heads/release/') }}
+        env:
+          # True if the version already has a 'rc' pre-release identifier
+          BUMP_RC: ${{ contains(steps.get-version.outputs.current_version, 'rc') }}
+        run: |
+          if [ "$BUMP_RC" = true ]; then
+            poetry version prerelease
+          else
+            poetry version ${GITHUB_REF#refs/heads/release/}rc1
+          fi
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+          echo "venue=uat" >> $GITHUB_ENV
+      - name: Release version
+        # If triggered by push to the main branch
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
+        env:
+          CURRENT_VERSION: ${{ steps.get-version.outputs.current_version }}
+        # Remove rc* from end of version string
+        # The ${string%%substring} syntax below deletes the longest match of $substring from back of $string.
+        run: |
+          poetry version ${CURRENT_VERSION%%rc*}
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+          echo "venue=ops" >> $GITHUB_ENV
+
+      - name: Lint
+        run: |
+          poetry run pylint podaac
+          poetry run flake8 podaac
+      - name: Test and coverage
+        run: |
+          poetry run pytest --junitxml=build/reports/pytest.xml --cov=podaac/ --cov-report=xml:build/reports/coverage.xml -m "not aws and not integration" tests/
+
+
 
       - name: Load sample
         run: python3 tests/example_load_data.py
