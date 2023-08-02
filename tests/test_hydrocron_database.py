@@ -28,7 +28,6 @@ def test_create_table(dynamo_instance):
     '''
 
     if dynamo_instance.table_exists(test_table_name):
-        print(dynamo_instance.tables)
         dynamo_instance.delete_table(test_table_name)
 
         hydrocron_test_table = dynamo_instance.create_table(test_table_name, 

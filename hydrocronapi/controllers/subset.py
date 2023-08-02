@@ -6,7 +6,7 @@ from typing import Generator
 
 from shapely import Polygon, Point
 
-import hydrocronapi.data_access.db
+import tests.db
 
 logger = logging.getLogger()
 
@@ -37,9 +37,9 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
 
     start = time.time()
     if feature.lower() == 'reach':
-        results = hydrocronapi.data_access.db.get_reach_series(start_time, end_time)
+        results = tests.db.get_reach_series(start_time, end_time)
     elif feature.lower() == 'node':
-        results = hydrocronapi.data_access.db.get_node_series(start_time, end_time)
+        results = tests.db.get_node_series(start_time, end_time)
     else:
         return {}
     end = time.time()
@@ -67,8 +67,8 @@ def format_subset_json(results: Generator, polygon, exact, time):
     -------
 
     """
-    # Fetch all results from mySQL query
-    results = list(results)
+    # Fetch all results from query
+    results = results['Items']
 
     data = {}
 
@@ -161,8 +161,8 @@ def format_subset_csv(results: Generator, polygon, exact, time, fields):
     -------
 
     """
-    # Fetch all results from mySQL query
-    results = list(results)
+    # Fetch all results from query
+    results = results['Items']
 
     data = {}
 

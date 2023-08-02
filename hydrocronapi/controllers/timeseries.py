@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 from typing import Generator
 
-import hydrocronapi.data_access.db
+import tests.db
 
 logger = logging.getLogger()
 
@@ -29,18 +29,6 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
     :rtype: None
     """
 
-    # If I'm too lazy to type in the UI
-    '''
-    if (feature_id == "CBBTTTSNNNNNN"):
-        feature_id = "73254700251"
-    if (feature == "Reach"): 
-        feature = "reach"
-    if (start_time == "2022-08-04T00:00:00+00:00"):
-        start_time = "2022-08-04 10:15:33"
-    if (end_time == "2022-08-22T12:59:59+00:00"):
-        end_time = "2022-08-22 10:16:38"
-    '''
-
     start_time = start_time.replace("T", " ")[0:19]
     end_time = end_time.replace("T", " ")[0:19]
     start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
@@ -48,9 +36,9 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
 
     start = time.time()
     if feature.lower() == 'reach':
-        results = hydrocronapi.data_access.db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
+        results = tests.db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
     elif feature.lower() == 'node':
-        results = hydrocronapi.data_access.db.get_node_series_by_feature_id(feature_id, start_time, end_time)
+        results = tests.db.get_node_series_by_feature_id(feature_id, start_time, end_time)
     else:
         return {}
     end = time.time()
@@ -79,7 +67,8 @@ def format_json(results: Generator, feature_id, start_time, end_time, exact, tim
 
     """
     # Fetch all results
-    results = list(results)
+    results = results['Items']
+    print(results)
 
     data = {}
 
@@ -101,6 +90,7 @@ def format_json(results: Generator, feature_id, start_time, end_time, exact, tim
 
 
         for t in results:
+            print(t)
             #TODO: Coordinate to filter in the database instance: if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
             if t['reach_id'] == feature_id and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
@@ -151,7 +141,7 @@ def format_csv(results: Generator, feature_id, exact, time, fields):
 
     """
     # Fetch all results
-    results = list(results)
+    results = results['Items']
 
     data = {}
 
