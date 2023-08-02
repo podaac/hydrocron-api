@@ -240,3 +240,8 @@ jobs:
           source bin/config.sh ${{ env.THE_ENV }}
           terraform plan -var-file=tfvars/"${{ env.THE_ENV }}".tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan
+          
+      - name: Test with pytest
+        run: |
+          pip install pytest pytest-cov
+          pytest tests/test_api.py
