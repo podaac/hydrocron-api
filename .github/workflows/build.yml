@@ -105,9 +105,5 @@ jobs:
       - name: Load sample
         run: python3 tests/example_load_data.py
 
-      - name: Setup local DynamoDB
-        run: aws dynamodb list-tables --endpoint-url http://localhost:8000
-
       - name: Test with pytest
-        id: tests
         run: pytest tests/test_api.py
