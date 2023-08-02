@@ -93,50 +93,21 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Setup DynamoDB Local
-        id: setupdb
-        uses: actions/checkout@v2
-        with:
-          dbPath: # undefined by default, if this is undefined inMemory will be used
-          sharedDb: # undefined by default
-          delayTransientStatuses: # undefined by default
-          optimizeDbBeforeStartup: # undefined by default
-          port: 8000
-          cors: '*'
-
-      - name: Get DynamoDB Item
-        id: config
-        uses: actions/checkout@v2
-        env:
-          AWS_DEFAULT_REGION: us-west-2
-          AWS_REGION: us-west-2
-          AWS_ACCESS_KEY_ID: a
-          AWS_SECRET_ACCESS_KEY: a
-          AWS_SESSION_TOKEN: fake_session_token
-        with:
-          operation: get
-          region: us-west-2
-          table: hydrocron_swot_reaches
-          key: |
-            { key: "reach_id" }
-
-      - name: Print item
-        run: |
-          echo '${{ steps.config.outputs.item }}'
-
-      - name: Print specific field using built-in function
-        run: |
-          echo '${{ steps.config.outputs.item }}'
-
-      - name: Print specific field using jq
-        run: |
-          jq '.commit' <<< '${{ steps.config.outputs.item }}'
-
-      - name: Test with pytest
-        id: tests
+      - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
           pip3 install pytest pytest-cov
           pip3 install -r requirements.txt
-          python3 tests/example_load_data.py
-          pytest tests/test_api.py
+
+      - name: Setup local DynamoDB
+        run: docker run -d -p 8000:8000 amazon/dynamodb-local
+
+      - name: Load sample
+          run: python3 tests/example_load_data.py
+
+      - name: Setup local DynamoDB
+          run: aws dynamodb list-tables --endpoint-url http://localhost:8000
+
+      - name: Test with pytest
+        id: tests
+        run: pytest tests/test_api.py
