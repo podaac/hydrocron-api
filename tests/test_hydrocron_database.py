@@ -13,9 +13,8 @@ import boto3
 import json
 from decimal import Decimal
 import geopandas as gpd
-from botocore.exceptions import ClientError
 
-from ..hydrocron_database import Hydrocron_DB
+from tests.hydrocron_database import Hydrocron_DB
 
 
 test_shapefile_path = 'hydrocron-db/tests/data/SWOT_L2_HR_RiverSP_Reach_548_011_NA_20230610T193337_20230610T193344_PIA1_01/SWOT_L2_HR_RiverSP_Reach_548_011_NA_20230610T193337_20230610T193344_PIA1_01.shp'
