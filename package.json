@@ -1,0 +1,19 @@
+{
+  "name": "@gov.nasa.jpl.podaac/hydrocron-api",
+  "service_name": "hydrocron-api",
+  "version": "0.0.1",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "start": "nodemon server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "eslint": "^8.1.0",
+    "eslint-plugin-jest": "^25.0.5"
+  }
+}
