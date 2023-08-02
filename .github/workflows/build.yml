@@ -93,6 +93,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Setup DynamoDB Local
+        uses: actions/checkout@v2
+        with:
+          dbPath: # undefined by default, if this is undefined inMemory will be used
+          sharedDb: # undefined by default
+          delayTransientStatuses: # undefined by default
+          optimizeDbBeforeStartup: # undefined by default
+          port: 8000
+          cors: '*'
+
       - name: Get DynamoDB Item
         id: config
         uses: actions/checkout@v2
@@ -117,7 +127,6 @@ jobs:
       - name: Print specific field using jq
         run: |
           jq '.commit' <<< '${{ steps.config.outputs.item }}'
-
 
       - name: Test with pytest
         id: tests
