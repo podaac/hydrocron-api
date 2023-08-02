@@ -95,7 +95,7 @@ jobs:
 
       - name: Get DynamoDB Item
         id: config
-        uses: actions/dynamodb-actions@v1.2.1
+        uses: actions/checkout@v2
         env:
           AWS_DEFAULT_REGION: us-west-2
           AWS_REGION: us-west-2
