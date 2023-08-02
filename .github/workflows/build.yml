@@ -93,6 +93,32 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Get DynamoDB Item
+        id: config
+        uses: actions/dynamodb-actions@v1.2.1
+        env:
+          AWS_DEFAULT_REGION: us-west-2
+          AWS_REGION: us-west-2
+          AWS_ACCESS_KEY_ID: a
+          AWS_SECRET_ACCESS_KEY: a
+          AWS_SESSION_TOKEN: fake_session_token
+        with:
+          operation: get
+          region: us-west-2
+          table: hydrocron_swot_reaches
+          key: |
+            { key: "reach_id" }
+      - name: Print item
+        run: |
+          echo '${{ steps.config.outputs.item }}'
+      - name: Print specific field using built-in function
+        run: |
+          echo '${{ fromJson(steps.config.outputs.item).commit }}'
+      - name: Print specific field using jq
+        run: |
+          jq '.commit' <<< '${{ steps.config.outputs.item }}'
+
+
       - name: Test with pytest
         run: |
           pip install --upgrade pip
