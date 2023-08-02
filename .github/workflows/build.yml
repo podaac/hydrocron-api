@@ -134,7 +134,6 @@ jobs:
 
       - name: Test with pytest
         id: tests
-        uses: actions/checkout@v2
         run: |
           python3 -m pip install --upgrade pip
           pip3 install pytest pytest-cov
