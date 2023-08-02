@@ -113,7 +113,7 @@ jobs:
           echo '${{ steps.config.outputs.item }}'
       - name: Print specific field using built-in function
         run: |
-          echo '${{ fromJson(steps.config.outputs.item).commit }}'
+          echo '${{ steps.config.outputs.item }}'
       - name: Print specific field using jq
         run: |
           jq '.commit' <<< '${{ steps.config.outputs.item }}'
