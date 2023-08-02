@@ -121,7 +121,8 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pip install --upgrade pip
-          pip install pytest pytest-cov
-          pip install -r requirements.txt
+          python3 -m pip install --upgrade pip
+          pip3 install pytest pytest-cov
+          pip3 install -r requirements.txt
+          python3 tests/example_load_data.py
           pytest tests/test_api.py
