@@ -68,7 +68,6 @@ def format_json(results: Generator, feature_id, start_time, end_time, exact, tim
     """
     # Fetch all results
     results = results['Items']
-    print(results)
 
     data = {}
 
@@ -90,7 +89,6 @@ def format_json(results: Generator, feature_id, start_time, end_time, exact, tim
 
 
         for t in results:
-            print(t)
             #TODO: Coordinate to filter in the database instance: if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
             if t['reach_id'] == feature_id and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
