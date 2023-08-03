@@ -1,5 +1,6 @@
 # pylint: disable=C0116
 # pylint: disable=C0114
+# pylint: disable=E0401
 #!/usr/bin/env python3
 
 import connexion
