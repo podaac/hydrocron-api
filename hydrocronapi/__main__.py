@@ -1,7 +1,8 @@
+# pylint: disable=C0116
+# pylint: disable=C0114
 #!/usr/bin/env python3
 
 import connexion
-
 
 def main():
     app = connexion.App(__name__, specification_dir='./swagger/')
