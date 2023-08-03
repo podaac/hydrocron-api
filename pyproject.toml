@@ -10,7 +10,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 exclude = ['contrib', 'docs', 'tests']
-packages = [ {include = "hydrocronapi"} ]
 
 packages = [
     { include = "podaac" },
