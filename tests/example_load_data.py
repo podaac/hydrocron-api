@@ -9,8 +9,7 @@ import json
 from decimal import Decimal
 import geopandas as gpd
 
-from pytest_dynamodb import factories
-
+from hydrocron_database import Hydrocron_DB
 
 
 # ## Set up the connection to dynamoDB
@@ -23,11 +22,10 @@ session = boto3.session.Session(aws_access_key_id='a',
                                     aws_session_token='fake_session_token',
                                     region_name='us-west-2')
 
-dyndb_resource = session.resource('dynamodb', endpoint_url='http://localhost:8001')
+dyndb_resource = session.resource('dynamodb', endpoint_url='http://localhost:8000')
 
+dynamo_instance = Hydrocron_DB(dyn_resource=dyndb_resource)
 
-dynamodb_my_proc = factories.dynamodb_proc(dynamodb_dir="/", port=8001, delay=True)
-dyndb_resource = factories.dynamodb('dynamodb')
 
 # ## Create the table & load data
 
