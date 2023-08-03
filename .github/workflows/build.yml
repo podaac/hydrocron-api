@@ -79,7 +79,7 @@ jobs:
           echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
           echo "venue=ops" >> $GITHUB_ENV
       - name: Install l2ss-py
-        run: poetry install -E hydrocronapi
+        run: poetry install -E hydrocron-api
 
       - name: Lint
         run: |
