@@ -1,6 +1,7 @@
 # pylint: disable=duplicate-code
 # pylint: disable=R1702
 # pylint: disable=C0114
+# pylint: disable=E0401
 
 import json
 import logging
