@@ -79,9 +79,10 @@ jobs:
           echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
           echo "venue=ops" >> $GITHUB_ENV
 
-      - name: Lint Install
+      - name: Lint and Flake Install
         run: |
           pip3 install -U pip pylint
+          pip3 install -U pip flake8
 
       - name: Lint
         run: |
