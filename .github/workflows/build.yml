@@ -85,8 +85,8 @@ jobs:
 
       - name: Lint
         run: |
-          poetry run pylint podaac
-          poetry run flake8 podaac
+          poetry run pylint hydrocronapi
+          poetry run flake8 hydrocronapi
       - name: Test and coverage
         run: |
           poetry run pytest --junitxml=build/reports/pytest.xml --cov=podaac/ --cov-report=xml:build/reports/coverage.xml -m "not aws and not integration" tests/

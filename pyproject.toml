@@ -12,7 +12,7 @@ classifiers = [
 exclude = ['contrib', 'docs', 'tests']
 
 packages = [
-    { include = "podaac" },
+    { include = "hydrocronapi" },
 ]
 
 [tool.poetry.dependencies]
