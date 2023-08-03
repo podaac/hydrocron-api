@@ -3,14 +3,14 @@
 
 
 ## Dependencies
-There are a handful of dependencies needed to deploy the entire Feature Translation Service
+There are a handful of dependencies needed to deploy the entire Hydrocron
 
 * Terraform - deployment technology.  >= Terraform v0.12.7
 * AWS CLI - Amazon Web Service command line interface. >= aws-cli/1.11.120
 * python3 environment - tested with python 3.7, needed for packaging the lambda functions.
 
 ## Soft dependencies
-These are dependencies for deploying the entire Feature Translation Service that exist outside of this build.
+These are dependencies for deploying the entire Hydrocron that exist outside of this build.
 
 * access key for NGAP environment
 * Terraform variables defined below
