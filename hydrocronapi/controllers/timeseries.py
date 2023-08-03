@@ -85,8 +85,6 @@ def format_json(results: Generator, feature_id, elapsed_time):
         data['type'] = "FeatureCollection"
         data['features'] = []
         i = 0
-        #st = float(time.mktime(start_time.timetuple()) - 946710000)
-        #et = float(time.mktime(end_time.timetuple()) - 946710000)
 
         for res in results:
             if res['reach_id'] == feature_id and res['feature_time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
