@@ -83,6 +83,7 @@ jobs:
         run: |
           pip3 install -U pip pylint
           pip3 install -U pip flake8
+          pip3 install -U pip boto3
 
       - name: Lint
         run: |
