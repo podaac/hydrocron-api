@@ -85,6 +85,7 @@ jobs:
           pip3 install -U pip flake8
           pip3 install -U pip boto3
           pip3 install -U pip geopandas
+          pip3 install -U pip pytest
 
       - name: Lint
         run: |
