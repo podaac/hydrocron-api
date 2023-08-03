@@ -87,6 +87,7 @@ jobs:
           pip3 install -U pip geopandas
           pip3 install -U pip pytest
           pip3 install -U pip connexion
+          pip3 install -U pip flask_testing
 
       - name: Lint
         run: |
