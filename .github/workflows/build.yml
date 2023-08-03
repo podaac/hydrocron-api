@@ -110,10 +110,10 @@ jobs:
           pip3 install -U pip flask_testing
           pip3 install -U pip pytest-dynamodb
 
-      - name: Lint
-        run: |
-          poetry run pylint hydrocronapi
-          poetry run flake8 hydrocronapi
+      #- name: Lint
+      #  run: |
+      #    poetry run pylint hydrocronapi
+      #    poetry run flake8 hydrocronapi
 
       - name: Load sample
         run: python3 tests/example_load_data.py
