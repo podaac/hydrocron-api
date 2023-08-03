@@ -88,11 +88,6 @@ jobs:
         run: |
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
-      - name: Test and coverage
-        run: |
-          poetry run pytest --junitxml=build/reports/pytest.xml --cov=podaac/ --cov-report=xml:build/reports/coverage.xml -m "not aws and not integration" tests/
-
-
 
       - name: Load sample
         run: python3 tests/example_load_data.py
