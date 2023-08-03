@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Issue 8 - Rearrange database code
     - Issue 8 - Rearrange tests
     - Issue 8 - Add script to load data
+    - Issue 8 - Created CI/CD
 ### Deprecated 
 ### Removed
 ### Fixed
