@@ -12,6 +12,9 @@ classifiers = [
 exclude = ['contrib', 'docs', 'tests']
 packages = [ {include = "hydrocronapi"} ]
 
+packages = [
+    { include = "podaac" },
+]
 [tool.poetry.dependencies]
 python = "^3.10"
 six = "^1.16.0"

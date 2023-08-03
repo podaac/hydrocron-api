@@ -81,7 +81,7 @@ jobs:
 
       - name: Lint Install
         run: |
-          pip3 install pylint
+          pip3 install -U pip pylint
 
       - name: Lint
         run: |
