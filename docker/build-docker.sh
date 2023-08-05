@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-# This script is intended to be run by the CI/CD pipeline to build a specific version of this application.
+# This script is intended to be run by the CI/CD pipeline to build a specific version of the Hydrocron API.
 
 set -Eeo pipefail
-
-LOCAL_BUILD=false
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -22,10 +20,6 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --local)
-    LOCAL_BUILD=true
-    shift # past argument
-    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -34,7 +28,7 @@ esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
-USAGE="USAGE: build-docker.sh -n|--service-name service_name -v|--service-version service_version [--local]"
+USAGE="USAGE: build-docker.sh -n|--service-name service_name -v|--service-version service_version"
 
 # shellcheck disable=SC2154
 if [[ -z "${service_name}" ]]; then
@@ -54,21 +48,13 @@ set -u
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 PROJECT_DIR="$(dirname "${SCRIPTPATH}")"
-DIST_PATH="dist/"
 
-app_path=$( cd ${SCRIPTPATH}/..  && echo $(pwd) )
-
-repositoryName=ghcr.io/podaac/${service_name}
+repositoryName=podaac/podaac-cloud/${service_name}
 
 # Docker tags can't include '+' https://github.com/docker/distribution/issues/1201
 dockerTagVersion=$(echo "${service_version}" | tr "+" _)
 
-# Build the image
-if [ "$LOCAL_BUILD" = true ] ; then
-  wheel_filename="$(echo "${service_name}" | tr "-" _)-${service_version}-py3-none-any.whl"
-  docker build -t "${repositoryName}":"${dockerTagVersion}" --build-arg DIST_PATH="${DIST_PATH}" --build-arg SOURCE="${DIST_PATH}${wheel_filename}" -f "$SCRIPTPATH"/Dockerfile "$PROJECT_DIR" 1>&2
-else
-  docker build -t "${repositoryName}":"${dockerTagVersion}" --build-arg SOURCE="${service_name}==${service_version}" -f "$SCRIPTPATH"/Dockerfile "$app_path" 1>&2
-fi
+tar_filename="${service_name}-${service_version}.tar.gz"
+docker build -t "${repositoryName}":"${dockerTagVersion}" --build-arg SOURCE="dist/${tar_filename}" -f "$SCRIPTPATH"/Dockerfile "$PROJECT_DIR" 1>&2
 
 echo "${repositoryName}":"${dockerTagVersion}"

@@ -37,17 +37,7 @@ Follow the instructions in the [docker README](../docker/README.md) to build the
 ## Build and deploy the application
 We use a pre-built docker container to do the deployment (Please do not use local terraform!)
 
-From the project root directory:
-```
-export tf_venue=sit
-docker run -v ~/.aws:/home/dockeruser/.aws:ro -v ${PWD}:/home/dockeruser -w /home/dockeruser/terraform cae-artifactory.jpl.nasa.gov:16003/podaac/service/deploy-terraform-1.0.3:latest bash bin/deploy.sh -v ${tf_venue} -t ${docker_tag}
-```
-
 ## Destroying the Application
 Similarly, use the pre-built docker container to do the destroy (Please do not use local terraform!)
 
-From the project root directory:
-```
-docker run -v ~/.aws:/home/dockeruser/.aws:ro -v ${PWD}:/home/dockeruser cae-artifactory.jpl.nasa.gov:16003/podaac/service/deploy-terraform-1.0.3:latest bash bin/destroy.sh -v ${tf_venue} -t ${docker_tag}
-```
-This will take anywhere from 3-10 minutes.
+

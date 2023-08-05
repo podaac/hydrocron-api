@@ -18,7 +18,7 @@ case $key in
     -v|--tf-venue)
     tf_venue="$2"
     case $tf_venue in
-     ngap-service-sit|ngap-service-uat|ngap-service-ops|ngap-cumulus-swot-sit|ngap-cumulus-sit|ngap-cumulus-swot-uat|ngap-cumulus-uat|ngap-cumulus-ops|ngap-cumulus-sndbx) ;;
+     sit|uat|ops) ;;
      *)
         echo "tf_venue must be sit, uat, or ops"
         exit 1;;
@@ -53,7 +53,7 @@ fi
 set -u
 
 repositoryName=$(echo "${docker_tag}" | awk -F':' '{print $1}')
-tf_profile="${tf_venue}"
+tf_profile="ngap-service-${tf_venue}"
 
 # Get the AWS Account ID for this venue/profile
 # shellcheck disable=SC2154
@@ -63,9 +63,10 @@ aws_acct=$(aws sts get-caller-identity --profile "$tf_profile" | python -c "impo
 aws ecr create-repository --repository-name "${repositoryName}" --profile "$tf_profile" || echo "No need to create, repository ${repositoryName} already exists"
 
 # Login to ECR
+echo "aws ecr get-login-password --region us-west-2 --profile \"$tf_profile\" | docker login --username AWS --password-stdin \"$aws_acct\".dkr.ecr.us-west-2.amazonaws.com"
 set +x
 $(aws ecr get-login --no-include-email --region us-west-2 --profile "$tf_profile" 2> /dev/null) || \
-docker login --username AWS --password "$(aws ecr get-login-password --region us-west-2 --profile "$tf_profile")" "$aws_acct".dkr.ecr.us-west-2.amazonaws.com
+  docker login --username AWS --password "$(aws ecr get-login-password --region us-west-2 --profile "$tf_profile")" "$aws_acct".dkr.ecr.us-west-2.amazonaws.com
 set -x
 
 # Tag the image for this venue's ECR
@@ -73,6 +74,3 @@ docker tag "${docker_tag}" "$aws_acct".dkr.ecr.us-west-2.amazonaws.com/"${docker
 
 # Push the tag
 docker push "$aws_acct".dkr.ecr.us-west-2.amazonaws.com/"${docker_tag}"
-
-# Clean up docker
-docker rmi "$aws_acct".dkr.ecr.us-west-2.amazonaws.com/"${docker_tag}" || true
