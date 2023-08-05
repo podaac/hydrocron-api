@@ -58,6 +58,8 @@ tf_profile="ngap-service-${tf_venue}"
 # Get the AWS Account ID for this venue/profile
 # shellcheck disable=SC2154
 aws_acct=$(aws sts get-caller-identity --profile "$tf_profile" | python -c "import sys, json; print(json.load(sys.stdin)['Account'])")
+echo "aws_acct"
+echo $aws_acct
 
 # Create repository if needed
 aws ecr create-repository --repository-name "${repositoryName}" --profile "$tf_profile" || echo "No need to create, repository ${repositoryName} already exists"
