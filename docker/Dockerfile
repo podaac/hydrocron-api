@@ -10,6 +10,7 @@ RUN mkdir ${project_dir} ${app_dir} ${config_dir}
 WORKDIR ${app_dir}
 
 COPY package*.json ./
+RUN npm cache clean --force
 RUN npm install
 COPY . .
 
