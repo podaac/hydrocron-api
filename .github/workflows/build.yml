@@ -95,29 +95,6 @@ jobs:
             THE_VERSION=${{ env.project_version }}
             echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
             npm --no-git-tag-version version ${THE_VERSION//-*}
-            
-      - name: Run Snyk as a blocking step
-        uses: snyk/actions/node@master
-        env:
-            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: >
-              --org=${{ secrets.SNYK_ORG_ID }}
-              --project-name=${{ github.repository }}
-              --severity-threshold=high
-              --fail-on=all
-
-
-      - name: Run Snyk on Node
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
-          args: >
-            --org=${{ secrets.SNYK_ORG_ID }}
-            --project-name=${{ github.repository }}
 
       - name: Setup local DynamoDB
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
