@@ -201,10 +201,10 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Deploy docker to ECR
+      - name: Build and deploy docker to ECR
         run: |
-          bash ./docker/build-docker.sh -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
-          bash ./docker/push-docker-ecr.sh -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
+          sh ./docker/build-docker.sh -n ${{ env.PROJECT_NAME }} -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
+          sh ./docker/push-docker-ecr.sh -n ${{ env.PROJECT_NAME }} -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
 
 
       
