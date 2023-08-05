@@ -160,9 +160,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy Env Override
-        if: |
-          github.event.head_commit.message == '/deploy sit' ||
-          github.event.head_commit.message == '/deploy uat'
+        #if: |
+        #  github.event.head_commit.message == '/deploy sit' ||
+        #  github.event.head_commit.message == '/deploy uat'
         run: |
           message="${{ github.event.head_commit.message }}"
           trimmed_message=${message:1}  # Remove leading slash
@@ -181,12 +181,12 @@ jobs:
             type=raw,value=${{ env.THE_ENV }}
 
       - name: Build and push Docker image
-        if: |
-          github.ref == 'refs/heads/develop' ||
-          github.ref == 'refs/heads/main'    ||
-          startsWith(github.ref, 'refs/heads/release') ||
-          github.event.head_commit.message == '/deploy sit' ||
-          github.event.head_commit.message == '/deploy uat'
+        #if: |
+        #  github.ref == 'refs/heads/develop' ||
+        #  github.ref == 'refs/heads/main'    ||
+        #  startsWith(github.ref, 'refs/heads/release') ||
+        #  github.event.head_commit.message == '/deploy sit' ||
+        #  github.event.head_commit.message == '/deploy uat'
         uses: docker/build-push-action@v3
         with:
           context: .
