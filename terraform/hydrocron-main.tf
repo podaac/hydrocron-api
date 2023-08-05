@@ -293,8 +293,8 @@ POLICY
 #CodeBuild Project
 
 resource "aws_codebuild_project" "hydrocron" {
-  name          = "FTS"
-  description   = "FTS Postman Testing"
+  name          = "Hydrocron"
+  description   = "Hydrocron Postman Testing"
   build_timeout = "60"
   service_role  = aws_iam_role.hydrocron-codebuild-iam.arn
 
@@ -320,7 +320,7 @@ resource "aws_codebuild_project" "hydrocron" {
     cloudwatch_logs {
       status = "ENABLED"
       group_name = "codeBuild"
-      stream_name = "FTS"
+      stream_name = "Hydrocron"
     }
 
     s3_logs {
