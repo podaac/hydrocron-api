@@ -2,7 +2,7 @@
 
 # This script is intended to be run by the CI/CD pipeline to push a docker tag previously built by build-docker.sh
 
-set -Eeo pipefail
+#set -Eeo pipefail
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]

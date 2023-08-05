@@ -2,7 +2,7 @@
 
 # This script is intended to be run by the CI/CD pipeline to build a specific version of the Hydrocron API.
 
-set -Eeo pipefail
+#set -Eeo pipefail
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
