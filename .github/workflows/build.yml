@@ -203,8 +203,8 @@ jobs:
 
       - name: Build and deploy docker to ECR
         run: |
-          sh ./docker/build-docker.sh -n "podaac-hydrocron" -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
-          sh ./docker/push-docker-ecr.sh -n "podaac-hydrocron" -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
+          bash ./docker/build-docker.sh -n "podaac-hydrocron" -v "SIT" -t "${{ env.THE_VERSION }}"
+          bash ./docker/push-docker-ecr.sh -n "podaac-hydrocron" -v "SIT" -t "${{ env.THE_VERSION }}"
 
 
       
