@@ -11,946 +11,204 @@ servers:
   - url: 'https://hydrocron.podaac.uat.earthdata.nasa.gov/'
     description: User Acceptance
 paths:
-  '/huc/{huc}':
-    summary: HUCs
-    description: Interact with HUC objects by ID
+  /timeseries:
     get:
-      deprecated: true
-      summary: Get HUC (deprecated)
-      description: Get one or more HUC by ID
+      summary: "Get Timeseries for a particular Reach, Node, or LakeID"
+      description: "Get Timeseries for a particular Reach, Node, or LakeID"
+      operationId: gettimeseries_get
       parameters:
-        - $ref: '#/components/parameters/huc_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
+      - name: feature
+        in: query
+        description: Data requested for Reach or Node or Lake
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum: [ "Reach", "Lake", "Node"]
+        example: Reach
+      - name: feature_id
+        in: query
+        description: ID of the feature to retrieve in format CBBTTTSNNNNNN (i.e. 74297700000000)
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: 71224100223
+      - name: start_time
+        in: query
+        description: Start time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2022-08-04T00:00:00Z
+      - name: end_time
+        in: query
+        description: End time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2022-08-23T00:00:00Z
+      - name: output
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum: [ "csv", "geojson"]
+          default: geojson
+        example: geojson
+      - name: fields
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: feature_id, time_str, wse, geometry
+        example: feature_id, time_str, wse, geometry
       responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v021_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "HUC": "$input.params('huc')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/region/{region}':
-    summary: Regions
-    description: Interact with HUC objects by Region
+        "200":
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: "400 error. The specified URL is invalid (does not exist)."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "404":
+          description: "404 error. An entry with the specified region was not found."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "413":
+          description: "413 error. Your query has returned is too large."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+      x-openapi-router-controller: hydrocronapi.controllers.timeseries
+  /timeseriesSubset:
     get:
-      deprecated: true
-      summary: Get Region (deprecated)
-      description: Get one or more HUC by region
+      summary: Subset by time series for a given spatial region
+      description: "Get Timeseries for a particular Reach, Node, or LakeID"
+      operationId: getsubset_get
       parameters:
-        - $ref: '#/components/parameters/region_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
+      - name: feature
+        in: query
+        description: Data requested for Reach or Node or Lake
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum: [ "Reach", "Lake", "Node"]
+        example: Reach
+      - name: subsetpolygon
+        in: query
+        description: GEOJSON of the subset area
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: '{"features": [{"type": "Feature","geometry": {"coordinates": [[-95.6499095054704,50.323685647314554],[-95.3499095054704,50.323685647314554],[-95.3499095054704,50.19088502467528],[-95.6499095054704,50.19088502467528],[-95.6499095054704,50.323685647314554]],"type": "LineString"},"properties": {}}],"type": "FeatureCollection"}'
+      - name: start_time
+        in: query
+        description: Start time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2022-08-04T00:00:00Z
+      - name: end_time
+        in: query
+        description: End time of the timeseries
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: 2022-08-23T00:00:00Z
+      - name: output
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum: [ "csv", "geojson"]
+          default: geojson
+        example: geojson
+      - name: fields
+        in: query
+        description: Format of the data returned
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: feature_id, time_str, wse, geometry
+        example: feature_id, time_str, wse, geometry
       responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v021_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "region": "$input.params('region')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/rivers/reach/{reach}':
-    summary: River Reach
-    description: Interact with River Reach objects by ID
-    get:
-      deprecated: true
-      summary: Get River Reach (deprecated)
-      description: Get one or more river reach(es) by ID
-      parameters:
-        - $ref: '#/components/parameters/reach_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
-      responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v021_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "reach": "$input.params('reach')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/rivers/node/{node}':
-    summary: River Node
-    description: Interact with River Node objects by ID
-    get:
-      deprecated: true
-      summary: Get River Node (deprecated)
-      description: Get one or more river node(s) by ID
-      parameters:
-        - $ref: '#/components/parameters/node_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
-      responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v021_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "node": "$input.params('node')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/v1/huc/{huc}':
-    summary: HUCs
-    description: Interact with HUC objects by ID
-    get:
-      summary: Get HUC
-      description: Get one or more HUC by ID
-      parameters:
-        - $ref: '#/components/parameters/huc_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessV1'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "HUC": "$input.params('huc')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/v1/region/{region}':
-    summary: Regions
-    description: Interact with HUC objects by Region
-    get:
-      summary: Get Region
-      description: Get one or more HUC by region
-      parameters:
-        - $ref: '#/components/parameters/region_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessV1'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "region": "$input.params('region')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/v1/rivers/{name}':
-    get:
-      parameters:
-        - $ref: '#/components/parameters/river_name_param'
-        - $ref: '#/components/parameters/include_reaches_option_param'
-        - $ref: '#/components/parameters/include_nodes_option_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessV1'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "name": "$input.params('name')",
-                "reaches": "$input.params('reaches')",
-                "nodes": "$input.params('nodes')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/v1/rivers/reach/{reach}':
-    summary: River Reach
-    description: Interact with River Reach objects by ID
-    get:
-      summary: Get River Reach
-      description: Get one or more river reach(es) by ID
-      parameters:
-        - $ref: '#/components/parameters/reach_param'
-        - $ref: '#/components/parameters/river_name_option_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessV1'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "reach": "$input.params('reach')",
-                "river_name": "$input.params('river_name')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-  '/v1/rivers/node/{node}':
-    summary: River Node
-    description: Interact with River Node objects by ID
-    get:
-      summary: Get River Node
-      description: Get one or more river node(s) by ID
-      parameters:
-        - $ref: '#/components/parameters/node_param'
-        - $ref: '#/components/parameters/river_name_option_param'
-        - $ref: '#/components/parameters/exact_param'
-        - $ref: '#/components/parameters/page_number_param'
-        - $ref: '#/components/parameters/page_size_param'
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessV1'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "exact":"$input.params('exact')",
-                "node": "$input.params('node')",
-                "river_name": "$input.params('river_name')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-components:
-  parameters:
-    huc_param:
-      name: huc
-      in: path
-      required: true
-      schema:
-        type: string
-    region_param:
-      name: region
-      in: path
-      required: true
-      schema:
-        type: string
-    river_name_param:
-      name: name
-      in: path
-      required: true
-      schema:
-        type: string
-    reach_param:
-      name: reach
-      in: path
-      required: true
-      schema:
-        type: string
-    node_param:
-      name: node
-      in: path
-      required: true
-      schema:
-        type: string
-    exact_param:
-      name: exact
-      in: query
-      example: true
-      schema:
-        type: string
-    polygon_format_param:
-      name: polygon_format
-      in: query
-      schema:
-        type: string
-    page_number_param:
-      name: page_number
-      in: query
-      schema:
-        type: integer
-    page_size_param:
-      name: page_size
-      in: query
-      schema:
-        type: integer
-    river_name_option_param:
-      name: river_name
-      in: query
-      schema:
-        type: string
-    include_reaches_option_param:
-      name: reaches
-      description: Include river reaches in results
-      example: true
-      in: query
-      schema:
-        type: string
-    include_nodes_option_param:
-      name: nodes
-      description: Include river nodes in results
-      example: false
-      in: query
-      schema:
-        type: string
-  responses:
-    Success:
-      description: Success Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SuccessResponse'
-    SuccessV1:
-      description: V1 Success Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SuccessV1Response'
-    ClientError:
-      description: 400 response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: 404 response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    ServerError:
-      description: 500 response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  schemas:
-    Empty:
-      title: Empty Schema
-      type: object
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-    SuccessResponse:
-      title: Success Response Body
-      type: object
-      properties:
-        status:
-          type: string
-          description: HTTP Status code returned by backend
-        time:
-          type: string
-          description: Time in milliseconds to complete request
-        hits:
-          type: integer
-          description: Total number of results
-        search on:
-          $ref: '#/components/schemas/SearchParameters'
-        results_count:
-          type: integer
-          description: Number of result entries returned in this request. Only appears if hits > page_size
-        results:
-          type: object
-          description: Single object where each property of the object is a result
-    SuccessV1Response:
-      title: SuccessV1 Response Body
-      type: object
-      properties:
-        status:
-          type: string
-          description: HTTP Status code returned by backend
-        time:
-          type: string
-          description: Time in milliseconds to complete request
-        hits:
-          type: integer
-          description: Total number of results
-        search on:
-          $ref: '#/components/schemas/SearchV1Parameters'
-        results_count:
-          type: integer
-          description: Number of result entries returned in this request. Only appears if hits > page_size
-        results:
-          type: array
-          description: List of result objects. List can contain objects of type [HUC, RiverReach, RiverNode], or a merge of two or more types (e.g. RiverReach and RiverNode) depending on the resource being queried. (e.g. if requesting /huc or /region, a list of HUC objects will be returned, and if requesting /rivers/name, a list of RiverReach and RiverNodes [merged] will be returned)
-          items:
-            type: object
-            anyOf:
-              - $ref: '#/components/schemas/HUC'
-              - $ref: '#/components/schemas/RiverReach'
-              - $ref: '#/components/schemas/RiverNode'
-    SearchParameters:
-      title: Search Parameters
-      type: object
-      properties:
-        parameter:
-          type: string
-        exact:
-          type: boolean
-        polygon_format:
-          type: string
-        page_number:
-          type: integer
-        page_size:
-          type: integer
-    SearchV1Parameters:
-      title: Search Parameters
-      type: object
-      properties:
-        parameter:
-          type: string
-        river_name:
-          type: string
-        exact:
-          type: boolean
-        polygon_format:
-          type: string
-        page_number:
-          type: integer
-        page_size:
-          type: integer
-    HUC:
-      type: object
-      properties:
-        Region Name:
-          type: string
-        HUC:
-          type: string
-        USGS Polygon:
-          type: object
-          properties:
-            Object URL:
-              type: string
-            Source:
-              type: string
-        Bounding Box:
-          type: string
-        Convex Hull Polygon:
-          type: string
-        Visvalingam Polygon:
-          type: string
-    RiverReach:
-      title: River Reach
-      type: object
-      properties:
-        reach_id:
-          type: string
-        geojson:
-          type: object
-      additionalProperties: true
-    RiverNode:
-      title: River Node
-      type: object
-      properties:
-        node_id:
-          type: string
-        geojson:
-          type: object
-      additionalProperties: true
-x-amazon-apigateway-policy:
-  Version: '2012-10-17'
-  Statement:
-    - Effect: Allow
-      Principal: '*'
-      Action: 'execute-api:Invoke'
-      Resource: '*'
-    - Effect: Deny
-      Principal: '*'
-      Action: 'execute-api:Invoke'
-      Resource: '*'
-      Condition:
-        StringNotEquals:
-          'aws:SourceVpc': ${vpc_id}
+        "200":
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: "400 error. The specified URL is invalid (does not exist)."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "404":
+          description: "404 error. An entry with the specified region was not found."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "413":
+          description: "413 error. Your query has returned is too large."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+      x-openapi-router-controller: hydrocronapi.controllers.subset
+
