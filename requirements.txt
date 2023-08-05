@@ -1,4 +1,4 @@
-boto3 == 1.28.2
+boto3 == 1.28.18
 pandas == 2.0.3
 geopandas == 0.13.2
 shapely == 2.0.1
