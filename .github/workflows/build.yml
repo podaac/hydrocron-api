@@ -98,9 +98,11 @@ jobs:
             npm --no-git-tag-version version ${THE_VERSION//-*}
 
       - name: Setup local DynamoDB
+        if: ${{ startsWith('test') }}
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
 
       - name: Lint and Flake Install
+        if: ${{ startsWith('test') }}
         run: |
           pip3 install -U pip pylint
           pip3 install -U pip flake8
@@ -112,9 +114,11 @@ jobs:
           pip3 install -U pip pytest-dynamodb
 
       - name: Load sample
+        if: ${{ startsWith('test') }}
         run: python3 tests/example_load_data.py
 
       - name: Test with pytest
+        if: ${{ startsWith('test') }}
         run: pytest tests/test_api.py
 
       - name: Commit Version Bump
@@ -147,6 +151,7 @@ jobs:
           node-version: 14
 
       - name: NPM install & NPM Lint
+        if: ${{ startsWith('test') }}
         run:
           npm install
           npm run lint
