@@ -203,8 +203,8 @@ jobs:
 
       - name: Build and deploy docker to ECR
         run: |
-          bash ./docker/build-docker.sh --service-name "podaac-hydrocron" --service-version "${{ env.THE_VERSION }}" >> $DOCKER_TAG
-          bash ./docker/push-docker-ecr.sh --tf-venue "sit" --docker-tag "${{ DOCKER_TAG }}"
+          bash ./docker/build-docker.sh --service-name "podaac-hydrocron" --service-version "${{ env.THE_VERSION }}" >> $env.DOCKER_TAG
+          bash ./docker/push-docker-ecr.sh --tf-venue "sit" --docker-tag "${{ env.DOCKER_TAG }}"
 
 
       
