@@ -150,6 +150,7 @@ jobs:
         run:
           npm install
           npm run lint
+
       # Setup docker to build and push images
       - name: Log in to the Container registry
         uses: docker/login-action@v1
@@ -159,9 +160,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy Env Override
-        #if: |
-        #  github.event.head_commit.message == '/deploy sit' ||
-        #  github.event.head_commit.message == '/deploy uat'
+        if: |
+          github.event.head_commit.message == '/deploy sit' ||
+          github.event.head_commit.message == '/deploy uat'
         run: |
           message="${{ github.event.head_commit.message }}"
           trimmed_message=${message:1}  # Remove leading slash
