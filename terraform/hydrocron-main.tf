@@ -1,25 +1,3 @@
-
-# SSM Parameter values
-data "aws_ssm_parameter" "hydrocron-db-user" {
-  name = "${local.hydrocrondb_resource_name}-user"
-}
-
-data "aws_ssm_parameter" "hydrocron-db-user-pass" {
-  name = "${local.hydrocrondb_resource_name}-user-pass"
-}
-
-data "aws_ssm_parameter" "hydrocron-db-host" {
-  name = "${local.hydrocrondb_resource_name}-host"
-}
-
-data "aws_ssm_parameter" "hydrocron-db-name" {
-  name = "${local.hydrocrondb_resource_name}-name"
-}
-
-data "aws_ssm_parameter" "hydrocron-db-sg" {
-  name = "${local.hydrocrondb_resource_name}-sg"
-}
-
 #Security Groups
 
 ## Application Lambda Security Group
