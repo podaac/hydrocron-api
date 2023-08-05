@@ -1,0 +1,27 @@
+#!/bin/bash
+
+outside_config_dir=/config
+work_dir=/work
+app_dir=/app
+
+if [ -e "/config/server.crt" ]; then
+    echo "server.crt is here"
+    cp /config/server.crt /project/config/server.crt
+fi;
+
+if [ -e "/config/server.key" ]; then
+    echo "server.key is here"
+    cp /config/server.key /project/config/server.key
+fi;
+
+if [ -e "/config/config.js" ]; then
+    echo "config.js is here"
+    cp /config/config.js /project/config/config.js
+fi;
+
+if [ -e "/config/private-config.js" ]; then
+    echo "private-config.js is here"
+    cp /config/private-config.js /project/config/private-config.js
+fi;
+
+forever server/server.js
