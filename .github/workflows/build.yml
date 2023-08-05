@@ -152,7 +152,7 @@ jobs:
 
       - name: NPM install & NPM Lint
         if: ${{ startsWith(github.ref, 'test') }}
-        run:
+        run: |
           npm install
           npm run lint
 
@@ -200,6 +200,11 @@ jobs:
           pull: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy docker to ECR
+        run: |
+          bash ./docker/build-docker.sh -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
+          bash ./docker/push-docker-ecr.sh -v ${{ env.THE_ENV }} -t "${{ env.THE_VERSION }}"
 
 
       
