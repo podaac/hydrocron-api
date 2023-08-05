@@ -234,4 +234,4 @@ jobs:
           TF_VAR_hydrocronapi_api_docker_image: "ghcr.io/podaac/hydrocron-api:${{ env.DOCKER_METADATA_OUTPUT_VERSION }}"
 
         run: |
-          bash bin/deploy.sh -v ${env.TARGET_ENV_UPPERCASE}
+          bash bin/deploy.sh -v "sit"
