@@ -62,7 +62,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda_0_2_1" {
   function_name = "${local.ec2_resources_name}-0_2_1"
   role          = aws_iam_role.hydrocron-service-role.arn
   package_type = "Image"
-  image_uri     = "${local.account_id}.dkr.ecr.us-west-2.amazonaws.com/podaac/podaac-cloud/podaac-hydrocron:0.2.1"
+  image_uri     = "${local.account_id}.dkr.ecr.us-west-2.amazonaws.com/podaac/podaac-cloud/podaac-hydrocron:latest"
   timeout       = 5
 
   vpc_config {
