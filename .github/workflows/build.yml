@@ -151,7 +151,6 @@ jobs:
           node-version: 14
 
       - name: NPM install & NPM Lint
-        if: ${{ startsWith(github.ref, 'test') }}
         run:
           npm install
           npm run lint
