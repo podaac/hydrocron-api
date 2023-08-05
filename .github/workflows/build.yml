@@ -35,7 +35,7 @@ jobs:
 
       ## Read the json file into the environment variables
       - name: JSON to variables
-        uses: actions/checkout@v2
+        uses: rgarcia-phi/json-to-variables@v1.1.0
         with:
           filename: 'package.json'
           prefix: project
@@ -47,7 +47,77 @@ jobs:
           echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
           GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
           echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
-          echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+
+      ## NPM Tagging
+      - name: Pre Alpha
+        #if: |
+        #  startsWith(github.ref, 'refs/heads/issue') ||
+        #  startsWith(github.ref, 'refs/heads/dependabot/') ||
+        #  startsWith(github.ref, 'refs/heads/feature/')
+        run: |
+            echo "THE_ENV=sit" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+            echo "THE_VERSION=$(npm --no-git-tag-version --allow-same-version version ${{ env.THE_VERSION }}-${GITHUB_SHA})" >> $GITHUB_ENV
+
+      ## Set Alpha variables
+      - name: Alpha
+        if: github.ref == 'refs/heads/develop'
+        run: |
+            echo "THE_ENV=sit" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+            echo "THE_VERSION=$(npm --no-git-tag-version version prerelease)" >> $GITHUB_ENV
+
+      ## Bump RC Version
+      - name: Bump rc version
+        # If triggered by push to a release branch
+        if: ${{ startsWith(github.ref, 'refs/heads/release/') }}
+        env:
+          # True if the version already has a 'rc' pre-release identifier
+          BUMP_RC: ${{ contains(env.project_version, 'rc') }}
+          RELEASE_VERSION: ${THE_BRANCH//*\/}
+        run: |
+          if [ "$BUMP_RC" == true ]; then
+            echo "THE_VERSION=$(npm --no-git-tag-version version prerelease --preid rc)" >> $GITHUB_ENV
+          else
+            echo "THE_VERSION=$(npm --no-git-tag-version version ${GITHUB_REF#refs/heads/release/}-rc.1)" >> $GITHUB_ENV
+          fi
+
+          echo "THE_ENV=uat" >> $GITHUB_ENV
+          echo "TARGET_ENV_UPPERCASE=UAT" >> $GITHUB_ENV
+
+      ## Set Release variables
+      - name: Release
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
+        run: |
+            echo "THE_ENV=ops" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=OPS" >> $GITHUB_ENV
+            echo "Modifying version number ${{ env.project_version}}"
+            THE_VERSION=${{ env.project_version }}
+            echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
+            npm --no-git-tag-version version ${THE_VERSION//-*}
+            
+      - name: Run Snyk as a blocking step
+        uses: snyk/actions/node@master
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: >
+              --org=${{ secrets.SNYK_ORG_ID }}
+              --project-name=${{ github.repository }}
+              --severity-threshold=high
+              --fail-on=all
+
+
+      - name: Run Snyk on Node
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: >
+            --org=${{ secrets.SNYK_ORG_ID }}
+            --project-name=${{ github.repository }}
 
       - name: Setup local DynamoDB
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
@@ -92,6 +162,16 @@ jobs:
           git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
           git push origin "${{ env.THE_VERSION }}"
 
+      # Setup Node to install and test
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: NPM install & NPM Lint
+        run:
+          npm install
+          npm run lint
       # Setup docker to build and push images
       - name: Log in to the Container registry
         uses: docker/login-action@v1
