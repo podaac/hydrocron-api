@@ -35,7 +35,7 @@ jobs:
 
       ## Read the json file into the environment variables
       - name: JSON to variables
-        uses: rgarcia-phi/json-to-variables@v1.1.0
+        uses: actions/checkout@v2
         with:
           filename: 'package.json'
           prefix: project
@@ -178,5 +178,5 @@ jobs:
         
         run: |
           source bin/config.sh ${{ env.THE_ENV }}
-        #  terraform plan -var-file=tfvars/"${{ env.THE_ENV }}".tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
-        #  terraform apply -auto-approve tfplan
+          terraform plan -var-file=tfvars/"${{ env.THE_ENV }}".tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
+          terraform apply -auto-approve tfplan
