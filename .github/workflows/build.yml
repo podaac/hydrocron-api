@@ -186,12 +186,12 @@ jobs:
             type=raw,value=${{ env.THE_ENV }}
 
       - name: Build and push Docker image
-        #if: |
-        #  github.ref == 'refs/heads/develop' ||
-        #  github.ref == 'refs/heads/main'    ||
-        #  startsWith(github.ref, 'refs/heads/release') ||
-        #  github.event.head_commit.message == '/deploy sit' ||
-        #  github.event.head_commit.message == '/deploy uat'
+        if: |
+          github.ref == 'refs/heads/develop' ||
+          github.ref == 'refs/heads/main'    ||
+          startsWith(github.ref, 'refs/heads/release') ||
+          github.event.head_commit.message == '/deploy sit' ||
+          github.event.head_commit.message == '/deploy uat'
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -221,6 +221,8 @@ jobs:
 
       - name: Build and deploy docker to ECR
         run: |
+          bash aws configure get ngap-service-sit.${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
+          bash aws configure get ngap-service-sit.${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
           bash ./docker/build-docker.sh -n podaac-hydrocron -v ${{ env.THE_VERSION }}
           bash ./docker/push-docker-ecr.sh --aws-account ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }} --docker-tag ${{ env.DOCKER_METADATA_OUTPUT_TAGS }} --tf-venue "SIT" 
 
