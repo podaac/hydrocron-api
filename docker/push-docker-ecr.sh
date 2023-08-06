@@ -10,6 +10,13 @@ do
 key="$1"
 
 case $key in
+    -a|--aws-account)
+    aws_acct="$2"
+    echo "--- aws-account"
+    echo $aws_acct
+    shift # past argument
+    shift # past value
+    ;;
     -t|--docker-tag)
     docker_tag="$2"
     echo "--- tf_venue"
@@ -60,7 +67,8 @@ repositoryName=$(echo "${docker_tag}" | awk -F':' '{print $1}')
 
 # Get the AWS Account ID for this venue/profile
 # shellcheck disable=SC2154
-aws_acct=$(aws sts get-caller-identity | python -c "import sys, json; print(json.load(sys.stdin)['Account'])")
+# aws_acct=$(aws sts get-caller-identity | python -c "import sys, json; print(json.load(sys.stdin)['Account'])")
+
 echo "aws_acct"
 echo $aws_acct
 
