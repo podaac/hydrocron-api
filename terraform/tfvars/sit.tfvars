@@ -9,3 +9,6 @@ default_vpc_sg = "sg-09e578df0adec589e"
 
 #SIT subnet_ids
 private_subnets = ["subnet-0d15606f25bd4047b","subnet-0adee3417fedb7f05"]
+
+export REGION=us-west-2
+export BUCKET=podaac-services-sit-terraform

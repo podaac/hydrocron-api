@@ -12,3 +12,6 @@ default_vpc_sg = "sg-0d09018c534f40b61"
 
 # OPS subnet_ids
 private_subnets = ["subnet-0c7ced80b933cab42","subnet-0317affbe0ae6d440"]
+
+export REGION=us-west-2
+export BUCKET=podaac-services-ops-terraform
