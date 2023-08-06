@@ -1,3 +1,4 @@
+# IMAGESTAT
 # This is the main build pipeline that verifies and publishes the software
 name: Build
 # Controls when the workflow will run
@@ -159,16 +160,7 @@ jobs:
           name: python-artifact
           path: dist/*
 
-      ## Set environment variables
-      - name: Configure Initial YAML file and environment variables
-        run: |
-          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
-          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
-          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
-          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
-          echo "THE_ENV=sit" >> $GITHUB_ENV
-          echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
-
+      # HYDROCRON
       - name: Setup local DynamoDB
         if: ${{ startsWith(github.ref, 'test') }}
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
@@ -181,6 +173,16 @@ jobs:
         if: ${{ startsWith(github.ref, 'test') }}
         run: pytest tests/test_api.py
 
+      # HITIDE
+      ## Set environment variables
+      - name: Configure Initial YAML file and environment variables
+        run: |
+          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
+          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
+          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
+          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
+          echo "THE_ENV=sit" >> $GITHUB_ENV
+          echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
 
       - name: Commit Version Bump
         # If building develop, a release branch, or main then we commit the version bump back to the repo
@@ -189,8 +191,8 @@ jobs:
           github.ref == 'refs/heads/main'    ||
           startsWith(github.ref, 'refs/heads/release')
         run: |
-          git config --global user.name 'hitide-profile bot'
-          git config --global user.email 'hitide-profile@noreply.github.com'
+          git config --global user.name 'hydrocron bot'
+          git config --global user.email 'hydrocron@noreply.github.com'
           git commit -am "/version ${{ env.THE_VERSION }}"
           git push
 
