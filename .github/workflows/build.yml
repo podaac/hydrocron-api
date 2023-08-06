@@ -243,7 +243,7 @@ jobs:
           file: docker/Dockerfile
           push: true
           pull: true
-          tags: pattern={{version}},value=${{ env.THE_VERSION }},type=raw,value=${{ env.THE_ENV }}
+          tags: value=${{ env.THE_VERSION }},type=raw
           labels: ${{ env.THE_VERSION }}
 
       
