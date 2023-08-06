@@ -243,7 +243,7 @@ jobs:
           file: docker/Dockerfile
           push: true
           pull: true
-          tags: value=${{ env.THE_VERSION }},type=raw
+          tags: [ 'v*.*.*' ]
           labels: ${{ env.THE_VERSION }}
 
       
