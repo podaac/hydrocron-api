@@ -277,5 +277,5 @@ jobs:
           echo "-------"
           echo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           source bin/config.sh ${{ env.THE_ENV }}
-          terraform plan -var-file=tfvars/${{ env.THE_ENV }}.tfvars -var="app_version=${{ env.THE_VERSION }}" -var="image=${{ env.TF_VAR_hydrocronapi_api_docker_image }}" -out="tfplan"
+          terraform plan -var-file=tfvars/${{ env.THE_ENV }}.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan
