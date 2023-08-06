@@ -53,17 +53,74 @@ jobs:
         run: |
           echo "current_version=$(poetry version | awk '{print $2}')" >> $GITHUB_OUTPUT
           echo "pyproject_name=$(poetry version | awk '{print $1}')" >> $GITHUB_ENV
-
-      # Checkout
-      - name: Checkout project to build and deploy
-        uses: actions/checkout@v2
-
-      ## Read the json file into the environment variables
-      - name: JSON to variables
-        uses: rgarcia-phi/json-to-variables@v1.1.0
+      - name: Bump pre-alpha version
+        # If triggered by push to a feature branch
+        if: |
+          startsWith(github.ref, 'refs/heads/feature') ||
+          startsWith(github.ref, 'refs/heads/issue')     ||
+          startsWith(github.ref, 'refs/heads/dependabot')
+        run: |
+          new_ver="${{ steps.get-version.outputs.current_version }}+$(git rev-parse --short ${GITHUB_SHA})"
+          poetry version $new_ver
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+      - name: Bump alpha version
+        # If triggered by push to the develop branch
+        if: ${{ github.ref == 'refs/heads/develop' }}
+        run: |
+          poetry version prerelease
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+          echo "venue=sit" >> $GITHUB_ENV
+      - name: Bump rc version
+        # If triggered by push to a release branch
+        if: ${{ startsWith(github.ref, 'refs/heads/release/') }}
+        env:
+          # True if the version already has a 'rc' pre-release identifier
+          BUMP_RC: ${{ contains(steps.get-version.outputs.current_version, 'rc') }}
+        run: |
+          if [ "$BUMP_RC" = true ]; then
+            poetry version prerelease
+          else
+            poetry version ${GITHUB_REF#refs/heads/release/}-rc.1
+          fi
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+          echo "venue=uat" >> $GITHUB_ENV
+      - name: Release version
+        # If triggered by push to the main branch
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
+        env:
+          CURRENT_VERSION: ${{ steps.get-version.outputs.current_version }}
+        # Remove -rc.* from end of version string
+        # The ${string%%substring} syntax below deletes the longest match of $substring from back of $string.
+        run: |
+          poetry version ${CURRENT_VERSION%%-rc.*}
+          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
+          echo "venue=ops" >> $GITHUB_ENV
+      - name: Install hydrocron
+        run: poetry install
+      - name: Lint
+        run: |
+          poetry run pylint hydrocron
+          poetry run flake8 hydrocron
+      - name: Run Snyk as a blocking step
+        uses: snyk/actions/python-3.9@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          filename: 'package.json'
-          prefix: project
+          command: test
+          args: >
+            --org=${{ secrets.SNYK_ORG_ID }}
+            --project-name=${{ github.repository }}
+            --severity-threshold=high
+            --fail-on=all
+      - name: Run Snyk on Python
+        uses: snyk/actions/python-3.9@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: >
+            --org=${{ secrets.SNYK_ORG_ID }}
+            --project-name=${{ github.repository }}
 
       ## Set environment variables
       - name: Configure Initial YAML file and environment variables
@@ -124,23 +181,6 @@ jobs:
 
       - name: Setup local DynamoDB
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
-
-      - name: Run Snyk as a blocking step
-        uses: snyk/actions/node@master
-        env:
-            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }} --severity-threshold=high --fail-on=all
-
-
-      - name: Run Snyk on Node
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
-          args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }}
 
       - name: Load sample
         run: python3 tests/example_load_data.py
