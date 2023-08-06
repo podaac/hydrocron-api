@@ -110,6 +110,46 @@ paths:
                 type: array
                 items:
                   type: string
+      x-amazon-apigateway-integration:
+        uri: ${ftsapi_v021_lambda_arn}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
+                  #set($context.responseOverride.status = 206)
+                #end
+                $input.json('$')
+          ^400.*:
+            statusCode: "400"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
+          ^404.*:
+            statusCode: "404"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
+          ^413.*:
+            statusCode: "413"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
+          ^[^1-5].*:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
       x-openapi-router-controller: hydrocronapi.controllers.timeseries
   /timeseriesSubset:
     get:
@@ -210,5 +250,45 @@ paths:
                 type: array
                 items:
                   type: string
+      x-amazon-apigateway-integration:
+        uri: ${ftsapi_v021_lambda_arn}
+        responses:
+          default:
+            statusCode: "200"
+            responseTemplates:
+              application/json: |
+                #set($inputRoot = $input.path('$'))
+                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
+                  #set($context.responseOverride.status = 206)
+                #end
+                $input.json('$')
+          ^400.*:
+            statusCode: "400"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
+          ^404.*:
+            statusCode: "404"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
+          ^413.*:
+            statusCode: "413"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
+          ^[^1-5].*:
+            statusCode: "500"
+            responseTemplates:
+              application/json: |-
+                {
+                  "error" : "$input.path('$.errorMessage')"
+                }
       x-openapi-router-controller: hydrocronapi.controllers.subset
 
