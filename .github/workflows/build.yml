@@ -258,10 +258,10 @@ jobs:
 
       ## NPM Tagging
       - name: Pre Alpha
-        if: |
-          startsWith(github.ref, 'refs/heads/issue') ||
-          startsWith(github.ref, 'refs/heads/dependabot/') ||
-          startsWith(github.ref, 'refs/heads/feature/')
+        #if: |
+        #  startsWith(github.ref, 'refs/heads/issue') ||
+        #  startsWith(github.ref, 'refs/heads/dependabot/') ||
+        #  startsWith(github.ref, 'refs/heads/feature/')
         run: |
             echo "THE_ENV=sit" >> $GITHUB_ENV
             echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
