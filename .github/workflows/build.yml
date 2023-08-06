@@ -307,9 +307,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy Env Override
-        if: |
-          github.event.head_commit.message == '/deploy sit' ||
-          github.event.head_commit.message == '/deploy uat'
+        #if: |
+        #  github.event.head_commit.message == '/deploy sit' ||
+        #  github.event.head_commit.message == '/deploy uat'
         run: |
           message="${{ github.event.head_commit.message }}"
           trimmed_message=${message:1}  # Remove leading slash
