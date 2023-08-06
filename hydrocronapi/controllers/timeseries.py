@@ -165,3 +165,10 @@ def format_csv(results: Generator, feature_id, fields):
                 csv += '\n'
 
     return csv
+
+
+def lambda_handler(event, context):
+    """
+    This function queries the HUC database for relevant results
+    """
+    print("test timeseries")

@@ -182,3 +182,10 @@ def format_subset_csv(results: Generator, polygon, fields):
                     csv += '\n'
 
     return csv
+
+
+def lambda_handler(event, context):
+    """
+    This function queries the HUC database for relevant results
+    """
+    print("test subset")
