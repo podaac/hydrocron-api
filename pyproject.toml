@@ -18,7 +18,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 six = "^1.16.0"
-boto3 = "^1.28.18"
+boto3 = "^1.28.20"
 pandas = "^2.0.3"
 shapely = "^2.0.1"
 connexion = {version = "^2.14.2", extras = ["swagger-ui"]}
