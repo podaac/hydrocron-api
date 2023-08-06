@@ -285,5 +285,5 @@ jobs:
           echo "-------"
           echo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           terraform init -reconfigure -backend-config="bucket=podaac-services-sit-terraform" -backend-config="region=us-west-2"
-          terraform plan -var-file=tfvars/${{ env.THE_ENV }}.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
+          terraform plan -var-file=tfvars/sit.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan
