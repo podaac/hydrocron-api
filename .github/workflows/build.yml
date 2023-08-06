@@ -288,10 +288,10 @@ jobs:
             npm --no-git-tag-version version ${THE_VERSION//-*}     
 
       - name: Push Tag
-        if: |
-          github.ref == 'refs/heads/develop' ||
-          github.ref == 'refs/heads/main'    ||
-          startsWith(github.ref, 'refs/heads/release')
+        #if: |
+        #  github.ref == 'refs/heads/develop' ||
+        #  github.ref == 'refs/heads/main'    ||
+        #  startsWith(github.ref, 'refs/heads/release')
         run: |
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
@@ -307,9 +307,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy Env Override
-        if: |
-          github.event.head_commit.message == '/deploy sit' ||
-          github.event.head_commit.message == '/deploy uat'
+        #if: |
+        #  github.event.head_commit.message == '/deploy sit' ||
+        #  github.event.head_commit.message == '/deploy uat'
         run: |
           message="${{ github.event.head_commit.message }}"
           trimmed_message=${message:1}  # Remove leading slash
