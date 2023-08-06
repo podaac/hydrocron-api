@@ -49,48 +49,76 @@ jobs:
         run: |
           echo "current_version=$(poetry version | awk '{print $2}')" >> $GITHUB_OUTPUT
           echo "pyproject_name=$(poetry version | awk '{print $1}')" >> $GITHUB_ENV
-      - name: Bump pre-alpha version
-        # If triggered by push to a feature branch
+
+
+      # Checkout
+      - name: Checkout project to build and deploy
+        uses: actions/checkout@v2
+
+      ## Read the json file into the environment variables
+      - name: JSON to variables
+        uses: rgarcia-phi/json-to-variables@v1.1.0
+        with:
+          filename: 'package.json'
+          prefix: project
+
+      ## Set environment variables
+      - name: Configure Initial YAML file and environment variables
+        run: |
+          echo "THE_VERSION=${{ env.project_version }}" >> $GITHUB_ENV;
+          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
+          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
+          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
+
+      ## NPM Tagging
+      - name: Pre Alpha
         if: |
-          startsWith(github.ref, 'refs/heads/feature') ||
-          startsWith(github.ref, 'refs/heads/issue')     ||
-          startsWith(github.ref, 'refs/heads/dependabot')
+          startsWith(github.ref, 'refs/heads/issue') ||
+          startsWith(github.ref, 'refs/heads/dependabot/') ||
+          startsWith(github.ref, 'refs/heads/feature/')
         run: |
-          new_ver="${{ steps.get-version.outputs.current_version }}+$(git rev-parse --short ${GITHUB_SHA})"
-          poetry version $new_ver
-          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
-      - name: Bump alpha version
-        # If triggered by push to the develop branch
-        if: ${{ github.ref == 'refs/heads/develop' }}
+            echo "THE_ENV=sit" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+            echo "THE_VERSION=$(npm --no-git-tag-version --allow-same-version version ${{ env.THE_VERSION }}-${GITHUB_SHA})" >> $GITHUB_ENV
+
+      ## Set Alpha variables
+      - name: Alpha
+        if: github.ref == 'refs/heads/develop'
         run: |
-          poetry version prerelease
-          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
-          echo "venue=sit" >> $GITHUB_ENV
+            echo "THE_ENV=sit" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+            echo "THE_VERSION=$(npm --no-git-tag-version version prerelease)" >> $GITHUB_ENV
+
+      ## Bump RC Version
       - name: Bump rc version
         # If triggered by push to a release branch
         if: ${{ startsWith(github.ref, 'refs/heads/release/') }}
         env:
           # True if the version already has a 'rc' pre-release identifier
-          BUMP_RC: ${{ contains(steps.get-version.outputs.current_version, 'rc') }}
+          BUMP_RC: ${{ contains(env.project_version, 'rc') }}
+          RELEASE_VERSION: ${THE_BRANCH//*\/}
         run: |
-          if [ "$BUMP_RC" = true ]; then
-            poetry version prerelease
+          if [ "$BUMP_RC" == true ]; then
+            echo "THE_VERSION=$(npm --no-git-tag-version version prerelease --preid rc)" >> $GITHUB_ENV
           else
-            poetry version ${GITHUB_REF#refs/heads/release/}-rc.1
+            echo "THE_VERSION=$(npm --no-git-tag-version version ${GITHUB_REF#refs/heads/release/}-rc.1)" >> $GITHUB_ENV
           fi
-          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
-          echo "venue=uat" >> $GITHUB_ENV
-      - name: Release version
-        # If triggered by push to the main branch
+
+          echo "THE_ENV=uat" >> $GITHUB_ENV
+          echo "TARGET_ENV_UPPERCASE=UAT" >> $GITHUB_ENV
+
+      ## Set Release variables
+      - name: Release
         if: ${{ startsWith(github.ref, 'refs/heads/main') }}
-        env:
-          CURRENT_VERSION: ${{ steps.get-version.outputs.current_version }}
-        # Remove -rc.* from end of version string
-        # The ${string%%substring} syntax below deletes the longest match of $substring from back of $string.
         run: |
-          poetry version ${CURRENT_VERSION%%-rc.*}
-          echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
-          echo "venue=ops" >> $GITHUB_ENV
+            echo "THE_ENV=ops" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=OPS" >> $GITHUB_ENV
+            echo "Modifying version number ${{ env.project_version}}"
+            THE_VERSION=${{ env.project_version }}
+            echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
+            npm --no-git-tag-version version ${THE_VERSION//-*}   
+
+
       - name: Install hydrocron
         if: ${{ startsWith(github.ref, 'test') }}
         run: poetry install
@@ -99,6 +127,7 @@ jobs:
         run: |
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
+
       - name: Install external libraries
         if: ${{ startsWith(github.ref, 'test') }}
         run: |
@@ -108,6 +137,7 @@ jobs:
           pip3 install connexion
           pip3 install flask_testing
           npm install
+
       - name: Run Snyk as a blocking step
         if: ${{ startsWith(github.ref, 'test') }}
         uses: snyk/actions/python-3.9@master
@@ -130,6 +160,7 @@ jobs:
           args: >
             --org=${{ secrets.SNYK_ORG_ID }}
             --project-name=${{ github.repository }}
+
       - name: Commit Version Bump
         # If building develop, a release branch, or main then we commit the version bump back to the repo
         if: |
@@ -211,9 +242,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy Env Override
-        #if: |
-        #  github.event.head_commit.message == '/deploy sit' ||
-        #  github.event.head_commit.message == '/deploy uat'
+        if: |
+          github.event.head_commit.message == '/deploy sit' ||
+          github.event.head_commit.message == '/deploy uat'
         run: |
           message="${{ github.event.head_commit.message }}"
           trimmed_message=${message:1}  # Remove leading slash
