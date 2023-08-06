@@ -141,6 +141,16 @@ jobs:
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git commit -am "/version ${{ env.software_version }}"
           git push
+      - name: Push Tag
+        #if: |
+        #  github.ref == 'refs/heads/develop' ||
+        #  github.ref == 'refs/heads/main'    ||
+        #  startsWith(github.ref, 'refs/heads/release')
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${{ env.software_version }}" -m "Version ${{ env.software_version }}"
+          git push origin "${{ env.software_version }}"
       - name: Build Python Artifact
         run: |
           poetry build
@@ -178,17 +188,6 @@ jobs:
           git config --global user.email 'hitide-profile@noreply.github.com'
           git commit -am "/version ${{ env.THE_VERSION }}"
           git push
-
-      - name: Push Tag
-        #if: |
-        #  github.ref == 'refs/heads/develop' ||
-        #  github.ref == 'refs/heads/main'    ||
-        #  startsWith(github.ref, 'refs/heads/release')
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
-          git push origin "${{ env.THE_VERSION }}"
 
       # Setup docker to build and push images
       - name: Log in to the Container registry
