@@ -17,3 +17,4 @@ export TF_VAR_region="$REGION"
 export TF_VAR_stage="$VENUE"
 
 terraform init -reconfigure -backend-config="bucket=$BUCKET" -backend-config="region=$REGION"
+echo "<-+-+"
