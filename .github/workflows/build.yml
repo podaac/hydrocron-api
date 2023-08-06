@@ -97,30 +97,10 @@ jobs:
             echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
             npm --no-git-tag-version version ${THE_VERSION//-*}
 
-      - name: Run Snyk as a blocking step
-        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
-        uses: snyk/actions/node@master
-        env:
-            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }} --severity-threshold=high --fail-on=all
-
-
-      - name: Run Snyk on Node
-        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
-          args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }}
-
       - name: Setup local DynamoDB
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
 
       - name: Lint and Flake Install
-        if: ${{ startsWith(github.ref, 'test') }}
         run: |
           pip3 install -U pip pylint
           pip3 install -U pip flake8
@@ -130,6 +110,23 @@ jobs:
           pip3 install -U pip connexion
           pip3 install -U pip flask_testing
           pip3 install -U pip pytest-dynamodb
+
+      - name: Run Snyk as a blocking step
+        uses: snyk/actions/node@master
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }} --severity-threshold=high --fail-on=all
+
+
+      - name: Run Snyk on Node
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }}
 
       - name: Load sample
         run: python3 tests/example_load_data.py
