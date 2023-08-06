@@ -2,7 +2,7 @@
 
 # This script is intended to be run by the CI/CD pipeline to build a specific version of the Hydrocron API.
 
-#set -Eeo pipefail
+set -Eeo pipefail
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -56,5 +56,5 @@ dockerTagVersion=$(echo "${service_version}" | tr "+" _)
 
 tar_filename="${service_name}-${service_version}.tar.gz"
 docker build -t "${repositoryName}":"${dockerTagVersion}" --build-arg SOURCE="dist/${tar_filename}" -f "$SCRIPTPATH"/Dockerfile "$PROJECT_DIR" 1>&2
-echo "*******"
+
 echo "${repositoryName}":"${dockerTagVersion}"
