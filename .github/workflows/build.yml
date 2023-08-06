@@ -162,7 +162,10 @@ jobs:
       ## Set environment variables
       - name: Configure Initial YAML file and environment variables
         run: |
-          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
+          echo "THE_VERSION=${{ env.project_version }}" >> $GITHUB_ENV;
+          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
+          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
+          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
 
       - name: Setup local DynamoDB
         if: ${{ startsWith(github.ref, 'test') }}
@@ -189,6 +192,16 @@ jobs:
           git commit -am "/version ${{ env.THE_VERSION }}"
           git push
 
+      - name: Push Tag
+        if: |
+          github.ref == 'refs/heads/develop' ||
+          github.ref == 'refs/heads/main'    ||
+          startsWith(github.ref, 'refs/heads/release')
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
+          git push origin "${{ env.THE_VERSION }}"
       # Setup docker to build and push images
       - name: Log in to the Container registry
         uses: docker/login-action@v1
