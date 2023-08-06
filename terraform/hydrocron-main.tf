@@ -57,17 +57,6 @@ resource "aws_security_group_rule" "allow_app_in" {
 }
 
 
-resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
-  rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
-  stage_name  = "default"
-  depends_on = [aws_api_gateway_rest_api.hydrocron-api-gateway]
-  triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_rest_api.hydrocron-api-gateway.body
-    ]))
-  }
-}
-
 
 
 # API Gateway
