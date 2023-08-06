@@ -1,16 +1,7 @@
-FROM node:10
-LABEL org.opencontainers.image.source="https://github.com/podaac/hydrocron"
-RUN npm install forever -g
+FROM public.ecr.aws/lambda/python:3.8
 
-ENV project_dir /project
-ENV app_dir ${project_dir}/app
-ENV config_dir ${project_dir}/config
+COPY $SOURCE .
+RUN pip3 install -t /var/task --force ./$SOURCE
 
-RUN mkdir ${project_dir} ${app_dir} ${config_dir}
-WORKDIR ${app_dir}
-
-COPY package*.json ./
-RUN npm install
-COPY . .
-
-CMD ${app_dir}/docker/docker-start-command
+# Run the lambda
+#CMD ["/var/task/podaac/controllers/hydrocron_controller.lambda_handler"]
