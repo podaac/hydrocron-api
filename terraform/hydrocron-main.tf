@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "allow_app_in" {
 
 # API Gateway
 resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
-  name        = "${local.ec2_resources_name}-api-gateway"
+  name        = "${local.ec2_resources_name}-api-gateway1"
   description = "API to access Hydrocron"
   body        = templatefile(
                   "${path.module}/api-specification-templates/hydrocron_aws_api.yml",
