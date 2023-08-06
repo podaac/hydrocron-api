@@ -218,13 +218,25 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
       - run: aws sts get-caller-identity
 
+      - name: upload image to ECR
+        uses: aws-actions/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
+          secret_key: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
+          registry: ${{ env.REGISTRY }}
+          repo: hydrocron-api
+          region: us-west-2
+          auto_tag: true
+          daemon_off: false
+          dockerfile: docker/Dockerfile
+          context: example
 
-      - name: Build and deploy docker to ECR
-        run: |
-          bash aws configure get ngap-service-sit.${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
-          bash aws configure get ngap-service-sit.${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
-          bash ./docker/build-docker.sh -n podaac-hydrocron -v ${{ env.THE_VERSION }}
-          bash ./docker/push-docker-ecr.sh --aws-account ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }} --docker-tag ${{ env.DOCKER_METADATA_OUTPUT_TAGS }} --tf-venue "SIT" 
+      #- name: Build and deploy docker to ECR
+      #  run: |
+      #    aws configure get ngap-service-sit.${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
+      #    aws configure get ngap-service-sit.${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
+      #    bash ./docker/build-docker.sh -n podaac-hydrocron -v ${{ env.THE_VERSION }}
+      #    bash ./docker/push-docker-ecr.sh --aws-account ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }} --docker-tag ${{ env.DOCKER_METADATA_OUTPUT_TAGS }} --tf-venue "SIT"
 
 
       - uses: hashicorp/setup-terraform@v2.0.3
