@@ -327,12 +327,12 @@ jobs:
             type=raw,value=${{ env.THE_ENV }}
 
       - name: Build and push Docker image
-        if: |
-          github.ref == 'refs/heads/develop' ||
-          github.ref == 'refs/heads/main'    ||
-          startsWith(github.ref, 'refs/heads/release') ||
-          github.event.head_commit.message == '/deploy sit' ||
-          github.event.head_commit.message == '/deploy uat'
+        #if: |
+        #  github.ref == 'refs/heads/develop' ||
+        #  github.ref == 'refs/heads/main'    ||
+        #  startsWith(github.ref, 'refs/heads/release') ||
+        #  github.event.head_commit.message == '/deploy sit' ||
+        #  github.event.head_commit.message == '/deploy uat'
         uses: docker/build-push-action@v3
         with:
           context: .
