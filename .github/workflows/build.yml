@@ -284,6 +284,6 @@ jobs:
         run: |
           echo "-------"
           echo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          bash bin/config.sh ${{ env.THE_ENV }}
+          source bin/config.sh ${{ env.THE_ENV }}
           terraform plan -var-file=tfvars/${{ env.THE_ENV }}.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan

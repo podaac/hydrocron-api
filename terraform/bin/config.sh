@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+#set -eo pipefail
 
 if [ ! $# -eq 1 ]
 then
