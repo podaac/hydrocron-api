@@ -4,6 +4,7 @@ variable "stage" {}
 variable "vpc_id" {}
 variable "private_subnets" {}
 variable "default_vpc_sg" {}
+variable "image" {default = ""}
 
 variable "default_tags" {
   type = map(string)

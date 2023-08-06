@@ -58,11 +58,11 @@ resource "aws_security_group_rule" "allow_app_in" {
 
 # Lambda Function for the last stable pre-1.0 release of the API. This function is intended to be temprorary
 # and should be removed once clients have moved off of this version (primarily, earthdata search client)
-resource "aws_lambda_function" "hydrocron_api_lambda_0_0_1" {
-  function_name = "${local.ec2_resources_name}-0_0_1"
+resource "aws_lambda_function" "hydrocron_api_lambda_0_2_1" {
+  function_name = "${local.ec2_resources_name}-0_2_1"
   role          = aws_iam_role.hydrocron-service-role.arn
   package_type = "Image"
-  image_uri     = ${local.image}
+  image_uri     = ${var.image}
   timeout       = 5
 
   vpc_config {
@@ -84,10 +84,10 @@ resource "aws_lambda_function" "hydrocron_api_lambda_0_0_1" {
     })
 }
 
-resource "aws_lambda_permission" "allow_hydrocron_0_0_1" {
+resource "aws_lambda_permission" "allow_hydrocron_0_2_1" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hydrocron_api_lambda_0_0_1.function_name
+  function_name = aws_lambda_function.hydrocron_api_lambda_0_2_1.function_name
   principal     = "apigateway.amazonaws.com"
 
   # The "/*/*/*" portion grants access from any method on any resource
@@ -110,7 +110,7 @@ resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
   package_type = "Image"
-  image_uri     = "${local.account_id}.dkr.ecr.us-west-2.amazonaws.com/${var.docker_tag}"
+  image_uri     = ${var.image}
   timeout       = 5
 
   vpc_config {
