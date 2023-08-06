@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 #set -eo pipefail
 
-VENUE=$1
+while [[ $# -gt 0 ]]
+do
+VENUE="$1"
+
 source "$(dirname $BASH_SOURCE)/../environments/$VENUE.env"
 
 export TF_IN_AUTOMATION=true  # https://www.terraform.io/cli/config/environment-variables#tf_in_automation
