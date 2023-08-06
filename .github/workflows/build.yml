@@ -97,6 +97,7 @@ jobs:
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
           pip3 install boto3
+          pip3 install pandas
           npm install
       - name: Run Snyk as a blocking step
         uses: snyk/actions/python-3.9@master
