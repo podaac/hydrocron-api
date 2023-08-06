@@ -215,7 +215,7 @@ jobs:
       ## Set environment variables
       - name: Configure Initial YAML file and environment variables
         run: |
-          echo "THE_VERSION=${{ env.project_version }}" >> $GITHUB_ENV;
+          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
           echo $THE_VERSION
           echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
           GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
@@ -290,5 +290,5 @@ jobs:
 
         run: |
           source bin/config.sh ${{ env.THE_ENV }}
-          terraform plan -var-file=tfvars/SIT.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
+          terraform plan -var-file=tfvars/SIT.tfvars -var="app_version=${{ env.software_version }}" -out="tfplan"
           terraform apply -auto-approve tfplan
