@@ -58,11 +58,28 @@ resource "aws_security_group_rule" "allow_app_in" {
 
 # Lambda Function for the last stable pre-1.0 release of the API. This function is intended to be temprorary
 # and should be removed once clients have moved off of this version (primarily, earthdata search client)
+resource "ghcr_repository" "listing" {
+  name                 = "hydrocron_api_lambda_0_0_1"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      docker pull "ghcr.io/podaac/hydrocron-api:0.0.1"
+      docker tag "ghcr.io/podaac/hydrocron-api:0.0.1" dummy_container
+      docker push dummy_container
+    EOT
+  }
+}
+
 resource "aws_lambda_function" "hydrocron_api_lambda_0_0_1" {
   function_name = "${local.ec2_resources_name}-0_0_1"
   role          = aws_iam_role.hydrocron-service-role.arn
   package_type = "Image"
-  image_uri     = ghcr.io/podaac/hydrocron-api:0.0.1
+  image_uri     = "ghcr.io/podaac/hydrocron-api:0.0.1"
   timeout       = 5
 
   vpc_config {
@@ -110,7 +127,7 @@ resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
   package_type = "Image"
-  image_uri     = ghcr.io/podaac/hydrocron-api:0.0.1
+  image_uri     = "ghcr.io/podaac/hydrocron-api:0.0.1"
   timeout       = 5
 
   vpc_config {
