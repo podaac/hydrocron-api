@@ -56,6 +56,15 @@ resource "aws_security_group_rule" "allow_app_in" {
   source_security_group_id = aws_security_group.service-app-sg.id
 }
 
+environment {
+variables = {
+  DB_HOST=data.aws_ssm_parameter.fts-db-host.value
+  DB_NAME=data.aws_ssm_parameter.fts-db-name.value
+  DB_USERNAME=data.aws_ssm_parameter.fts-db-user.value
+  DB_PASSWORD_SSM_NAME=data.aws_ssm_parameter.fts-db-user-pass.name
+}
+}
+
 
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
