@@ -93,15 +93,12 @@ jobs:
           echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
           echo "venue=ops" >> $GITHUB_ENV
       - name: Install hydrocron
-        if: ${{ startsWith(github.ref, 'test') }}
         run: poetry install
       - name: Lint
-        if: ${{ startsWith(github.ref, 'test') }}
         run: |
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
       - name: Install external libraries
-        if: ${{ startsWith(github.ref, 'test') }}
         run: |
           pip3 install boto3
           pip3 install geopandas
@@ -110,7 +107,6 @@ jobs:
           pip3 install flask_testing
           npm install
       - name: Run Snyk as a blocking step
-        if: ${{ startsWith(github.ref, 'test') }}
         uses: snyk/actions/python-3.9@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -122,7 +118,6 @@ jobs:
             --severity-threshold=high
             --fail-on=all
       - name: Run Snyk on Python
-        if: ${{ startsWith(github.ref, 'test') }}
         uses: snyk/actions/python-3.9@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -162,15 +157,12 @@ jobs:
 
       # HYDROCRON
       - name: Setup local DynamoDB
-        if: ${{ startsWith(github.ref, 'test') }}
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
 
       - name: Load sample
-        if: ${{ startsWith(github.ref, 'test') }}
         run: python3 tests/example_load_data.py
 
       - name: Test with pytest
-        if: ${{ startsWith(github.ref, 'test') }}
         run: pytest tests/test_api.py
 
       # HITIDE
@@ -183,29 +175,6 @@ jobs:
           echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
           echo "THE_ENV=sit" >> $GITHUB_ENV
           echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
-
-      - name: Commit Version Bump
-        # If building develop, a release branch, or main then we commit the version bump back to the repo
-        if: |
-          github.ref == 'refs/heads/develop' ||
-          github.ref == 'refs/heads/main'    ||
-          startsWith(github.ref, 'refs/heads/release')
-        run: |
-          git config --global user.name 'hydrocron bot'
-          git config --global user.email 'hydrocron@noreply.github.com'
-          git commit -am "/version ${{ env.THE_VERSION }}"
-          git push
-
-      - name: Push Tag
-        if: |
-          github.ref == 'refs/heads/develop' ||
-          github.ref == 'refs/heads/main'    ||
-          startsWith(github.ref, 'refs/heads/release')
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
-          git push origin "${{ env.THE_VERSION }}"
 
       # Setup Node to install and test
       - name: Setup Node
