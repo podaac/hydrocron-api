@@ -79,22 +79,6 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   }
 }
 
-
-resource "aws_cloudwatch_log_group" "hydrocron-api-gateway-logs" {
-  name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.hydrocron-api-gateway.id}/${aws_api_gateway_deployment.hydrocron-api-gateway-deployment.stage_name}"
-  retention_in_days = 60
-}
-
-output "url" {
-  value = "${aws_api_gateway_deployment.hydrocron-api-gateway-deployment.invoke_url}/api"
-}
-
-resource "aws_ssm_parameter" "hydrocron-api-url" {
-  name  = "hydrocron-api-url"
-  type  = "String"
-  value = aws_api_gateway_deployment.hydrocron-api-gateway-deployment.invoke_url
-}
-
 #########################
 # CodeBuild functionality
 #########################
