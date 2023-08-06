@@ -20,7 +20,7 @@ provider "aws" {
 locals {
   name        = var.app_name
   environment = var.stage
-
+  image    = var.TF_VAR_REGISTRY/var.TF_VAR_IMAGE_NAME
   account_id = data.aws_caller_identity.current.account_id
 
   # This is the convention we use to know what belongs to each other

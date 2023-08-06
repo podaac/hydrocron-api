@@ -392,6 +392,7 @@ jobs:
           TF_VAR_hydrocronapi_api_docker_image: "podaac/podaac-cloud/podaac-hydrocron:${{ env.THE_VERSION }}"
 
         run: |
-          source bin/config.sh ${{ env.THE_ENV }}
+          echo ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          source bin/config.sh ${{ env.THE_ENV }} ${{ env.REGISTRY }} ${{ env.IMAGE_NAME }}
           terraform plan -var-file=tfvars/sit.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan
