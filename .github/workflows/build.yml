@@ -16,6 +16,7 @@ on:
 env:
   POETRY_VERSION: "1.3.1"
   PYTHON_VERSION: "3.10"
+  PROJECT_ NAME: podaac/hydrocron
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
@@ -231,6 +232,63 @@ jobs:
       - name: Test with pytest
         run: pytest tests/test_api.py
 
+
+      ## Read the json file into the environment variables
+      - name: JSON to variables
+        uses: rgarcia-phi/json-to-variables@v1.1.0
+        with:
+          filename: 'package.json'
+          prefix: project
+
+      ## Set environment variables
+      - name: Configure Initial YAML file and environment variables
+        run: |
+          echo "THE_VERSION=${{ env.project_version }}" >> $GITHUB_ENV;
+          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
+          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
+          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
+
+      ## NPM Tagging
+      - name: Pre Alpha
+        if: |
+          startsWith(github.ref, 'refs/heads/issue') ||
+          startsWith(github.ref, 'refs/heads/dependabot/') ||
+          startsWith(github.ref, 'refs/heads/feature/')
+        run: |
+            echo "THE_ENV=sit" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+            echo "THE_VERSION=$(npm --no-git-tag-version --allow-same-version version ${{ env.THE_VERSION }}-${GITHUB_SHA})" >> $GITHUB_ENV
+
+      ## Set Alpha variables
+      - name: Alpha
+        if: github.ref == 'refs/heads/develop'
+        run: |
+            echo "THE_ENV=sit" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+            echo "THE_VERSION=$(npm --no-git-tag-version version prerelease)" >> $GITHUB_ENV
+
+
+      ## Set Release variables
+      - name: Release
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
+        run: |
+            echo "THE_ENV=ops" >> $GITHUB_ENV
+            echo "TARGET_ENV_UPPERCASE=OPS" >> $GITHUB_ENV
+            echo "Modifying version number ${{ env.project_version}}"
+            THE_VERSION=${{ env.project_version }}
+            echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
+            npm --no-git-tag-version version ${THE_VERSION//-*}     
+
+      - name: Push Tag
+        if: |
+          github.ref == 'refs/heads/develop' ||
+          github.ref == 'refs/heads/main'    ||
+          startsWith(github.ref, 'refs/heads/release')
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
+          git push origin "${{ env.THE_VERSION }}"
       # Setup docker to build and push images
       - name: Log in to the Container registry
         uses: docker/login-action@v1
