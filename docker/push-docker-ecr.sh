@@ -19,7 +19,7 @@ case $key in
     ;;
     -t|--docker-tag)
     docker_tag="$2"
-    echo "--- tf_venue"
+    echo "--- docker-tag"
     echo $docker_tag
     shift # past argument
     shift # past value
