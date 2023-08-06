@@ -1,4 +1,4 @@
-# FTS API Docker Image
+# Hydrocron API Docker Image
 
 This directory contains the `Dockerfile` used to build the Docker image capable of running FTS API as a lambda.
 
@@ -6,7 +6,7 @@ It includes a number of helper scripts to be run by the CI/CD pipeline but can a
 
 ## Building
 
-Building the FTS API docker image depends on a tar file version of the project. This can be built using `poetry build` or by downloading a previously built version of the project as a tar. 
+Building the Hydrocron API docker image depends on a tar file version of the project. This can be built using `poetry build` or by downloading a previously built version of the project as a tar. 
 
 ### Building from tar
 
@@ -21,7 +21,7 @@ The docker tag of the built image will be returned from the script.
 Example:
 
 ```shell script
-./docker/build-docker.sh -n podaac-fts -v 1.0.0-alpha.3
+./docker/build-docker.sh -n podaac-hydrocron -v 1.0.0-alpha.3
 ```
 
 ## Running
@@ -43,6 +43,6 @@ The easiest way to use the `push-docker-ecr.sh` script is to first call `build-d
 Example:
 
 ```shell script
-export docker_tag=$(./docker/build-docker.sh -n podaac-fts -v 1.0.0-alpha.3)
+export docker_tag=$(./docker/build-docker.sh -n podaac-hydrocron -v 1.0.0-alpha.3)
 ./docker/push-docker-ecr.sh -v sit -t $docker_tag
 ```
