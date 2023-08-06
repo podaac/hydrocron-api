@@ -118,7 +118,6 @@ jobs:
           command: test
           args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }} --severity-threshold=high --fail-on=all
 
-
       - name: Run Snyk on Node
         uses: snyk/actions/node@master
         env:
@@ -126,7 +125,6 @@ jobs:
         with:
           command: monitor
           args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }}
-
 
       - name: Setup local DynamoDB
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
