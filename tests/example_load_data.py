@@ -7,7 +7,7 @@
 import boto3
 import json
 from decimal import Decimal
-import pandas as gpd
+import geopandas as gpd
 
 from hydrocron_database import Hydrocron_DB
 
