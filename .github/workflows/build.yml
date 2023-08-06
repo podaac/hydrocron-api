@@ -142,10 +142,10 @@ jobs:
           git commit -am "/version ${{ env.software_version }}"
           git push
       - name: Push Tag
-        #if: |
-        #  github.ref == 'refs/heads/develop' ||
-        #  github.ref == 'refs/heads/main'    ||
-        #  startsWith(github.ref, 'refs/heads/release')
+        if: |
+          github.ref == 'refs/heads/develop' ||
+          github.ref == 'refs/heads/main'    ||
+          startsWith(github.ref, 'refs/heads/release')
         run: |
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
@@ -160,9 +160,9 @@ jobs:
           path: dist/*
       - name: Publish to test.pypi.org
         id: pypi-test-publish
-        #if: |
-        #  github.ref == 'refs/heads/develop' ||
-        #  startsWith(github.ref, 'refs/heads/release')
+        if: |
+          github.ref == 'refs/heads/develop' ||
+          startsWith(github.ref, 'refs/heads/release')
         env:
           POETRY_PYPI_TOKEN_TESTPYPI: ${{secrets.POETRY_PYPI_TOKEN_TESTPYPI}}
         run: |
@@ -171,7 +171,7 @@ jobs:
           echo "PACKAGE=$(poetry version | awk '{print $1}')" >> $GITHUB_ENV
       - name: Publish to pypi.org
         id: pypi-publish
-        #if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{secrets.POETRY_PYPI_TOKEN_PYPI}}
         run: |
@@ -286,6 +286,17 @@ jobs:
             THE_VERSION=${{ env.project_version }}
             echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
             npm --no-git-tag-version version ${THE_VERSION//-*}     
+
+      - name: Push Tag
+        #if: |
+        #  github.ref == 'refs/heads/develop' ||
+        #  github.ref == 'refs/heads/main'    ||
+        #  startsWith(github.ref, 'refs/heads/release')
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
+          git push origin "${{ env.THE_VERSION }}"
 
       # Setup docker to build and push images
       - name: Log in to the Container registry
