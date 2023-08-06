@@ -97,10 +97,8 @@ jobs:
             echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
             npm --no-git-tag-version version ${THE_VERSION//-*}
 
-      - name: Setup local DynamoDB
-        run: docker run -d -p 8000:8000 amazon/dynamodb-local
-
       - name: Lint and Flake Install
+        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
         run: |
           pip3 install -U pip pylint
           pip3 install -U pip flake8
@@ -129,6 +127,10 @@ jobs:
           command: monitor
           args: --org=${{ secrets.SNYK_ORG_ID }} --project-name=${{ github.repository }}
 
+
+      - name: Setup local DynamoDB
+        run: docker run -d -p 8000:8000 amazon/dynamodb-local
+	
       - name: Load sample
         run: python3 tests/example_load_data.py
 
