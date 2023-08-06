@@ -203,10 +203,8 @@ jobs:
 
       - name: Build and deploy docker to ECR
         run: |
-          bash echo "DOCKER_TAG=$(./docker/build-docker.sh -n podaac-hydrocron -v '${{ env.THE_VERSION }}')" >> $GITHUB_ENV
-          bash echo "----------"
-          bash echo ${{ env.DOCKER_TAG }}
-          bash ./docker/push-docker-ecr.sh --tf-venue "sit" --docker-tag ${{ env.DOCKER_TAG }}
+          bash ./docker/build-docker.sh -n podaac-hydrocron -v ${{ env.THE_VERSION }}
+          bash ./docker/push-docker-ecr.sh --tf-venue "sit" --docker-tag ${{ env.DOCKER_METADATA_OUTPUT_TAGS }}
 
 
       
