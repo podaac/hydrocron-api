@@ -80,7 +80,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda_0_0_1" {
   }
 
   tags = merge(local.default_tags, {
-        "Version": "0.2.1"
+        "Version": "0.0.1"
     })
 }
 
