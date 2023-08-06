@@ -212,11 +212,17 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      ## Read the json file into the environment variables
+      - name: JSON to variables
+        uses: rgarcia-phi/json-to-variables@v1.1.0
+        with:
+          filename: 'package.json'
+          prefix: project
+
       ## Set environment variables
       - name: Configure Initial YAML file and environment variables
         run: |
-          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
-          echo $THE_VERSION
+          echo "THE_VERSION=${{ env.project_version }}" >> $GITHUB_ENV;
           echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
           GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
           echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
