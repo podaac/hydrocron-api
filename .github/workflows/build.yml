@@ -162,7 +162,7 @@ jobs:
       ## Set environment variables
       - name: Configure Initial YAML file and environment variables
         run: |
-          echo "THE_VERSION=${{ env.project_version }}" >> $GITHUB_ENV;
+          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
           echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
           GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
           echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
