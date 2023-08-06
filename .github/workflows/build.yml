@@ -289,6 +289,7 @@ jobs:
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
           git push origin "${{ env.THE_VERSION }}"
+
       # Setup docker to build and push images
       - name: Log in to the Container registry
         uses: docker/login-action@v1
