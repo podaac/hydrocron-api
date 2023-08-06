@@ -290,5 +290,5 @@ jobs:
 
         run: |
           source bin/config.sh ${{ env.THE_ENV }}
-          terraform plan -var-file=tfvars/SIT.tfvars -var="app_version=${{ env.software_version }}" -out="tfplan"
+          terraform plan -var-file=tfvars/sit.tfvars -var="app_version=${{ env.software_version }}" -out="tfplan"
           terraform apply -auto-approve tfplan
