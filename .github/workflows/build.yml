@@ -92,6 +92,7 @@ jobs:
           echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
           echo "venue=ops" >> $GITHUB_ENV
       - name: Install hydrocron
+        if: ${{ startsWith(github.ref, 'test') }}
         run: poetry install
       - name: Lint
         if: ${{ startsWith(github.ref, 'test') }}
@@ -99,6 +100,7 @@ jobs:
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
       - name: Install external libraries
+        if: ${{ startsWith(github.ref, 'test') }}
         run: |
           pip3 install boto3
           pip3 install geopandas
@@ -220,10 +222,6 @@ jobs:
       - name: Configure Initial YAML file and environment variables
         run: |
           echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
-          echo $THE_VERSION
-          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
-          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
-          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
           echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
 
       - name: Setup local DynamoDB
@@ -238,107 +236,6 @@ jobs:
         if: ${{ startsWith(github.ref, 'test') }}
         run: pytest tests/test_api.py
 
-
-      ## Read the json file into the environment variables
-      - name: JSON to variables
-        uses: rgarcia-phi/json-to-variables@v1.1.0
-        with:
-          filename: 'package.json'
-          prefix: project
-
-      ## Set environment variables
-      - name: Configure Initial YAML file and environment variables
-        run: |
-          echo "THE_VERSION=${{ env.project_version }}" >> $GITHUB_ENV;
-          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
-          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
-          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
-
-      ## NPM Tagging
-      - name: Pre Alpha
-        #if: |
-        #  startsWith(github.ref, 'refs/heads/issue') ||
-        #  startsWith(github.ref, 'refs/heads/dependabot/') ||
-        #  startsWith(github.ref, 'refs/heads/feature/')
-        run: |
-            echo "THE_ENV=sit" >> $GITHUB_ENV
-            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
-            echo "THE_VERSION=$(npm --no-git-tag-version --allow-same-version version ${{ env.THE_VERSION }}-${GITHUB_SHA})" >> $GITHUB_ENV
-
-      ## Set Alpha variables
-      - name: Alpha
-        if: github.ref == 'refs/heads/develop'
-        run: |
-            echo "THE_ENV=sit" >> $GITHUB_ENV
-            echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
-            echo "THE_VERSION=$(npm --no-git-tag-version version prerelease)" >> $GITHUB_ENV
-
-
-      ## Set Release variables
-      - name: Release
-        if: ${{ startsWith(github.ref, 'refs/heads/main') }}
-        run: |
-            echo "THE_ENV=ops" >> $GITHUB_ENV
-            echo "TARGET_ENV_UPPERCASE=OPS" >> $GITHUB_ENV
-            echo "Modifying version number ${{ env.project_version}}"
-            THE_VERSION=${{ env.project_version }}
-            echo "THE_VERSION=${THE_VERSION//-*}" >> $GITHUB_ENV
-            npm --no-git-tag-version version ${THE_VERSION//-*}     
-
-      - name: Push Tag
-        #if: |
-        #  github.ref == 'refs/heads/develop' ||
-        #  github.ref == 'refs/heads/main'    ||
-        #  startsWith(github.ref, 'refs/heads/release')
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-          git tag -a "${{ env.THE_VERSION }}" -m "Version ${{ env.THE_VERSION }}"
-          git push origin "${{ env.THE_VERSION }}"
-
-      # Setup docker to build and push images
-      - name: Log in to the Container registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deploy Env Override
-        #if: |
-        #  github.event.head_commit.message == '/deploy sit' ||
-        #  github.event.head_commit.message == '/deploy uat'
-        run: |
-          message="${{ github.event.head_commit.message }}"
-          trimmed_message=${message:1}  # Remove leading slash
-          override_env=$(echo "$trimmed_message" | grep -oE '[^[:space:]]+$')
-          override_env_upper=$(echo "$trimmed_message" | awk '{print toupper($NF)}')
-          echo "THE_ENV=${override_env}" >> $GITHUB_ENV
-          echo "TARGET_ENV_UPPERCASE=${override_env_upper}" >> $GITHUB_ENV
-
-      - name: Extract metadata (tags, labels) for Docker
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{version}},value=${{ env.THE_VERSION }}
-            type=raw,value=${{ env.THE_ENV }}
-
-      - name: Build and push Docker image
-        #if: |
-        #  github.ref == 'refs/heads/develop' ||
-        #  github.ref == 'refs/heads/main'    ||
-        #  startsWith(github.ref, 'refs/heads/release') ||
-        #  github.event.head_commit.message == '/deploy sit' ||
-        #  github.event.head_commit.message == '/deploy uat'
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: docker/Dockerfile
-          push: true
-          pull: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
 
       
       # Setup Terraform to Deploy
@@ -356,27 +253,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
       - run: aws sts get-caller-identity
-
-      #- name: upload image to ECR
-      #  uses: appleboy/docker-ecr-action@master
-      #  with:
-      #    access_key: ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
-      #    secret_key: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
-      #    registry: ${{ env.REGISTRY }}
-      #    repo: hydrocron-api
-      #    region: us-west-2
-      #    auto_tag: true
-      #    daemon_off: false
-      #    dockerfile: docker/Dockerfile
-      #    context: example
-
-      #- name: Build and deploy docker to ECR
-      #  run: |
-      #    aws configure get ngap-service-sit.${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
-      #    aws configure get ngap-service-sit.${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
-      #    bash ./docker/build-docker.sh -n podaac-hydrocron -v ${{ env.THE_VERSION }}
-      #    bash ./docker/push-docker-ecr.sh --aws-account ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }} --docker-tag ${{ env.DOCKER_METADATA_OUTPUT_TAGS }} --tf-venue "SIT"
-
 
       - uses: hashicorp/setup-terraform@v2.0.3
         with:
