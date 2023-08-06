@@ -1,6 +1,6 @@
 # Hydrocron API Docker Image
 
-This directory contains the `Dockerfile` used to build the Docker image capable of running FTS API as a lambda.
+This directory contains the `Dockerfile` used to build the Docker image capable of running hydrocron API as a lambda.
 
 It includes a number of helper scripts to be run by the CI/CD pipeline but can also be run locally to build the image.
 
