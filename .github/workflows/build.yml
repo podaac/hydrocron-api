@@ -92,7 +92,6 @@ jobs:
           echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
           echo "venue=ops" >> $GITHUB_ENV
       - name: Install hydrocron
-        if: ${{ startsWith(github.ref, 'test') }}
         run: poetry install
       - name: Lint
         if: ${{ startsWith(github.ref, 'test') }}
@@ -100,7 +99,6 @@ jobs:
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
       - name: Install external libraries
-        if: ${{ startsWith(github.ref, 'test') }}
         run: |
           pip3 install boto3
           pip3 install geopandas
