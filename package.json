@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "boto3": "^0.0.1",
-    "geopandas": "0.13.2"
+    "pandas": "0.0.3"
   },
   "devDependencies": {
     "eslint": "^8.1.0",
