@@ -12,6 +12,3 @@ default_vpc_sg = "sg-0a6324ed6a7bcf729"
 
 # UAT subnet_ids
 private_subnets = ["subnet-011ec668db7629352","subnet-040f539b1bd5d06eb"]
-
-export REGION=us-west-2
-export BUCKET=podaac-services-uat-terraform
