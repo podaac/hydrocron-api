@@ -56,15 +56,6 @@ resource "aws_security_group_rule" "allow_app_in" {
   source_security_group_id = aws_security_group.service-app-sg.id
 }
 
-environment {
-variables = {
-  DB_HOST=data.aws_ssm_parameter.fts-db-host.value
-  DB_NAME=data.aws_ssm_parameter.fts-db-name.value
-  DB_USERNAME=data.aws_ssm_parameter.fts-db-user.value
-  DB_PASSWORD_SSM_NAME=data.aws_ssm_parameter.fts-db-user-pass.name
-}
-}
-
 
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
@@ -244,6 +235,14 @@ resource "aws_codebuild_project" "hydrocron" {
     type = "S3"
   }
 
+  environment {
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image_pull_credentials_type = "CODEBUILD"
+    privileged_mode = false
+    image = "aws/codebuild/standard:3.0"
+    type = "LINUX_CONTAINER"
+  }
+
   logs_config {
     cloudwatch_logs {
       status = "ENABLED"
@@ -262,4 +261,13 @@ resource "aws_codebuild_project" "hydrocron" {
     location = "podaac-services-${var.stage}-deploy/internal/hydrocron/"
   }
 
+  vpc_config {
+    vpc_id = var.vpc_id
+
+    subnets = var.private_subnets
+
+    security_group_ids = [
+      aws_security_group.service-app-sg.id
+    ]
+  }
 }
