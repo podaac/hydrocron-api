@@ -125,18 +125,6 @@ jobs:
       - name: Setup local DynamoDB
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
 
-      - name: Lint and Flake Install
-        run: |
-          pip3 install -U pip pylint
-          pip3 install -U pip flake8
-          pip3 install -U pip boto3
-          pip3 install -U pip geopandas
-          pip3 install -U pip pytest
-          pip3 install -U pip connexion
-          pip3 install -U pip flask_testing
-          pip3 install -U pip pytest-dynamodb
-          npm install
-
       - name: Run Snyk as a blocking step
         uses: snyk/actions/node@master
         env:
