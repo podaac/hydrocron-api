@@ -1,46 +1,15 @@
 #!/usr/bin/env bash
-
-set -Eexo pipefail
-
-# Read in args from command line
-
-POSITIONAL=()
+set -eo pipefail
 while [[ $# -gt 0 ]]
 do
-key="$1"
+VENUE="$1"
 
-case $key in
-    -t|--docker-tag)
-    docker_tag="$2"
-    shift # past argument
-    shift # past value
-    ;;
-    -v|--tf-venue)
-    tf_venue="$2"
-    case $tf_venue in
-     sit|uat|ops) ;;
-     *)
-        echo "tf_venue must be sit, uat, or ops"
-        exit 1;;
-    esac
-    shift # past argument
-    shift # past value
-    ;;
-    *)    # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
-    shift # past argument
-    ;;
-esac
-done
-set -- "${POSITIONAL[@]}" # restore positional parameters
+source "$(dirname $BASH_SOURCE)/../environments/$VENUE.env"
 
-# https://www.terraform.io/docs/commands/environment-variables.html#tf_in_automation
-TF_IN_AUTOMATION=true
+export TF_IN_AUTOMATION=true  # https://www.terraform.io/cli/config/environment-variables#tf_in_automation
+export TF_INPUT=false  # https://www.terraform.io/cli/config/environment-variables#tf_input
 
-# Terraform initialization
-terraform init -reconfigure -input=false -backend-config="bucket=podaac-services-${tf_venue}-terraform" -backend-config="profile=ngap-service-${tf_venue}"
+export TF_VAR_region="$REGION"
+export TF_VAR_stage="$VENUE"
 
-terraform plan -input=false -var-file=tfvars/"${tf_venue}".tfvars -var="credentials=~/.aws/credentials" -var="docker_tag=${docker_tag}" -var="profile=ngap-service-${tf_venue}" -out="tfplan"
-
-# Apply the plan that was created
-terraform apply -input=false -auto-approve tfplan
+terraform init -reconfigure -backend-config="bucket=$BUCKET" -backend-config="region=$REGION"
