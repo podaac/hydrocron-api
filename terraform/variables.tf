@@ -24,5 +24,5 @@ variable "profile" {
 }
 
 variable "docker_tag" {
-  default = "podaac/hydrocron:latest"
+  default = "ghcr.io/podaac/hydrocron:latest"
 }
