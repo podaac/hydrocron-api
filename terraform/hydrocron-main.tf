@@ -56,30 +56,6 @@ resource "aws_security_group_rule" "allow_app_in" {
   source_security_group_id = aws_security_group.service-app-sg.id
 }
 
-# Lambda Function for the last stable pre-1.0 release of the API. This function is intended to be temprorary
-# and should be removed once clients have moved off of this version (primarily, earthdata search client)
-
-
-  vpc_config {
-    subnet_ids = var.private_subnets
-    security_group_ids = [aws_security_group.service-app-sg.id]
-  }
-
-  environment {
-    variables = {
-      DB_HOST=data.aws_ssm_parameter.hydrocron-db-host.value
-      DB_NAME=data.aws_ssm_parameter.hydrocron-db-name.value
-      DB_USERNAME=data.aws_ssm_parameter.hydrocron-db-user.value
-      DB_PASSWORD_SSM_NAME=data.aws_ssm_parameter.hydrocron-db-user-pass.name
-    }
-  }
-
-  tags = merge(local.default_tags, {
-        "Version": "0.2.1"
-    })
-}
-
-
 
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
@@ -259,14 +235,6 @@ resource "aws_codebuild_project" "hydrocron" {
     type = "S3"
   }
 
-  environment {
-    compute_type = "BUILD_GENERAL1_SMALL"
-    image_pull_credentials_type = "CODEBUILD"
-    privileged_mode = false
-    image = "aws/codebuild/standard:3.0"
-    type = "LINUX_CONTAINER"
-  }
-
   logs_config {
     cloudwatch_logs {
       status = "ENABLED"
@@ -285,13 +253,4 @@ resource "aws_codebuild_project" "hydrocron" {
     location = "podaac-services-${var.stage}-deploy/internal/hydrocron/"
   }
 
-  vpc_config {
-    vpc_id = var.vpc_id
-
-    subnets = var.private_subnets
-
-    security_group_ids = [
-      aws_security_group.service-app-sg.id
-    ]
-  }
 }
