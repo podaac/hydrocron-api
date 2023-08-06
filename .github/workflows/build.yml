@@ -243,8 +243,8 @@ jobs:
           file: docker/Dockerfile
           push: true
           pull: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.THE_VERSION }}
+          labels: ${{ env.THE_VERSION }}
 
       
       # Setup Terraform to Deploy
