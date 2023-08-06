@@ -12,3 +12,19 @@ variable "default_tags" {
   type = map(string)
   default = {}
 }
+
+variable "app_version" {
+  default = ""
+}
+
+variable "credentials" {
+  default = "~/.aws/credentials"
+}
+
+variable "profile" {
+  default = "ngap-service-sit"
+}
+
+variable "docker_tag" {
+  default = "podaac/hydrocron:latest"
+}
