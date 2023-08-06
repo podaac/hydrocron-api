@@ -96,9 +96,12 @@ jobs:
         run: |
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
+      - name: Install external libraries
+        run: |
           pip3 install boto3
           pip3 install geopandas
           pip3 install pytest
+          pip3 install connexion
           npm install
       - name: Run Snyk as a blocking step
         uses: snyk/actions/python-3.9@master
