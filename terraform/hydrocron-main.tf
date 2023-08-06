@@ -58,12 +58,7 @@ resource "aws_security_group_rule" "allow_app_in" {
 
 # Lambda Function for the last stable pre-1.0 release of the API. This function is intended to be temprorary
 # and should be removed once clients have moved off of this version (primarily, earthdata search client)
-resource "aws_lambda_function" "hydrocron_api_lambda_0_2_1" {
-  function_name = "${local.ec2_resources_name}-0_2_1"
-  role          = aws_iam_role.hydrocron-service-role.arn
-  package_type = "Image"
-  image_uri     = "${local.account_id}.dkr.ecr.us-west-2.amazonaws.com/podaac/podaac-cloud/podaac-hydrocron:latest"
-  timeout       = 5
+
 
   vpc_config {
     subnet_ids = var.private_subnets
@@ -84,16 +79,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda_0_2_1" {
     })
 }
 
-resource "aws_lambda_permission" "allow_hydrocron_0_2_1" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hydrocron_api_lambda_0_2_1.function_name
-  principal     = "apigateway.amazonaws.com"
 
-  # The "/*/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.hydrocron-api-gateway.execution_arn}/*/*/*"
-}
 
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
@@ -106,40 +92,7 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   }
 }
 
-resource "aws_lambda_function" "hydrocron_api_lambdav1" {
-  function_name = "${local.ec2_resources_name}-function"
-  role          = aws_iam_role.hydrocron-service-role.arn
-  package_type = "Image"
-  image_uri     = "${local.account_id}.dkr.ecr.us-west-2.amazonaws.com/${var.docker_tag}"
-  timeout       = 5
 
-  vpc_config {
-    subnet_ids = var.private_subnets
-    security_group_ids = [aws_security_group.service-app-sg.id]
-  }
-
-  environment {
-    variables = {
-      DB_HOST=data.aws_ssm_parameter.hydrocron-db-host.value
-      DB_NAME=data.aws_ssm_parameter.hydrocron-db-name.value
-      DB_USERNAME=data.aws_ssm_parameter.hydrocron-db-user.value
-      DB_PASSWORD_SSM_NAME=data.aws_ssm_parameter.hydrocron-db-user-pass.name
-    }
-  }
-
-  tags = var.default_tags
-}
-
-resource "aws_lambda_permission" "allow_hydrocron" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hydrocron_api_lambdav1.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # The "/*/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.hydrocron-api-gateway.execution_arn}/*/*/*"
-}
 
 # API Gateway
 resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
@@ -148,8 +101,6 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   body        = templatefile(
                   "${path.module}/api-specification-templates/hydrocron_aws_api.yml",
                   {
-                    hydrocronapi_v021_lambda_arn = aws_lambda_function.hydrocron_api_lambda_0_2_1.invoke_arn
-                    hydrocronapi_lambda_arn = aws_lambda_function.hydrocron_api_lambdav1.invoke_arn
                     vpc_id = var.vpc_id
                   })
   parameters = {
