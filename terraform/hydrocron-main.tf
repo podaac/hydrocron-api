@@ -55,6 +55,7 @@ resource "aws_security_group_rule" "allow_app_in" {
   to_port     = 3306
   source_security_group_id = aws_security_group.service-app-sg.id
 }
+
 /*
 # Lambda Function for the last stable pre-1.0 release of the API. This function is intended to be temprorary
 # and should be removed once clients have moved off of this version (primarily, earthdata search client)
