@@ -46,14 +46,9 @@ PACKAGE_NAME="hydrocron"
 VERSION="0.0.1"
 
 ROOT_PATH="$PWD"
-ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION.zip"
+ZIP_PATH="$ROOT_PATH/$PACKAGE_NAME-$VERSION.zip"
 
-cd build/lib/python3.*/site-packages
-touch hydrocronapi/__init__.py
-rm -rf *.dist-info _virtualenv.*
-find . -type d -name __pycache__ -exec rm -rf {} \+
-
-mkdir -p "$ROOT_PATH/dist/"
+mkdir -p "$ROOT_PATH/"
 rm -f "$ZIP_PATH"
 zip -vr9 "$ZIP_PATH" .
 
