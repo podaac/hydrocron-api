@@ -215,6 +215,21 @@ jobs:
         with:
           terraform_version: 1.0.3
 
+      #########################################################################
+      # Publish release to releases
+      #########################################################################
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: 'zip'
+          filename: '${{ github.repository }}-${{ env.THE_VERSION}}'
+          exclusions: '*.git* /*node_modules/* .editorconfig'
+      - name: Upload Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          artifacts: "${{ github.repository }}-${{ env.THE_VERSION}}.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Deploy Terraform
         #if: |
         #  github.ref == 'refs/heads/develop' ||
@@ -234,7 +249,6 @@ jobs:
           echo "-------"
           echo ${{ env.THE_ENV }}
           echo ${{ env.THE_VERSION }}
-          tar -zcvf hydrocron.tar.gz ../
-          terraform init -reconfigure -backend-config="bucket=podaac-services-sit-terraform" -backend-config="region=us-west-2"
-          terraform plan -var-file=tfvars/${{ env.THE_ENV }}.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
+          source bin/config.sh ${{ env.THE_ENV }}
+          terraform plan -var-file=tfvars/"${{ env.THE_ENV }}".tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan

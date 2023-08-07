@@ -1,15 +1,60 @@
 #!/usr/bin/env bash
-set -eo pipefail
+
+set -Eexo pipefail
+
+# Read in args from command line
+
+POSITIONAL=()
 while [[ $# -gt 0 ]]
 do
-VENUE="$1"
+key="$1"
 
-source "$(dirname $BASH_SOURCE)/../environments/$VENUE.env"
+case $key in
+    --ticket)
+    ticket="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    --app-version)
+    app_version="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -v|--tf-venue)
+    tf_venue="$2"
+    case $tf_venue in
+     sit|uat|ops) ;;
+     *)
+        echo "tf_venue must be sit, uat, or ops"
+        exit 1;;
+    esac
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
 
-export TF_IN_AUTOMATION=true  # https://www.terraform.io/cli/config/environment-variables#tf_in_automation
-export TF_INPUT=false  # https://www.terraform.io/cli/config/environment-variables#tf_input
+# https://www.terraform.io/docs/commands/environment-variables.html#tf_in_automation
+TF_IN_AUTOMATION=true
 
-export TF_VAR_region="$REGION"
-export TF_VAR_stage="$VENUE"
+# Terraform initialization
+terraform init -reconfigure -input=false -backend-config="bucket=podaac-services-${tf_venue}-terraform" -backend-config="profile=ngap-service-${tf_venue}"
 
-terraform init -reconfigure -backend-config="bucket=$BUCKET" -backend-config="region=$REGION"
+if [[ "${ticket}" ]]; then
+  set +e
+  terraform workspace new "${ticket}"
+  set -e
+  terraform workspace select "${ticket}"
+else
+  terraform workspace select default
+fi
+
+terraform plan -input=false -var-file=tfvars/"${tf_venue}".tfvars -var="credentials=~/.aws/credentials" -var="profile=ngap-service-${tf_venue}" -var="app_version=${app_version}" -out="tfplan"
+
+# Apply the plan that was created
+terraform apply -input=false -auto-approve tfplan
