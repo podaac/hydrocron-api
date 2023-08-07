@@ -195,43 +195,6 @@ jobs:
           npm install
           npm run lint
 
-      # Setup docker to build and push images
-      - name: Log in to the Container registry
-        if: ${{ startsWith(github.ref, 'test') }}
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        if: ${{ startsWith(github.ref, 'test') }}
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{version}},value=${{ env.THE_VERSION }}
-            type=raw,value=${{ env.THE_ENV }}
-
-      - name: Build and push Docker image
-        if: ${{ startsWith(github.ref, 'test') }}
-        #if: |
-        #  github.ref == 'refs/heads/develop' ||
-        #  github.ref == 'refs/heads/main'    ||
-        #  startsWith(github.ref, 'refs/heads/release') ||
-        #  github.event.head_commit.message == '/deploy sit' ||
-        #  github.event.head_commit.message == '/deploy uat'
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: docker/Dockerfile
-          push: true
-          pull: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      
       # Setup Terraform to Deploy
 
       - name: Configure AWS Credentials as Environment Variables
