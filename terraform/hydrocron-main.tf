@@ -70,8 +70,8 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 
 data "archive_file" "zip_the_python_code" {
 type        = "zip"
-source_dir  = "${path.module}/hydrocron/"
-output_path = "${path.module}/hydrocron/hydrocron.zip"
+source_dir  = "${path.module}/"
+output_path = "${path.module}/hydrocron.zip"
 }
 
 

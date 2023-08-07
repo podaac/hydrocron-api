@@ -234,7 +234,7 @@ jobs:
           echo "-------"
           echo ${{ env.THE_ENV }}
           echo ${{ env.THE_VERSION }}
-          tar -zcvf archive.tar.gz .
+          tar -zcvf hydrocron.tar.gz ../
           terraform init -reconfigure -backend-config="bucket=podaac-services-sit-terraform" -backend-config="region=us-west-2"
           terraform plan -var-file=tfvars/${{ env.THE_ENV }}.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan
