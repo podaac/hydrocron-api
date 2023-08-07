@@ -74,7 +74,7 @@ resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   role          = aws_iam_role.hydrocron-service-role.arn
   s3_bucket     = "podaac-services-sit-hydrocron"
   s3_key        = "hydrocron"
-  timeout       = 5
+  timeout       = 10
   handler       = "timeseries.lambda_handler"
   runtime       = "python3.8"
 
