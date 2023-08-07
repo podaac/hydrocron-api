@@ -68,13 +68,6 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   }
 }
 
-data “archive_file” “zipit” {
- type = “zip”
- source_dir = “crawler/dist”
- output_path = “${var.crawler_packaged_file}”
-}
-
-
 data "archive_file" "zip_the_python_code" {
 type        = "zip"
 source_dir  = "${path.module}/hydrocron/"
