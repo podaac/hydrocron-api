@@ -111,7 +111,7 @@ paths:
                 items:
                   type: string
       x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v001_lambda_arn}
+        uri: ${hydrocronapi_lambda_arn}
         responses:
           default:
             statusCode: "200"
@@ -251,7 +251,7 @@ paths:
                 items:
                   type: string
       x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v001_lambda_arn}
+        uri: ${hydrocronapi_lambda_arn}
         responses:
           default:
             statusCode: "200"
