@@ -215,20 +215,14 @@ jobs:
         with:
           terraform_version: 1.0.3
 
-      #########################################################################
-      # Publish release to releases
-      #########################################################################
-      - name: Archive Release
-        uses: thedoctor0/zip-release@0.7.1
+      #   -- Build --
+      - name: Build lambda package
+        run: ./build.sh
+      - name: Upload packaged zip
+        uses: actions/upload-artifact@v3.1.0
         with:
-          type: 'zip'
-          filename: '${{ github.repository }}-${{ env.THE_VERSION}}'
-          exclusions: '*.git* /*node_modules/* .editorconfig'
-      - name: Upload Release
-        uses: ncipollo/release-action@v1.12.0
-        with:
-          artifacts: "${{ github.repository }}-${{ env.THE_VERSION}}.zip"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: dist
+          path: dist/*.zip
 
       - name: Deploy Terraform
         #if: |
