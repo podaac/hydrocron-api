@@ -80,6 +80,8 @@ resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   role          = aws_iam_role.hydrocron-service-role.arn
   filename      = "${path.module}/hydrocron.zip"
   timeout       = 5
+  handler       = "timeseries.lambda_handler"
+  runtime                        = "python3.10"
 
   vpc_config {
     subnet_ids = var.private_subnets
