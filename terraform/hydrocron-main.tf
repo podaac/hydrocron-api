@@ -69,16 +69,11 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 }
 
 
-data "archive_file" "zip_the_python_code" {
-type        = "zip"
-source_dir  = "${path.module}/"
-output_path = "${path.module}/hydrocron.zip"
-}
-
 resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
-  filename      = "${path.module}/hydrocron.zip"
+  s3_bucket     = ${var.bucket}
+  s3_key        = "hydrocron"
   timeout       = 5
   handler       = "timeseries.lambda_handler"
   runtime       = "python3.8"
