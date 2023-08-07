@@ -56,17 +56,6 @@ resource "aws_security_group_rule" "allow_app_in" {
   source_security_group_id = aws_security_group.service-app-sg.id
 }
 
-resource "aws_lambda_permission" "allow_hydrocron_0_0_1" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hydrocron_api_lambda_0_0_1.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # The "/*/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.hydrocron-api-gateway.execution_arn}/*/*/*"
-}
-*/
 
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id

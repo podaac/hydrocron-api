@@ -41,8 +41,8 @@ resource "aws_iam_policy" "hydrocron-service-policy" {
               "s3:ListBucket*"
           ],
           "Resource": [
-                  "arn:aws:s3:::podaac-${var.stage}-service-work",
-                  "arn:aws:s3:::podaac-${var.stage}-service-work/*"
+                  "arn:aws:s3:::podaac-hydrocron-${var.stage}-service-work",
+                  "arn:aws:s3:::podaac-hydrocron-${var.stage}-service-work/*"
           ]
       },
       {
@@ -56,7 +56,7 @@ resource "aws_iam_policy" "hydrocron-service-policy" {
               "s3:DeleteObjectVersion"
           ],
           "Resource": [
-              "arn:aws:s3:::podaac-${var.stage}-service-work",
+              "arn:aws:s3:::podaac-hydrocron-${var.stage}-service-work",
               "arn:aws:s3:::podaac-${var.stage}-service-work/*"
           ]
       },
