@@ -85,6 +85,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda_0_0_1" {
     })
 }
 
+
 resource "aws_lambda_permission" "allow_hydrocron_0_0_1" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
@@ -95,6 +96,7 @@ resource "aws_lambda_permission" "allow_hydrocron_0_0_1" {
   # within the API Gateway REST API.
   source_arn = "${aws_api_gateway_rest_api.hydrocron-api-gateway.execution_arn}/*/*/*"
 }
+*/
 
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
@@ -110,8 +112,8 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
-  package_type = "Image"
-  image_uri     = "ghcr.io/podaac/hydrocron-api:0.0.1"
+  #package_type = "Image"
+  #image_uri     = "ghcr.io/podaac/hydrocron-api:0.0.1"
   timeout       = 5
 
   vpc_config {
@@ -152,7 +154,7 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   body        = templatefile(
                   "${path.module}/api-specification-templates/hydrocron_aws_api.yml",
                   {
-                    hydrocronapi_v001_lambda_arn = aws_lambda_function.hydrocron_api_lambda_0_0_1.invoke_arn
+                    # hydrocronapi_v001_lambda_arn = aws_lambda_function.hydrocron_api_lambda_0_0_1.invoke_arn
                     hydrocronapi_lambda_arn = aws_lambda_function.hydrocron_api_lambdav1.invoke_arn
                     vpc_id = var.vpc_id
                   })
