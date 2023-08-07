@@ -1,11 +1,3 @@
-# configure the S3 backend for storing state. This allows different
-# team members to control and update terraform state.
-terraform {
-  backend "s3" {
-    key    = "services/hydrocron/terraform.tfstate"
-    region = "us-west-2"
-  }
-}
 
 provider "aws" {
   region = "us-west-2"
