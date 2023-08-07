@@ -42,8 +42,8 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 
 
-PACKAGE_NAME=$(awk -F' = ' '{gsub(/"/,"");if($1=="name")print $2}' pyproject.toml)
-VERSION=$(poetry version -s)
+PACKAGE_NAME="hydrocron"
+VERSION="0.0.1"
 
 ROOT_PATH="$PWD"
 ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION.zip"
