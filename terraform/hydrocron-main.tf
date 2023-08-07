@@ -68,12 +68,15 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   }
 }
 
+data "aws_s3_bucket_object" "package" {
+  bucket = "${local.ec2_resources_name}-public"
+  key    = "hydrocron.zip"
+}
 
 resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
-  s3_bucket     = "${local.ec2_resources_name}-public"
-  s3_key        = "hydrocron"
+  source_code_hash = data.aws_s3_bucket_object.package.metadata.Hash
   timeout       = 5
   handler       = "timeseries.lambda_handler"
   runtime       = "python3.8"
