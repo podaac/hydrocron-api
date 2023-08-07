@@ -48,9 +48,6 @@ VERSION="0.0.1"
 ROOT_PATH="$PWD"
 ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION.zip"
 
-# Install the bundle plugin using `poetry self add poetry-plugin-bundle`
-poetry bundle venv build --clear --without=dev
-
 cd build/lib/python3.*/site-packages
 touch hydrocronapi/__init__.py
 rm -rf *.dist-info _virtualenv.*
