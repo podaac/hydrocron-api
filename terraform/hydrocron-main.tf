@@ -72,7 +72,7 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
-  s3_bucket     = ${var.bucket}
+  s3_bucket     = "podaac-services-sit-terraform"
   s3_key        = "hydrocron"
   timeout       = 5
   handler       = "timeseries.lambda_handler"
