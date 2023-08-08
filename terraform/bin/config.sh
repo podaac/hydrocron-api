@@ -69,6 +69,3 @@ if [[ "${ticket}" ]]; then
 else
   terraform workspace select default
 fi
-
-# Apply the plan that was created
-terraform apply -input=false -auto-approve tfplan
