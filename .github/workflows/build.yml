@@ -155,10 +155,6 @@ jobs:
       - name: Build Python Artifact
         run: |
           poetry build
-      - uses: actions/upload-artifact@v3
-        with:
-          name: python-artifact
-          path: dist/*
 
       # HYDROCRON
       - name: Setup local DynamoDB
@@ -214,6 +210,16 @@ jobs:
       - uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: 1.0.3
+
+
+      #   -- Build --
+      - name: Build lambda package
+        run: ./build.sh
+      - name: Upload packaged zip
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: dist
+          path: dist/*.zip
 
       - name: Deploy Terraform
         #if: |
