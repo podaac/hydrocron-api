@@ -261,7 +261,6 @@ resource "aws_codebuild_project" "hydrocron" {
   description   = "Hydrocron Postman Testing"
   build_timeout = "60"
   service_role  = aws_iam_role.hydrocron-codebuild-iam.arn
-  use_existing_cloudwatch_log_group = true
 
   artifacts {
     packaging = "NONE"
