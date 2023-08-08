@@ -20,17 +20,6 @@ data "aws_ssm_parameter" "hydrocron-db-sg" {
   name = "${local.hydrocrondb_resource_name}-sg"
 }
 
-## Allow ingress from the lambda security group to the database security group
-resource "aws_security_group_rule" "allow_app_in" {
-  type        = "ingress"
-  security_group_id = data.aws_ssm_parameter.hydrocron-db-sg.value
-  protocol    = "tcp"
-  from_port   = 3306
-  to_port     = 3306
-  source_security_group_id = var.default_vpc_sg
-}
-
-
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
   stage_name  = "default"
