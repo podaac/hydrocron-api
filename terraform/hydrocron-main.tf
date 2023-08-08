@@ -71,7 +71,7 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 resource "aws_lambda_function" "hydrocron_api_lambdav1" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
-  filename      = "/home/runner/work/hydrocron-api/hydrocron-api/terraform/hydrocron-0.0.1.zip"
+  filename      = "python-artifact.zip"
   timeout       = 5
   handler       = "timeseries.lambda_handler"
   runtime       = "python3.8"
