@@ -233,7 +233,6 @@ jobs:
           echo ${{ env.THE_ENV }}
           echo ${{ env.THE_VERSION }}
           source bin/config.sh ${{ env.THE_ENV }}
-          aws iam delete-instance-profile --instance-profile-name service-hydrocron-api-sit-instance-profile
           terraform init -reconfigure -backend-config="bucket=podaac-services-sit-terraform" -backend-config="region=us-west-2"
           terraform plan -var-file=tfvars/${{ env.THE_ENV }}.tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
           terraform apply -auto-approve tfplan
