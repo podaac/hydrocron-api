@@ -68,7 +68,7 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   }
 }
 
-resource "aws_lambda_function" "hydrocron_api_lambdav1" {
+resource "aws_lambda_function" "hydrocron_api_lambda" {
   function_name = "${local.ec2_resources_name}-function"
   role          = aws_iam_role.hydrocron-service-role.arn
   filename      = "python-artifact.zip"
@@ -96,7 +96,7 @@ resource "aws_lambda_function" "hydrocron_api_lambdav1" {
 resource "aws_lambda_permission" "allow_hydrocron" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hydrocron_api_lambdav1.function_name
+  function_name = aws_lambda_function.hydrocron_api_lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
   # The "/*/*/*" portion grants access from any method on any resource
@@ -114,7 +114,7 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   body        = templatefile(
                   "${path.module}/api-specification-templates/hydrocron_aws_api.yml",
                   {
-                    hydrocronapi_lambda_arn = aws_lambda_function.hydrocron_api_lambdav1.invoke_arn
+                    hydrocronapi_lambda_arn = aws_lambda_function.hydrocron_api_lambda.invoke_arn
                     vpc_id = var.vpc_id
                   })
   parameters = {
