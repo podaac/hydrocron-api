@@ -34,8 +34,8 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 
 resource "aws_lambda_function" "hydrocron_api_lambda" {
   function_name = "${local.ec2_resources_name}-function"
+  filename      = "https://github.com/podaac/hydrocron-api/suites/14901968922/artifacts/849031538"
   role          = aws_iam_role.hydrocron-service-role.arn
-  filename      = "dist/python-artifact.zip"
   timeout       = 5
   handler       = "timeseries.lambda_handler"
   runtime       = "python3.8"
