@@ -52,7 +52,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda" {
 
   vpc_config {
     subnet_ids = var.private_subnets
-    security_group_ids = [aws_security_group.service-app-sg.id]
+    security_group_ids = [var.default_vpc_sg]
   }
 
   environment {
