@@ -22,6 +22,30 @@ data "aws_ssm_parameter" "hydrocron-db-sg" {
 
 #Security Groups
 
+## Application Lambda Security Group
+resource "aws_security_group" "service-app-sg" {
+  description = "controls access to the lambda Application"
+  vpc_id = var.vpc_id
+  name   = "${local.ec2_resources_name}-sg"
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+
+    cidr_blocks = [
+      "0.0.0.0/0",
+    ]
+  }
+}
+
 ## Allow ingress from the lambda security group to the database security group
 resource "aws_security_group_rule" "allow_app_in" {
   type        = "ingress"
@@ -124,6 +148,26 @@ resource "aws_ssm_parameter" "hydrocron-api-url" {
 #########################
 
 #CodeBuild IAM role
+
+resource "aws_iam_role" "hydrocron-codebuild-iam" {
+  name = "hydrocron-codebuild"
+
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/NGAPShRoleBoundary"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "codebuild.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
 
 resource "aws_iam_role_policy" "hydrocron-codebuild-policy" {
   role = aws_iam_role.hydrocron-codebuild-iam.name
