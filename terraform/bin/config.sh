@@ -61,9 +61,6 @@ zip -vr9 "$ZIP_PATH" .
 # https://www.terraform.io/docs/commands/environment-variables.html#tf_in_automation
 TF_IN_AUTOMATION=true
 
-# Terraform initialization
-terraform init -reconfigure -input=false -backend-config="bucket=podaac-services-${tf_venue}-terraform" -backend-config="profile=ngap-service-${tf_venue}"
-
 if [[ "${ticket}" ]]; then
   set +e
   terraform workspace new "${ticket}"
@@ -72,8 +69,6 @@ if [[ "${ticket}" ]]; then
 else
   terraform workspace select default
 fi
-
-terraform plan -input=false -var-file=tfvars/"${tf_venue}".tfvars -var="credentials=~/.aws/credentials" -var="profile=ngap-service-${tf_venue}" -var="app_version=${app_version}" -out="tfplan"
 
 # Apply the plan that was created
 terraform apply -input=false -auto-approve tfplan
