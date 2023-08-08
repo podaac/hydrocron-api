@@ -34,7 +34,7 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 
 resource "aws_lambda_function" "hydrocron_api_lambda" {
   function_name = "${local.ec2_resources_name}-function"
-  filename      = "${path.module}/../dist/${local.name}-${local.version}.zip"
+  filename      = "${path.module}/../dist/${local.name}-0_0_1.zip"
   role          = aws_iam_role.hydrocron-service-role.arn
   timeout       = 5
   handler       = "timeseries.lambda_handler"
