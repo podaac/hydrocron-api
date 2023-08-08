@@ -7,6 +7,7 @@ ROOT_PATH="$PWD"
 ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION.zip"
 echo "----"
 echo $ZIP_PATH
+echo $ROOT_PATH
 
 mkdir -p "$ROOT_PATH/dist/"
 rm -f "$ZIP_PATH"
