@@ -269,7 +269,7 @@ resource "aws_codebuild_project" "hydrocron" {
     subnets = var.private_subnets
 
     security_group_ids = [
-      aws_security_group.service-app-sg.id
+      var.default_vpc_sg
     ]
   }
 }
