@@ -255,7 +255,6 @@ POLICY
 }
 
 #CodeBuild Project
-
 resource "aws_codebuild_project" "hydrocron" {
   name          = "Hydrocron"
   description   = "Hydrocron Postman Testing"
