@@ -27,7 +27,7 @@ resource "aws_security_group_rule" "allow_app_in" {
   protocol    = "tcp"
   from_port   = 3306
   to_port     = 3306
-  source_security_group_id = aws_security_group.service-app-sg.id
+  source_security_group_id = var.default_vpc_sg
 }
 
 
