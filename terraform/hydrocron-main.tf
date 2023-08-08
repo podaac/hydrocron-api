@@ -114,7 +114,7 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   body        = templatefile(
                   "${path.module}/api-specification-templates/hydrocron_aws_api.yml",
                   {
-                    hydrocronapi_lambda_arn = aws_lambda_function.hydrocron_api_lambda.invoke_arn
+                    hydrocronapi_lambda_arn = aws_lambda_function.hydrocron_api_lambdav1.invoke_arn
                     vpc_id = var.vpc_id
                   })
   parameters = {
