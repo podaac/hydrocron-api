@@ -20,6 +20,7 @@ data "aws_ssm_parameter" "hydrocron-db-sg" {
   name = "${local.hydrocrondb_resource_name}-sg"
 }
 
+
 resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
   stage_name  = "default"
