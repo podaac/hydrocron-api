@@ -70,6 +70,7 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
 
 resource "aws_lambda_function" "hydrocron_api_lambda" {
   function_name = "${local.ec2_resources_name}-function"
+  role          = lambda
   filename      = "python-artifact.zip"
   timeout       = 5
   handler       = "timeseries.lambda_handler"
