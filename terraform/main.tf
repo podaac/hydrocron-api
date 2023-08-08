@@ -16,7 +16,7 @@ locals {
   account_id = data.aws_caller_identity.current.account_id
 
   # This is the convention we use to know what belongs to each other
-  ec2_resources_name = "service-${local.name}-${local.environment}"
+  ec2_resources_name = "service-${local.name}-${local.environment}-0.0.1"
 
   # Used to refer to the HYDROCRON database resources by the same convention
   hydrocrondb_resource_name = "service-${var.db_app_name}-${local.environment}"
