@@ -239,9 +239,9 @@ jobs:
           echo ${{ env.THE_ENV }}
           echo ${{ env.THE_VERSION }}
           source bin/config.sh ${{ env.THE_ENV }}
-          #aws iam delete-policy --policy-arn arn:aws:iam::206226843404:policy/service-hydrocron-api-sit-service-policy
-          #aws iam delete-role --role-name service-hydrocron-api-sit-service-role
-          #aws iam delete-role --role-name hydrocron-codebuild
+          # aws iam delete-policy --policy-arn arn:aws:iam::206226843404:policy/service-hydrocron-api-sit-service-policy
+          # aws iam delete-role --role-name service-hydrocron-api-sit-service-role
+          # aws iam delete-role --role-name hydrocron-codebuild
           aws iam list-instance-profiles | grep service-hydrocron-api-sit-instance-profile
           aws iam delete-instance-profile --instance-profile-name service-hydrocron-api-sit-instance-profile
           terraform init -reconfigure -backend-config="bucket=podaac-services-${{ env.THE_ENV }}-terraform" -backend-config="region=us-west-2"
