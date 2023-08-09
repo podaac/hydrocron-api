@@ -276,77 +276,6 @@ paths:
         contentHandling: CONVERT_TO_TEXT
         type: aws
 components:
-  parameters:
-    huc_param:
-      name: huc
-      in: path
-      required: true
-      schema:
-        type: string
-    region_param:
-      name: region
-      in: path
-      required: true
-      schema:
-        type: string
-    river_name_param:
-      name: name
-      in: path
-      required: true
-      schema:
-        type: string
-    reach_param:
-      name: reach
-      in: path
-      required: true
-      schema:
-        type: string
-    node_param:
-      name: node
-      in: path
-      required: true
-      schema:
-        type: string
-    exact_param:
-      name: exact
-      in: query
-      example: true
-      schema:
-        type: string
-    polygon_format_param:
-      name: polygon_format
-      in: query
-      schema:
-        type: string
-    page_number_param:
-      name: page_number
-      in: query
-      schema:
-        type: integer
-    page_size_param:
-      name: page_size
-      in: query
-      schema:
-        type: integer
-    river_name_option_param:
-      name: river_name
-      in: query
-      schema:
-        type: string
-    include_reaches_option_param:
-      name: reaches
-      description: Include river reaches in results
-      example: true
-      in: query
-      schema:
-        type: string
-    include_nodes_option_param:
-      name: nodes
-      description: Include river nodes in results
-      example: false
-      in: query
-      schema:
-        type: string
   responses:
     Success:
       description: Success Response
@@ -431,10 +360,6 @@ components:
           description: List of result objects. List can contain objects of type [HUC, RiverReach, RiverNode], or a merge of two or more types (e.g. RiverReach and RiverNode) depending on the resource being queried. (e.g. if requesting /huc or /region, a list of HUC objects will be returned, and if requesting /rivers/name, a list of RiverReach and RiverNodes [merged] will be returned)
           items:
             type: object
-            anyOf:
-              - $ref: '#/components/schemas/HUC'
-              - $ref: '#/components/schemas/RiverReach'
-              - $ref: '#/components/schemas/RiverNode'
     SearchParameters:
       title: Search Parameters
       type: object
@@ -465,44 +390,6 @@ components:
           type: integer
         page_size:
           type: integer
-    HUC:
-      type: object
-      properties:
-        Region Name:
-          type: string
-        HUC:
-          type: string
-        USGS Polygon:
-          type: object
-          properties:
-            Object URL:
-              type: string
-            Source:
-              type: string
-        Bounding Box:
-          type: string
-        Convex Hull Polygon:
-          type: string
-        Visvalingam Polygon:
-          type: string
-    RiverReach:
-      title: River Reach
-      type: object
-      properties:
-        reach_id:
-          type: string
-        geojson:
-          type: object
-      additionalProperties: true
-    RiverNode:
-      title: River Node
-      type: object
-      properties:
-        node_id:
-          type: string
-        geojson:
-          type: object
-      additionalProperties: true
 x-amazon-apigateway-policy:
   Version: '2012-10-17'
   Statement:
