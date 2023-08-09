@@ -245,9 +245,10 @@ jobs:
           aws iam list-policy-versions --policy-arn arn:aws:iam::206226843404:policy/service-hydrocron-api-sit-service-policy
           aws iam list-instance-profiles-for-role --role-name service-hydrocron-api-sit-service-role
           
-          aws iam delete-policy-version --policy-arn arn:aws:iam::206226843404:policy/service-hydrocron-api-sit-service-policy --version-id v1
+          #aws iam delete-policy-version --policy-arn arn:aws:iam::206226843404:policy/service-hydrocron-api-sit-service-policy --version-id v1
           #aws iam remove-role-from-instance-profile --instance-profile-name service-hydrocron-api-sit-instance-profile --role-name service-hydrocron-api-sit-service-role
           #aws iam delete-instance-profile --instance-profile-name service-hydrocron-api-sit-instance-profile
+          aws iam delete-policy --policy-arn arn:aws:iam::206226843404:policy/service-hydrocron-api-sit-service-policy          
           aws iam delete-role --role-name service-hydrocron-api-sit-service-role
           
           #aws iam delete-policy --policy-arn arn:aws:iam::206226843404:policy/service-hydrocron-api-sit-service-policy
