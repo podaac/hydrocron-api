@@ -78,5 +78,4 @@ module "dynamodb_table" {
 
 module "disabled_dynamodb_table" {
   source = "../../"
-
 }
