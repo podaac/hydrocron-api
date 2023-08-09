@@ -1,5 +1,5 @@
 
-#  SSM Parameter values
+# SSM Parameter values
 data "aws_ssm_parameter" "hydrocron-db-user" {
   name = "${local.hydrocrondb_resource_name}-user"
 }
