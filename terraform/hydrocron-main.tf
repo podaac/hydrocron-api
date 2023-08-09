@@ -105,4 +105,5 @@ resource "aws_ssm_parameter" "hydrocron-api-url" {
   name  = "hydrocron-api-url"
   type  = "String"
   value = aws_api_gateway_deployment.hydrocron-api-gateway-deployment.invoke_url
+  overwrite = true
 }
