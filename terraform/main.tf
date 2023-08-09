@@ -31,14 +31,10 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
-resource "random_pet" "this" {
-  length = 2
-}
-
 module "dynamodb_table" {
   source = "../../"
 
-  name                        = "my-table-${random_pet.this.id}"
+  name                        = var.name_db
   hash_key                    = "id"
   range_key                   = "title"
   table_class                 = "STANDARD"

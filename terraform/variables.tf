@@ -26,3 +26,8 @@ variable "profile" {
 variable "docker_tag" {
   default = "ghcr.io/podaac/hydrocron:0.0.1"
 }
+
+variable "name_db" {
+  description = "dynamo table name"
+  default     = null
+}
