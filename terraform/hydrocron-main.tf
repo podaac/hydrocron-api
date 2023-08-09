@@ -76,7 +76,7 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   name        = "${local.ec2_resources_name}-api-gateway"
   description = "API to access Hydrocron"
   body        = templatefile(
-                  "${path.module}/api-specification-templates/hydrocron_aws_api_1.yml",
+                  "${path.module}/api-specification-templates/hydrocron_aws_api.yml",
                   {
                     hydrocronapi_lambda_arn = aws_lambda_function.hydrocron_api_lambda.invoke_arn
                     vpc_id = var.vpc_id
