@@ -1,7 +1,7 @@
 #  IAM roles
 
 resource "aws_iam_instance_profile" "hydrocron-service-profile" {
-  name = "${local.ec2_resources_name}-instance-profile"
+  name = aws_iam_role.hydrocron-service-role.name
   role = aws_iam_role.hydrocron-service-role.name
 }
 
