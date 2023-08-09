@@ -235,7 +235,7 @@ jobs:
           AWS_DEFAULT_REGION: us-west-2
 
         run: |
-          echo "-------"
+          echo "--------"
           echo ${{ env.THE_ENV }}
           echo ${{ env.THE_VERSION }}
           source bin/config.sh ${{ env.THE_ENV }}
