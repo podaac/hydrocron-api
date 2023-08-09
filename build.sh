@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
+
 PACKAGE_NAME=$(awk -F' = ' '{gsub(/"/,"");if($1=="name")print $2}' pyproject.toml)
 VERSION="0_0_1"
 ROOT_PATH="$PWD"
