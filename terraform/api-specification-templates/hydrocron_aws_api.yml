@@ -110,6 +110,7 @@ paths:
                 type: array
                 items:
                   type: string
+      x-openapi-router-controller: hydrocronapi.controllers.timeseries
       x-amazon-apigateway-integration:
         uri: ${hydrocronapi_lambda_arn}
         responses:
@@ -150,7 +151,6 @@ paths:
                 {
                   "error" : "$input.path('$.errorMessage')"
                 }
-      x-openapi-router-controller: hydrocronapi.controllers.timeseries
   /timeseriesSubset:
     get:
       summary: Subset by time series for a given spatial region
@@ -250,6 +250,7 @@ paths:
                 type: array
                 items:
                   type: string
+      x-openapi-router-controller: hydrocronapi.controllers.subset
       x-amazon-apigateway-integration:
         uri: ${hydrocronapi_lambda_arn}
         responses:
@@ -290,7 +291,6 @@ paths:
                 {
                   "error" : "$input.path('$.errorMessage')"
                 }
-      x-openapi-router-controller: hydrocronapi.controllers.subset
 x-amazon-apigateway-policy:
   Version: '2012-10-17'
   Statement:
