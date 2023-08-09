@@ -133,10 +133,8 @@ paths:
             {
               "body": {
                 "exact":"$input.params('exact')",
-                "HUC": "$input.params('huc')",
                 "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
+                "page_size": "$input.params('page_size')" 
               }
             }
         passthroughBehavior: when_no_templates
@@ -283,12 +281,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/SuccessResponse'
-    SuccessV1:
-      description: V1 Success Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SuccessV1Response'
     ClientError:
       description: 400 response
       content:
@@ -329,67 +321,12 @@ components:
         hits:
           type: integer
           description: Total number of results
-        search on:
-          $ref: '#/components/schemas/SearchParameters'
         results_count:
           type: integer
           description: Number of result entries returned in this request. Only appears if hits > page_size
         results:
           type: object
           description: Single object where each property of the object is a result
-    SuccessV1Response:
-      title: SuccessV1 Response Body
-      type: object
-      properties:
-        status:
-          type: string
-          description: HTTP Status code returned by backend
-        time:
-          type: string
-          description: Time in milliseconds to complete request
-        hits:
-          type: integer
-          description: Total number of results
-        search on:
-          $ref: '#/components/schemas/SearchV1Parameters'
-        results_count:
-          type: integer
-          description: Number of result entries returned in this request. Only appears if hits > page_size
-        results:
-          type: array
-          description: List of result objects. List can contain objects of type [HUC, RiverReach, RiverNode], or a merge of two or more types (e.g. RiverReach and RiverNode) depending on the resource being queried. (e.g. if requesting /huc or /region, a list of HUC objects will be returned, and if requesting /rivers/name, a list of RiverReach and RiverNodes [merged] will be returned)
-          items:
-            type: object
-    SearchParameters:
-      title: Search Parameters
-      type: object
-      properties:
-        parameter:
-          type: string
-        exact:
-          type: boolean
-        polygon_format:
-          type: string
-        page_number:
-          type: integer
-        page_size:
-          type: integer
-    SearchV1Parameters:
-      title: Search Parameters
-      type: object
-      properties:
-        parameter:
-          type: string
-        river_name:
-          type: string
-        exact:
-          type: boolean
-        polygon_format:
-          type: string
-        page_number:
-          type: integer
-        page_size:
-          type: integer
 x-amazon-apigateway-policy:
   Version: '2012-10-17'
   Statement:
