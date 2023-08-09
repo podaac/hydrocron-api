@@ -31,13 +31,16 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
+resource "random_pet" "this" {
+  length = 2
+}
 
 module "dynamodb_table" {
   source = "../../"
 
-  name                        = "Hydrocron_db"
+  name                        = "my-table-${random_pet.this.id}"
   hash_key                    = "id"
-  range_key                   = "feature_id"
+  range_key                   = "title"
   table_class                 = "STANDARD"
   deletion_protection_enabled = false
 
@@ -47,15 +50,19 @@ module "dynamodb_table" {
       type = "N"
     },
     {
-      name = "feature_id"
+      name = "title"
       type = "S"
+    },
+    {
+      name = "feature_id"
+      type = "N"
     }
   ]
 
   global_secondary_indexes = [
     {
-      name               = "Hydrocron_db"
-      hash_key           = "Hydrocron_db"
+      name               = "TitleIndex"
+      hash_key           = "title"
       range_key          = "feature_id"
       projection_type    = "INCLUDE"
       non_key_attributes = ["id"]
