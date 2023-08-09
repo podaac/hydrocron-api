@@ -1,5 +1,6 @@
 # pylint: disable=duplicate-code
 # pylint: disable=C0114
+# pylint: disable=W0613
 
 import logging
 import time
