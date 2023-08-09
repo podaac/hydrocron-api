@@ -71,7 +71,7 @@ resource "aws_lambda_permission" "allow_hydrocron" {
 
 
 
-# API Gateway
+#  API Gateway
 resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   name        = "${local.ec2_resources_name}-api-gateway"
   description = "API to access Hydrocron"
