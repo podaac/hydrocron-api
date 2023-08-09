@@ -243,8 +243,8 @@ jobs:
           aws iam list-instance-profiles | grep hydrocron
           aws iam list-roles | grep hydrocron
           aws iam list-policies | grep hydrocron
-          aws iam list-instance-profiles-for-role service-hydrocron-api-sit-service-role          aws iam list-instance-profiles-for-role service-hydrocron-api-sit-service-role
-          aws iam list-instance-profiles-for-role hydrocron-service-role
+          aws iam list-instance-profiles-for-role --role-name service-hydrocron-api-sit-service-role          aws iam list-instance-profiles-for-role service-hydrocron-api-sit-service-role
+          aws iam list-instance-profiles-for-role --role-name hydrocron-service-role
           aws iam delete-role --role-name service-hydrocron-api-sit-service-role
           aws iam delete-role --role-name hydrocron-service-role
           aws iam delete-instance-profile --instance-profile-name service-hydrocron-api-sit-instance-profile
