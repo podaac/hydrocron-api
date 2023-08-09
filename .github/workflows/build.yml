@@ -239,7 +239,7 @@ jobs:
           echo ${{ env.THE_ENV }}
           echo ${{ env.THE_VERSION }}
           source bin/config.sh ${{ env.THE_ENV }}
-          aws iam list-instance-profiles | grep hydrocron
+          #aws iam list-instance-profiles | grep hydrocron
           aws iam list-roles | grep hydrocron
           aws iam list-policies | grep hydrocron
           aws iam list-policy-versions | grep hydrocron
