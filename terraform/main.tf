@@ -10,9 +10,14 @@ provider "aws" {
 }
 
 locals {
-  name        = var.app_name
+  name        = regex("name = \"(\\S*)\"", data.local_file.pyproject_toml.content)[0]
+  version     = regex("version = \"(\\S*)\"", data.local_file.pyproject_toml.content)[0]
   environment = var.stage
 
+  app_prefix      = "service-${var.app_name}-${local.environment}"
+  service_prefix  = "service-${var.app_name}-${local.environment}-${var.service_name}"
+  service_path    = "/service/${var.app_name}/${var.service_name}"
+  
   account_id = data.aws_caller_identity.current.account_id
 
   # This is the convention we use to know what belongs to each other
@@ -22,10 +27,10 @@ locals {
   hydrocrondb_resource_name = "service-${var.db_app_name}-${local.environment}"
 
   default_tags = length(var.default_tags) == 0 ? {
-    team: "TVA",
-    application: local.ec2_resources_name,
-    Environment = var.stage
-    Version = var.docker_tag
+    team = "TVA"
+    application = local.app_prefix
+    version     = local.version
+    Environment = local.environment
   } : var.default_tags
 }
 
