@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from typing import Generator
 
-import hydrocronapi.controllers.db.db
+import hydrocronapi.controllers.db.db as db
 
 logger = logging.getLogger()
 
@@ -40,9 +40,9 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
 
     start = time.time()
     if feature.lower() == 'reach':
-        results = hydrocronapi.controllers.db.db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
+        results = db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
     elif feature.lower() == 'node':
-        results = hydrocronapi.controllers.db.db.get_node_series_by_feature_id(feature_id, start_time, end_time)
+        results = db.get_node_series_by_feature_id(feature_id, start_time, end_time)
     else:
         return {}
     end = time.time()

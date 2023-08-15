@@ -12,7 +12,7 @@ from typing import Generator
 
 from shapely import Polygon, Point
 
-import hydrocronapi.controllers.db.db
+import hydrocronapi.controllers.db.db as db
 
 logger = logging.getLogger()
 
