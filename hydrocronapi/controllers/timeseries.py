@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from typing import Generator
 
-import tests.db
+# import tests.db
 
 logger = logging.getLogger()
 
