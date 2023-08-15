@@ -9,7 +9,7 @@ import json
 from decimal import Decimal
 import geopandas as gpd
 
-from tests.db.hydrocron_database import Hydrocron_DB
+from .hydrocron_database import Hydrocron_DB
 
 
 # ## Set up the connection to dynamoDB
