@@ -87,9 +87,9 @@ data "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   endpoint_configuration {
     types = ["PRIVATE"]
   }
-  lifecycle {
-    prevent_destroy = true
-  }
+#  lifecycle {
+#    prevent_destroy = true
+#  }
 }
 
 data "aws_cloudwatch_log_group" "hydrocron-api-gateway-logs" {
