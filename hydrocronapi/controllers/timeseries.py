@@ -173,8 +173,8 @@ def lambda_handler(event, context):
     This function queries the HUC database for relevant results
     """
     print("test timeseries 1")
-    print("queryStringParameters")
-    print(event.queryStringParameters)
+    print("params")
+    print(event['params'])
     print("body")
     print(event.body)
 
