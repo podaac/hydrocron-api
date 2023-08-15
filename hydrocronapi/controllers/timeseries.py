@@ -173,5 +173,25 @@ def lambda_handler(event, context):
     This function queries the HUC database for relevant results
     """
     print("test timeseries")
-    print(event['body'])
-    return "200"
+    print(event)
+
+    data = {}
+
+    status = "200 OK"
+
+    data['status'] = status
+    data['time'] = str(10) + " ms."
+    data['hits'] = 10
+
+    data['search on'] = dict(
+        parameter="identifier",
+        exact="exact",
+        page_number=0,
+        page_size=20
+    )
+
+    data['results'] = ['0','1','2']
+
+    return data
+
+
