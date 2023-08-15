@@ -1,11 +1,11 @@
 #  IAM roles
 
-resource "aws_iam_instance_profile" "hydrocron-service-profile" {
+data "aws_iam_instance_profile" "hydrocron-service-profile" {
   name = aws_iam_role.hydrocron-service-role.name
   role = aws_iam_role.hydrocron-service-role.name
 }
 
-resource "aws_iam_policy" "hydrocron-service-policy" {
+data "aws_iam_policy" "hydrocron-service-policy" {
   name = "${local.ec2_resources_name}-service-policy"
   path = "/"
   policy = <<POLICY
@@ -72,7 +72,7 @@ resource "aws_iam_policy" "hydrocron-service-policy" {
 POLICY
 }
 
-resource "aws_iam_role" "hydrocron-service-role" {
+data "aws_iam_role" "hydrocron-service-role" {
   name = "${local.ec2_resources_name}-service-role"
 
   permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/NGAPShRoleBoundary"
@@ -93,7 +93,7 @@ resource "aws_iam_role" "hydrocron-service-role" {
 EOF
 }
 
-resource "aws_iam_policy_attachment" "hydrocron-service-attach" {
+data "aws_iam_policy_attachment" "hydrocron-service-attach" {
   name       = "${local.ec2_resources_name}-attachment"
   roles      = [aws_iam_role.hydrocron-service-role.id]
   policy_arn = aws_iam_policy.hydrocron-service-policy.arn

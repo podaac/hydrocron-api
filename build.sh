@@ -16,6 +16,8 @@ ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION.zip"
 
 poetry bundle venv build --clear --without=dev
 
+echo "+++"
+ls -alF
 cd build/lib/python3.*/site-packages
 touch hydrocronapi/__init__.py
 rm -rf *.dist-info _virtualenv.*

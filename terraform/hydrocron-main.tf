@@ -21,7 +21,7 @@ data "aws_ssm_parameter" "hydrocron-db-sg" {
 }
 
 
-resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
+data "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway.id
   stage_name  = "default"
   depends_on = [aws_api_gateway_rest_api.hydrocron-api-gateway]
@@ -32,7 +32,7 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
   }
 }
 
-resource "aws_lambda_function" "hydrocron_api_lambda" {
+data "aws_lambda_function" "hydrocron_api_lambda" {
   function_name = "${local.ec2_resources_name}-function"
   filename      = "/home/runner/work/hydrocron-api/hydrocron-api/terraform/hydrocron-0.0.1.zip"
   role          = aws_iam_role.hydrocron-service-role.arn
@@ -57,7 +57,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda" {
   tags = var.default_tags
 }
 
-resource "aws_lambda_permission" "allow_hydrocron" {
+data "aws_lambda_permission" "allow_hydrocron" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.hydrocron_api_lambda.function_name
@@ -72,7 +72,7 @@ resource "aws_lambda_permission" "allow_hydrocron" {
 
 
 #  API Gateway
-resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
+data "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   name        = "${local.ec2_resources_name}-api-gateway"
   description = "API to access Hydrocron"
   body        = templatefile(
@@ -92,7 +92,7 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "hydrocron-api-gateway-logs" {
+data "aws_cloudwatch_log_group" "hydrocron-api-gateway-logs" {
   name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.hydrocron-api-gateway.id}/${aws_api_gateway_deployment.hydrocron-api-gateway-deployment.stage_name}"
   retention_in_days = 60
 }
@@ -101,7 +101,7 @@ output "url" {
   value = "${aws_api_gateway_deployment.hydrocron-api-gateway-deployment.invoke_url}/api"
 }
 
-resource "aws_ssm_parameter" "hydrocron-api-url" {
+data "aws_ssm_parameter" "hydrocron-api-url" {
   name  = "hydrocron-api-url"
   type  = "String"
   value = aws_api_gateway_deployment.hydrocron-api-gateway-deployment.invoke_url
