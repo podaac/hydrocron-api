@@ -12,7 +12,7 @@ import geopandas as gpd
 from hydrocron_database import Hydrocron_DB
 
 
-# ##  Set up the connection to dynamoDB
+# ## Set up the connection to dynamoDB
 
 # In[2]:
 
