@@ -17,7 +17,7 @@ ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION.zip"
 poetry bundle venv build --clear --without=dev
 
 cd build/lib/python3.*/site-packages
-touch podaac/__init__.py
+touch hydrocronapi/__init__.py
 rm -rf *.dist-info _virtualenv.*
 find . -type d -name __pycache__ -exec rm -rf {} \+
 
