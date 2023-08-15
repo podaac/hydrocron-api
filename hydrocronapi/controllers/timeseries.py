@@ -173,10 +173,10 @@ def lambda_handler(event, context):
     This function queries the database for relevant results
     """
     print("test timeseries 1")
-    print("params")
-    print(event['params'])
     print("body")
-    print(event.body)
+    print(event['body'])
+    print("feature")
+    print(event['body']['feature'])
 
     data = {}
 
