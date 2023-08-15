@@ -26,3 +26,8 @@ variable "profile" {
 variable "docker_tag" {
   default = "ghcr.io/podaac/hydrocron:0.0.1"
 }
+
+variable "service_name" {
+    default = "hydrocron-api"
+    type = string
+}
