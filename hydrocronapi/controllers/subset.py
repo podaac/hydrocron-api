@@ -43,9 +43,9 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
 
     start = time.time()
     if feature.lower() == 'reach':
-        results = hydrocronapi.controllers.db.db.get_reach_series(start_time, end_time)
+        results = db.get_reach_series(start_time, end_time)
     elif feature.lower() == 'node':
-        results = hydrocronapi.controllers.db.db.get_node_series(start_time, end_time)
+        results = db.get_node_series(start_time, end_time)
     else:
         return {}
     end = time.time()
