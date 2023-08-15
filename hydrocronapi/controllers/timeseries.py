@@ -12,7 +12,7 @@ import hydrocronapi.controllers.db.db as db
 logger = logging.getLogger()
 
 
-def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields):  # noqa: E501
+def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields) -> object:  # noqa: E501
     """Get Timeseries for a particular Reach, Node, or LakeID
 
     Get Timeseries for a particular Reach, Node, or LakeID # noqa: E501
@@ -178,6 +178,15 @@ def lambda_handler(event, context):
     print("feature")
     print(event['body']['feature'])
 
+    feature = event['body']['feature']
+    feature_id = event['body']['feature_id']
+    start_time = event['body']['start_time']
+    end_time = event['body']['end_time']
+    output = event['body']['output']
+    fields = event['body']['fields']
+
+    results = gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
+
     data = {}
 
     status = "200 OK"
@@ -193,7 +202,7 @@ def lambda_handler(event, context):
         page_size=20
     )
 
-    data['results'] = ['0','1','2']
+    data['results'] = results
 
     return data
 
