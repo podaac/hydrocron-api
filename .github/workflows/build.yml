@@ -95,7 +95,7 @@ jobs:
           echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
           echo "venue=ops" >> $GITHUB_ENV
       - name: Install hydrocron
-        if: ${{ startsWith(github.ref, 'test') }}
+        #if: ${{ startsWith(github.ref, 'test') }}
         run: poetry install
       - name: Lint
         if: ${{ startsWith(github.ref, 'test') }}
@@ -103,7 +103,7 @@ jobs:
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
       - name: Install external libraries
-        if: ${{ startsWith(github.ref, 'test') }}
+        #if: ${{ startsWith(github.ref, 'test') }}
         run: |
           pip3 install boto3
           pip3 install geopandas
@@ -163,15 +163,15 @@ jobs:
 
 
       - name: Setup local DynamoDB
-        if: ${{ startsWith(github.ref, 'test') }}
+        #if: ${{ startsWith(github.ref, 'test') }}
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
 
       - name: Load sample
-        if: ${{ startsWith(github.ref, 'test') }}
+        #if: ${{ startsWith(github.ref, 'test') }}
         run: python3 tests/example_load_data.py
 
       - name: Test with pytest
-        if: ${{ startsWith(github.ref, 'test') }}
+        #if: ${{ startsWith(github.ref, 'test') }}
         run: pytest tests/test_api.py
 
 

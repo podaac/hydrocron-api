@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from typing import Generator
 
-# import tests.db
+import db
 
 logger = logging.getLogger()
 
@@ -173,4 +173,5 @@ def lambda_handler(event, context):
     This function queries the HUC database for relevant results
     """
     print("test timeseries")
+    print(event['body'])
     return "200"
