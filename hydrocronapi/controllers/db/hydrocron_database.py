@@ -14,6 +14,7 @@ class Hydrocron_DB:
             A Boto3 DynamoDB resource.
 
         """
+        print("dyn_resource")
         self.dyn_resource = dyn_resource
         self.tables = []
 
@@ -93,7 +94,9 @@ class Hydrocron_DB:
             The newly created table.
         """
         try:
+            print("hd: load table 1")
             table = self.dyn_resource.Table(table_name)
+            print("hd: load table 2")
             table.load()
 
         except ClientError as err:
