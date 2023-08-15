@@ -170,7 +170,7 @@ def format_csv(results: Generator, feature_id, fields):
 
 def lambda_handler(event, context):
     """
-    This function queries the HUC database for relevant results
+    This function queries the database for relevant results
     """
     print("test timeseries 1")
     print("params")
