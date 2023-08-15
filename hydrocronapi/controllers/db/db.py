@@ -28,6 +28,8 @@ dynamo_instance = Hydrocron_DB(dyn_resource=dyndb_resource)
 
 def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
     table_name = 'hydrocron_swot_reaches'
+    print("before dynamo")
+    print(dynamo_instance.list_tables())
     hydrocron_reach_table = dynamo_instance.load_table(table_name)
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('reach_id').eq('71224100223'))
     return items

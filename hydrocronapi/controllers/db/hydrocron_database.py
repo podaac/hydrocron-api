@@ -98,6 +98,8 @@ class Hydrocron_DB:
             table = self.dyn_resource.Table(table_name)
             print("hd: load table 2")
             table.load()
+            print("hd: load table 3")
+
 
         except ClientError as err:
             logger.error(
