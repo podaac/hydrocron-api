@@ -2,7 +2,7 @@
 
 set -Eexo pipefail
 
-# Read in args from command line
+# Read in args from command line 1
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
