@@ -41,11 +41,17 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+
       - name: Install bumpver & poetry
         run: pip3 install bumpver poetry poetry-plugin-bundle
       - name: Install dependencies
-        run: poetry install
-          
+        run: poetry install          
+
+      - name: Get version
+        id: get-version
+        run: |
+          echo "current_version=$(poetry version | awk '{print $2}')" >> $GITHUB_OUTPUT
+          echo "pyproject_name=$(poetry version | awk '{print $1}')" >> $GITHUB_ENV
       - name: Bump pre-alpha version
         # If triggered by push to a feature branch
         if: |
