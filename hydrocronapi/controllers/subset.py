@@ -12,7 +12,7 @@ from typing import Generator
 
 from shapely import Polygon, Point
 
-import tests.db
+import hydrocronapi.controllers.db.db
 
 logger = logging.getLogger()
 
@@ -43,9 +43,9 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
 
     start = time.time()
     if feature.lower() == 'reach':
-        results = tests.db.get_reach_series(start_time, end_time)
+        results = hydrocronapi.controllers.db.db.get_reach_series(start_time, end_time)
     elif feature.lower() == 'node':
-        results = tests.db.get_node_series(start_time, end_time)
+        results = hydrocronapi.controllers.db.db.get_node_series(start_time, end_time)
     else:
         return {}
     end = time.time()

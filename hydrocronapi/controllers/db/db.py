@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Generator
 
 import boto3
-from .hydrocron_database import Hydrocron_DB
+from hydrocronapi.controllers.db.hydrocron_database import Hydrocron_DB
 from boto3.dynamodb.conditions import Key
 
 
