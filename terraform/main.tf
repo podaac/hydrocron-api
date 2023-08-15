@@ -9,6 +9,10 @@ provider "aws" {
   }
 }
 
+data "local_file" "pyproject_toml" {
+  filename = abspath("${path.root}/../pyproject.toml")
+}
+
 locals {
   name        = regex("name = \"(\\S*)\"", data.local_file.pyproject_toml.content)[0]
   version     = regex("version = \"(\\S*)\"", data.local_file.pyproject_toml.content)[0]
