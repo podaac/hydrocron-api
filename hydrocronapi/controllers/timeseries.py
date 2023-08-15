@@ -39,6 +39,8 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
     end_time = datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
 
     start = time.time()
+    print("before db")
+    print(feature.lower())
     if feature.lower() == 'reach':
         results = db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
     elif feature.lower() == 'node':

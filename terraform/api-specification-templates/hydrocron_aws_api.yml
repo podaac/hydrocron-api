@@ -268,11 +268,15 @@ paths:
           application/json: |-
             {
               "body": {
+                "feature":"$input.params('feature')",
+                "subsetpolygon":"$input.params('subsetpolygon')",
+                "start_time":"$input.params('start_time')",
+                "end_time":"$input.params('end_time')",
+                "output": "$input.params('output')",
+                "fields": "$input.params('fields')",
                 "exact":"$input.params('exact')",
-                "region": "$input.params('region')",
                 "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" ,
-                "polygon_format": "$input.params('polygon_format')"
+                "page_size": "$input.params('page_size')" 
               }
             }
         passthroughBehavior: when_no_templates

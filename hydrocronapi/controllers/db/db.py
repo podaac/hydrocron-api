@@ -43,15 +43,18 @@ def get_node_series(start_time: datetime, end_time: datetime) -> Generator:
 
 
 def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_time: datetime) -> Generator:
-
+    print("db > get_reach_series_by_feature_id")
     #st = float(time.mktime(start_time.timetuple()) - 946710000)
     #et = float(time.mktime(end_time.timetuple()) - 946710000)
 
     #select * from reach where reach_id like %(feature_id)s and cast(time as float) >= %(start_time)s and cast(time as float) <= %(end_time)s""",
     table_name = 'hydrocron_swot_reaches'
 
+    print("before load")
     hydrocron_reach_table = dynamo_instance.load_table(table_name)
+    print("before query")
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('reach_id').eq(feature_id))
+    print(items)
     return items
 
 
