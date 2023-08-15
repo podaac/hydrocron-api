@@ -171,7 +171,7 @@ jobs:
         run: python3 tests/example_load_data.py
 
       - name: Test with pytest
-        if: ${{ startsWith(github.ref, 'test1') }}
+        if: ${{ startsWith(github.ref, 'test') }}
         run: pytest tests/test_api.py
 
 
