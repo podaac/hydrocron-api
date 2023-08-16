@@ -90,8 +90,7 @@ def format_json(results: Generator, feature_id, elapsed_time):
         i = 0
 
         for res in results:
-            # feature_id
-            if str(res['feature_id']) == feature_id and res['feature_time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+            if res['feature_time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
                 feature['geometry']['coordinates'] = []
                 feature_type = ''
