@@ -61,7 +61,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda_test" {
 resource "aws_lambda_permission" "allow_hydrocron-test" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hydrocron_api_lambda-test.function_name
+  function_name = aws_lambda_function.hydrocron_api_lambda_test.function_name
   principal     = "apigateway.amazonaws.com"
 
   # The "/*/*/*" portion grants access from any method on any resource
