@@ -34,8 +34,8 @@ resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment-test" {
 
 resource "aws_lambda_function" "hydrocron_api_lambda_timeseries_test" {
   function_name = "${local.ec2_resources_name}-function-timeseries-test"
-  filename = "${path.module}/../dist/${local.name}-${local.version}-timeseries-test.zip"
-  source_code_hash = filebase64sha256("${path.module}/../dist/${local.name}-${local.version}-timeseries-test.zip")
+  filename = "${path.module}/../dist/${local.name}-${local.version}-test.zip"
+  source_code_hash = filebase64sha256("${path.module}/../dist/${local.name}-${local.version}-test.zip")
   role          = aws_iam_role.hydrocron-service-role-test.arn
   timeout       = 5
   handler       = "hydrocronapi.controllers.timeseries.lambda_handler"
@@ -61,8 +61,8 @@ resource "aws_lambda_function" "hydrocron_api_lambda_timeseries_test" {
 
 resource "aws_lambda_function" "hydrocron_api_lambda_subset_test" {
   function_name = "${local.ec2_resources_name}-function-subset-test"
-  filename = "${path.module}/../dist/${local.name}-${local.version}-subset-test.zip"
-  source_code_hash = filebase64sha256("${path.module}/../dist/${local.name}-${local.version}-subset-test.zip")
+  filename = "${path.module}/../dist/${local.name}-${local.version}-test.zip"
+  source_code_hash = filebase64sha256("${path.module}/../dist/${local.name}-${local.version}-test.zip")
   role          = aws_iam_role.hydrocron-service-role-test.arn
   timeout       = 5
   handler       = "hydrocronapi.controllers.subset.lambda_handler"
