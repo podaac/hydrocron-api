@@ -185,9 +185,43 @@ def format_subset_csv(results: Generator, polygon, fields):
     return csv
 
 
+
 def lambda_handler(event, context):
     """
-    This function queries the HUC database for relevant results
+    This function queries the database for relevant results
     """
-    print("test subset")
-    return "200"
+    print("test timeseries 3")
+    print("body")
+    print(event['body'])
+    print("feature")
+    print(event['body']['feature'])
+
+    feature = event['body']['feature']
+    subsetpolygon = event['body']['subsetpolygon']
+    start_time = event['body']['start_time']
+    end_time = event['body']['end_time']
+    output = event['body']['output']
+    fields = event['body']['fields']
+
+    results = getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields)
+
+    data = {}
+
+    status = "200 OK"
+
+    data['status'] = status
+    data['time'] = str(10) + " ms."
+    data['hits'] = 10
+
+    data['search on'] = dict(
+        parameter="identifier",
+        exact="exact",
+        page_number=0,
+        page_size=20
+    )
+
+    data['results'] = results
+
+    return data
+
+

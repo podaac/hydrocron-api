@@ -89,7 +89,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn_test}
+        uri: ${hydrocronapi_lambda_arn_timeseries_test}
         responses:
           default:
             statusCode: "200"
@@ -225,7 +225,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
       x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn_test}
+        uri: ${hydrocronapi_lambda_arn_subset_test}
         responses:
           default:
             statusCode: "200"
