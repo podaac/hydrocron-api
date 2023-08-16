@@ -87,7 +87,7 @@ def format_json(results: Generator, feature_id, elapsed_time):
     else:
         data['status'] = "200 OK"
         data['time'] = str(elapsed_time) + " ms."
-        # data['search on'] = {"feature_id": feature_id}
+        # data['search on'] = {"reach_id": feature_id}
         data['type'] = "FeatureCollection"
         data['features'] = []
         i = 0
@@ -117,7 +117,7 @@ def format_json(results: Generator, feature_id, elapsed_time):
             i += 1
             feature['properties']['time'] = datetime.fromtimestamp(float(res['time']['S']) + 946710000).strftime(
                 "%Y-%m-%d %H:%M:%S")
-            feature['properties']['feature_id'] = float(res['feature_id']['S'])
+            feature['properties']['reach_id'] = float(res['reach_id']['S'])
             feature['properties']['wse'] = float(res['wse']['S'])
             feature['properties']['slope'] = float(res['slope']['S'])
             data['features'].append(feature)
@@ -185,7 +185,7 @@ def lambda_handler(event, context):
     print(event['body']['feature'])
 
     feature = event['body']['feature']
-    feature_id = event['body']['feature_id']
+    feature_id = event['body']['reach_id']
     start_time = event['body']['start_time']
     end_time = event['body']['end_time']
     output = event['body']['output']
