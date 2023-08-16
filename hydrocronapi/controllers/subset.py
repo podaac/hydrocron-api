@@ -101,13 +101,13 @@ def format_subset_json(results: Generator, polygon, elapsed_time):
                 point = Point(float(res['p_lon']), float(res['p_lat']))
                 if polygon.contains(point):
                     feature_type = ''
-                    if 'POINT' in res['geometry']:
-                        geometry = res['geometry'].replace('POINT (', '').replace(')', '')
+                    if 'POINT' in res['geometry']['S']:
+                        geometry = res['geometry']['S'].replace('POINT (', '').replace(')', '')
                         geometry = geometry.replace('"', '')
                         geometry = geometry.replace("'", "")
                         feature_type = 'Point'
-                    if 'LINESTRING' in res['geometry']:
-                        geometry = res['geometry'].replace('LINESTRING (', '').replace(')', '')
+                    if 'LINESTRING' in res['geometry']['S']:
+                        geometry = res['geometry']['S'].replace('LINESTRING (', '').replace(')', '')
                         geometry = geometry.replace('"', '')
                         geometry = geometry.replace("'", "")
                         feature_type = 'LineString'
@@ -118,9 +118,9 @@ def format_subset_json(results: Generator, polygon, elapsed_time):
                             (var_x, var_y) = pol.split(" ")
                             feature['geometry']['coordinates'].append([float(var_x), float(var_y)])
                             feature['properties']['time'] = datetime.fromtimestamp(
-                                float(res['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
-                            feature['properties']['reach_id'] = float(res['reach_id'])
-                            feature['properties']['wse'] = float(res['wse'])
+                                float(res['time']['S']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
+                            feature['properties']['reach_id'] = float(res['reach_id']['S'])
+                            feature['properties']['wse'] = float(res['wse']['S'])
 
                     if feature_type == 'Point':
                         feature['geometry']['coordinates'] = [float(res['p_lon']), float(res['p_lat'])]
@@ -178,7 +178,7 @@ def format_subset_csv(results: Generator, polygon, fields):
                         csv += str(res['wse'])
                         csv += ','
                     if 'geometry' in fields_set:
-                        csv += res['geometry'].replace('; ', ', ')
+                        csv += res['geometry']['S'].replace('; ', ', ')
                         csv += ','
                     csv += '\n'
 

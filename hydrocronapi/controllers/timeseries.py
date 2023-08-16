@@ -65,7 +65,7 @@ def format_json(results: Generator, feature_id, elapsed_time):
     ----------
     results
     feature_id
-    feature_time
+    elapsed_time
 
     Returns
     -------
@@ -115,11 +115,11 @@ def format_json(results: Generator, feature_id, elapsed_time):
                 if feature_type == 'Point':
                     feature['geometry']['coordinates'] = [float(var_x), float(var_y)]
             i += 1
-            feature['properties']['time'] = datetime.fromtimestamp(float(res['time']) + 946710000).strftime(
+            feature['properties']['time'] = datetime.fromtimestamp(float(res['time']['S']) + 946710000).strftime(
                 "%Y-%m-%d %H:%M:%S")
-            feature['properties']['feature_id'] = float(res['feature_id'])
-            feature['properties']['wse'] = float(res['wse'])
-            feature['properties']['slope'] = float(res['slope'])
+            feature['properties']['feature_id'] = float(res['feature_id']['S'])
+            feature['properties']['wse'] = float(res['wse']['S'])
+            feature['properties']['slope'] = float(res['slope']['S'])
             data['features'].append(feature)
 
         print(data)
@@ -167,7 +167,7 @@ def format_csv(results: Generator, feature_id, fields):
                     csv += str(res['wse'])
                     csv += ','
                 if 'geometry' in fields_set:
-                    csv += res['geometry'].replace('; ', ', ')
+                    csv += res['geometry']['S'].replace('; ', ', ')
                     csv += ','
                 csv += '\n'
 
