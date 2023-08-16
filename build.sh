@@ -12,7 +12,7 @@ PACKAGE_NAME=$(awk -F' = ' '{gsub(/"/,"");if($1=="name")print $2}' pyproject.tom
 VERSION=$(poetry version -s)
 
 ROOT_PATH="$PWD"
-ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION.zip"
+ZIP_PATH="$ROOT_PATH/dist/$PACKAGE_NAME-$VERSION-test.zip"
 
 poetry bundle venv build --clear --without=dev
 
