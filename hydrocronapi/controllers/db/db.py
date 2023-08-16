@@ -36,9 +36,11 @@ def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_ti
     response = dynamodb.get_item(
         TableName=table_name,
         Key={
-            'feature_id': {'S': '71224100223'}
+            'feature_id': {'S': feature_id}
         }
     )
+    print("get_item")
+    print(response)
     return response
 
 
