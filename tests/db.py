@@ -27,14 +27,14 @@ dyndb_resource = session.resource('dynamodb', endpoint_url='http://localhost:800
 dynamo_instance = Hydrocron_DB(dyn_resource=dyndb_resource)
 
 def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
-    table_name = 'hydrocron_swot_reaches'
+    table_name = 'hydrocron_swot_reaches_test'
     hydrocron_reach_table = dynamo_instance.load_table(table_name)
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('reach_id').eq('71224100223'))
     return items
 
 
 def get_node_series(start_time: datetime, end_time: datetime) -> Generator:
-    table_name = 'hydrocron_swot_reaches'
+    table_name = 'hydrocron_swot_reaches_test'
 
     hydrocron_reach_table = dynamo_instance.load_table(table_name)
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('node_id').eq('71224100223'))
@@ -48,7 +48,7 @@ def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_ti
     #et = float(time.mktime(end_time.timetuple()) - 946710000)
 
     #select * from reach where reach_id like %(feature_id)s and cast(time as float) >= %(start_time)s and cast(time as float) <= %(end_time)s""",
-    table_name = 'hydrocron_swot_reaches'
+    table_name = 'hydrocron_swot_reaches_test'
 
     hydrocron_reach_table = dynamo_instance.load_table(table_name)
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('reach_id').eq(feature_id))
@@ -56,7 +56,7 @@ def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_ti
 
 
 def get_node_series_by_feature_id(feature_id, start_time, end_time):
-    table_name = 'hydrocron_swot_reaches'
+    table_name = 'hydrocron_swot_reaches_test'
 
     hydrocron_reach_table = dynamo_instance.load_table(table_name)
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('node_id').eq(feature_id))
