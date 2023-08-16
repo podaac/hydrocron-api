@@ -110,7 +110,6 @@ jobs:
           pip3 install pytest
           pip3 install connexion
           pip3 install flask_testing
-          pip3 install shapely
           npm install
       - name: Run Snyk as a blocking step
         if: ${{ startsWith(github.ref, 'test') }}
