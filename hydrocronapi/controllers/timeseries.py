@@ -115,9 +115,9 @@ def format_json(results: Generator, feature_id, elapsed_time):
                 if feature_type == 'Point':
                     feature['geometry']['coordinates'] = [float(var_x), float(var_y)]
             i += 1
-            feature['properties']['feature_time'] = datetime.fromtimestamp(float(res['feature_time']) + 946710000).strftime(
+            feature['properties']['time'] = datetime.fromtimestamp(float(res['time']) + 946710000).strftime(
                 "%Y-%m-%d %H:%M:%S")
-            feature['properties']['reach_id'] = float(res['reach_id'])
+            feature['properties']['feature_id'] = float(res['feature_id'])
             feature['properties']['wse'] = float(res['wse'])
             feature['properties']['slope'] = float(res['slope'])
             data['features'].append(feature)
