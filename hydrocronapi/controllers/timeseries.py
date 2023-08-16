@@ -97,13 +97,13 @@ def format_json(results: Generator, feature_id, elapsed_time):
             feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
             feature['geometry']['coordinates'] = []
             feature_type = ''
-            if 'POINT' in res['geometry']:
-                geometry = res['geometry'].replace('POINT (', '').replace(')', '')
+            if 'POINT' in res['geometry']['S']:
+                geometry = res['geometry']['S'].replace('POINT (', '').replace(')', '')
                 geometry = geometry.replace('"', '')
                 geometry = geometry.replace("'", "")
                 feature_type = 'Point'
-            if 'LINESTRING' in res['geometry']:
-                geometry = res['geometry'].replace('LINESTRING (', '').replace(')', '')
+            if 'LINESTRING' in res['geometry']['S']:
+                geometry = res['geometry']['S'].replace('LINESTRING (', '').replace(')', '')
                 geometry = geometry.replace('"', '')
                 geometry = geometry.replace("'", "")
                 feature_type = 'LineString'
