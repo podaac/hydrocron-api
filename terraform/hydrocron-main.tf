@@ -93,6 +93,17 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway-test" {
   }
 }
 
+resource "aws_api_gateway_model" "hydrocron-api-gateway-model-test" {
+  rest_api_id  = "hydrocron0"
+  name         = "Hydrocron-test"
+  description  = "hydrocron-api-gateway-model-test"
+  content_type = "application/json"
+
+  schema = jsonencode({
+    type = "object"
+  })
+}
+
 resource "aws_cloudwatch_log_group" "hydrocron-api-gateway-logs-test" {
   name              = "API-Gateway-Execution-Logs_${aws_api_gateway_rest_api.hydrocron-api-gateway-test.id}/${aws_api_gateway_deployment.hydrocron-api-gateway-deployment-test.stage_name}"
   retention_in_days = 60
