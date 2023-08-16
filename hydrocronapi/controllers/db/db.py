@@ -12,18 +12,27 @@ logger = logging.getLogger()
 
 def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
     table_name = 'hydrocron_swot_reaches'
-    hydrocron_reach_table = dynamo_instance.load_table(table_name)
-    items = hydrocron_reach_table.query(KeyConditionExpression=Key('reach_id').eq('71224100223'))
-    return items
-
+    response = dynamodb.get_item(
+        TableName=table_name,
+        Key={
+            'feature_id': {'S': '71224100223'}
+        }
+    )
+    print("get_item")
+    print(response)
+    return response
 
 def get_node_series(start_time: datetime, end_time: datetime) -> Generator:
     table_name = 'hydrocron_swot_reaches'
-
-    hydrocron_reach_table = dynamo_instance.load_table(table_name)
-    items = hydrocron_reach_table.query(KeyConditionExpression=Key('node_id').eq('71224100223'))
-    return items
-
+    response = dynamodb.get_item(
+        TableName=table_name,
+        Key={
+            'node_id': {'S': '71224100223'}
+        }
+    )
+    print("get_item")
+    print(response)
+    return response
 
 
 def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_time: datetime) -> Generator:
@@ -46,7 +55,12 @@ def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_ti
 
 def get_node_series_by_feature_id(feature_id, start_time, end_time):
     table_name = 'hydrocron_swot_reaches'
-
-    hydrocron_reach_table = dynamo_instance.load_table(table_name)
-    items = hydrocron_reach_table.query(KeyConditionExpression=Key('node_id').eq(feature_id))
-    return items
+    response = dynamodb.get_item(
+        TableName=table_name,
+        Key={
+            'node_id': {'S': feature_id}
+        }
+    )
+    print("get_item")
+    print(response)
+    return response

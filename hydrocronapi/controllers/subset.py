@@ -74,7 +74,7 @@ def format_subset_json(results: Generator, polygon, elapsed_time):
 
     """
     # Fetch all results from query
-    results = results['Items']
+    results = results['Item']
 
     data = {}
 

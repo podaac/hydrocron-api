@@ -72,7 +72,10 @@ def format_json(results: Generator, feature_id, elapsed_time):
 
     """
     # Fetch all results
-    results = results['Item']
+    print("RESULTS")
+    res = results['Item']
+    print(results)
+    print(res)
 
     data = {}
 
@@ -89,35 +92,34 @@ def format_json(results: Generator, feature_id, elapsed_time):
         data['features'] = []
         i = 0
 
-        for res in results:
-            if res['feature_id'] == feature_id and res['feature_time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
-                feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
-                feature['geometry']['coordinates'] = []
-                feature_type = ''
-                if 'POINT' in res['geometry']:
-                    geometry = res['geometry'].replace('POINT (', '').replace(')', '')
-                    geometry = geometry.replace('"', '')
-                    geometry = geometry.replace("'", "")
-                    feature_type = 'Point'
-                if 'LINESTRING' in res['geometry']:
-                    geometry = res['geometry'].replace('LINESTRING (', '').replace(')', '')
-                    geometry = geometry.replace('"', '')
-                    geometry = geometry.replace("'", "")
-                    feature_type = 'LineString'
-                feature['geometry']['type'] = feature_type
-                for pol in geometry.split(", "):
-                    (var_x, var_y) = pol.split(" ")
-                    if feature_type == 'LineString':
-                        feature['geometry']['coordinates'].append([float(var_x), float(var_y)])
-                    if feature_type == 'Point':
-                        feature['geometry']['coordinates'] = [float(var_x), float(var_y)]
-                i += 1
-                feature['properties']['feature_time'] = datetime.fromtimestamp(float(res['feature_time']) + 946710000).strftime(
-                    "%Y-%m-%d %H:%M:%S")
-                feature['properties']['reach_id'] = float(res['reach_id'])
-                feature['properties']['wse'] = float(res['wse'])
-                feature['properties']['slope'] = float(res['slope'])
-                data['features'].append(feature)
+        if res['feature_id'] == feature_id and res['feature_time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+            feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
+            feature['geometry']['coordinates'] = []
+            feature_type = ''
+            if 'POINT' in res['geometry']:
+                geometry = res['geometry'].replace('POINT (', '').replace(')', '')
+                geometry = geometry.replace('"', '')
+                geometry = geometry.replace("'", "")
+                feature_type = 'Point'
+            if 'LINESTRING' in res['geometry']:
+                geometry = res['geometry'].replace('LINESTRING (', '').replace(')', '')
+                geometry = geometry.replace('"', '')
+                geometry = geometry.replace("'", "")
+                feature_type = 'LineString'
+            feature['geometry']['type'] = feature_type
+            for pol in geometry.split(", "):
+                (var_x, var_y) = pol.split(" ")
+                if feature_type == 'LineString':
+                    feature['geometry']['coordinates'].append([float(var_x), float(var_y)])
+                if feature_type == 'Point':
+                    feature['geometry']['coordinates'] = [float(var_x), float(var_y)]
+            i += 1
+            feature['properties']['feature_time'] = datetime.fromtimestamp(float(res['feature_time']) + 946710000).strftime(
+                "%Y-%m-%d %H:%M:%S")
+            feature['properties']['reach_id'] = float(res['reach_id'])
+            feature['properties']['wse'] = float(res['wse'])
+            feature['properties']['slope'] = float(res['slope'])
+            data['features'].append(feature)
 
         data['hits'] = i
 
