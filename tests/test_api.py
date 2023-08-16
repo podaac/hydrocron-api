@@ -32,7 +32,7 @@ class TestDefaultController(BaseTestCase):
         Get Timeseries for a particular Reach, Node, or LakeID
         """
         query_string = [('feature', 'Reach'),
-                        ('feature_id', '73254700251'),
+                        ('reach_id', '73254700251'),
                         ('format', 'csv'),
                         ('start_time', '2022-08-04T00:00:00+00:00'),
                         ('end_time', '2022-08-23T00:00:00+00:00')]
