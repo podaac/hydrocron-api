@@ -160,14 +160,12 @@ jobs:
 
 
 
-
-
       - name: Setup local DynamoDB
-        #if: ${{ startsWith(github.ref, 'test') }}
+        if: ${{ startsWith(github.ref, 'test') }}
         run: docker run -d -p 8000:8000 amazon/dynamodb-local
 
       - name: Load sample
-        #if: ${{ startsWith(github.ref, 'test') }}
+        if: ${{ startsWith(github.ref, 'test') }}
         run: python3 tests/example_load_data.py
 
       - name: Test with pytest
