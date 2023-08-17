@@ -162,6 +162,7 @@ jobs:
       - name: Build Python Artifact
         run: |
           poetry build
+          poetry self add poetry-plugin-bundle
 
 
 
