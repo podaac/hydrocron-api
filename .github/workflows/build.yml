@@ -96,6 +96,28 @@ jobs:
         run: |
           poetry run pylint hydrocronapi
           poetry run flake8 hydrocronapi
+
+
+      ## Set environment variables
+      - name: Configure Initial YAML file and environment variables
+        run: |
+          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
+          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
+          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
+          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
+          echo "THE_ENV=sit" >> $GITHUB_ENV
+          echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
+
+      # Setup Node to install and test
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: NPM install
+        run:
+          npm install
+
       - name: Run Snyk as a blocking step
         uses: snyk/actions/python-3.9@master
         env:
@@ -154,27 +176,6 @@ jobs:
 
 
 
-
-      ## Set environment variables
-      - name: Configure Initial YAML file and environment variables
-        run: |
-          echo "THE_VERSION=${{ env.software_version }}" >> $GITHUB_ENV;
-          echo "GIT_BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV;
-          GITHUB_REF_READABLE="${GITHUB_REF//\//-}"
-          echo "GITHUB_REF_READABLE=${GITHUB_REF_READABLE}" >> $GITHUB_ENV
-          echo "THE_ENV=sit" >> $GITHUB_ENV
-          echo "TARGET_ENV_UPPERCASE=SIT" >> $GITHUB_ENV
-
-      # Setup Node to install and test
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14
-
-      - name: NPM install & NPM Lint
-        run:
-          npm install
-          npm run lint
 
       # Setup Terraform to Deploy
 
