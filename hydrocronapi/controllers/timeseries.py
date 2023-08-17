@@ -1,13 +1,12 @@
 # pylint: disable=duplicate-code
-# pylint: disable=C0114
-# pylint: disable=W0613
+"""Module defining Lambda workflow for subset endpoint."""
 
 import logging
 import time
 from datetime import datetime
 from typing import Generator
 
-import hydrocronapi.controllers.db.db as db
+from hydrocronapi.controllers.db import db
 
 logger = logging.getLogger()
 
@@ -39,8 +38,6 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
     end_time = datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
 
     start = time.time()
-    print("before db")
-    print(feature.lower())
     if feature.lower() == 'reach':
         results = db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
     elif feature.lower() == 'node':
@@ -72,10 +69,7 @@ def format_json(results: Generator, feature_id, elapsed_time):
 
     """
     # Fetch all results
-    print("RESULTS")
     res = results['Item']
-    print(results)
-    print(res)
 
     data = {}
 
@@ -93,7 +87,6 @@ def format_json(results: Generator, feature_id, elapsed_time):
         i = 0
 
         if res['time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
-            print(feature_id)
             feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
             feature['geometry']['coordinates'] = []
             feature_type = ''
@@ -122,7 +115,6 @@ def format_json(results: Generator, feature_id, elapsed_time):
             feature['properties']['slope'] = float(res['slope']['S'])
             data['features'].append(feature)
 
-        print(data)
         data['hits'] = i
 
     return data
@@ -142,7 +134,7 @@ def format_csv(results: Generator, feature_id, fields):
 
     """
     # Fetch all results
-    results = results['Items']
+    results = results['Item']
 
     data = {}
 
@@ -152,7 +144,6 @@ def format_csv(results: Generator, feature_id, fields):
         data['error'] = f'413: Query exceeds 6MB with {len(results)} hits.'
 
     else:
-        # csv = "feature_id, time_str, wse, geometry\n"
         csv = fields + '\n'
         fields_set = fields.split(", ")
         for res in results:
@@ -174,15 +165,10 @@ def format_csv(results: Generator, feature_id, fields):
     return csv
 
 
-def lambda_handler(event, context):
+def lambda_handler(event):
     """
     This function queries the database for relevant results
     """
-    print("test timeseries 3")
-    print("body")
-    print(event['body'])
-    print("feature")
-    print(event['body']['feature'])
 
     feature = event['body']['feature']
     feature_id = event['body']['reach_id']
@@ -201,15 +187,13 @@ def lambda_handler(event, context):
     data['time'] = str(10) + " ms."
     data['hits'] = 10
 
-    data['search on'] = dict(
-        parameter="identifier",
-        exact="exact",
-        page_number=0,
-        page_size=20
-    )
+    data['search on'] = {
+        "parameter": "identifier",
+        "exact": "exact",
+        "page_number": 0,
+        "page_size": 20
+    }
 
     data['results'] = results
 
     return data
-
-

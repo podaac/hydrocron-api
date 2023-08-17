@@ -1,3 +1,10 @@
+# pylint: disable=W0613
+# pylint: disable=C0116
+# pylint: disable=C0411
+# pylint: disable=W0511
+"""Module to interface with DynamoDB database."""
+
+
 import logging
 from datetime import datetime
 from typing import Generator
@@ -25,6 +32,7 @@ session = boto3.session.Session(aws_access_key_id='a',
 dyndb_resource = session.resource('dynamodb', endpoint_url='http://localhost:8000')
 
 dynamo_instance = Hydrocron_DB(dyn_resource=dyndb_resource)
+
 
 def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
     hydrocron_table = dynamo_instance.load_table('hydrocron_swot_reaches_test')

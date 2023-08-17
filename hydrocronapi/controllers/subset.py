@@ -1,8 +1,6 @@
 # pylint: disable=duplicate-code
 # pylint: disable=R1702
-# pylint: disable=C0114
-# pylint: disable=E0401
-# pylint: disable=W0613
+"""Module defining Lambda workflow for subset endpoint."""
 
 import json
 import logging
@@ -12,7 +10,7 @@ from typing import Generator
 
 from shapely import Polygon, Point
 
-import hydrocronapi.controllers.db.db as db
+from hydrocronapi.controllers.db import db
 
 logger = logging.getLogger()
 
@@ -152,7 +150,7 @@ def format_subset_csv(results: Generator, polygon, fields):
 
     """
     # Fetch all results from query
-    results = results['Items']
+    results = results['Item']
 
     data = {}
 
@@ -185,16 +183,10 @@ def format_subset_csv(results: Generator, polygon, fields):
     return csv
 
 
-
-def lambda_handler(event, context):
+def lambda_handler(event):
     """
     This function queries the database for relevant results
     """
-    print("test timeseries 3")
-    print("body")
-    print(event['body'])
-    print("feature")
-    print(event['body']['feature'])
 
     feature = event['body']['feature']
     subsetpolygon = event['body']['subsetpolygon']
@@ -213,15 +205,13 @@ def lambda_handler(event, context):
     data['time'] = str(10) + " ms."
     data['hits'] = 10
 
-    data['search on'] = dict(
-        parameter="identifier",
-        exact="exact",
-        page_number=0,
-        page_size=20
-    )
+    data['search on'] = {
+        "parameter": "identifier",
+        "exact": "exact",
+        "page_number": 0,
+        "page_size": 20
+    }
 
     data['results'] = results
 
     return data
-
-

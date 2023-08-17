@@ -1,3 +1,9 @@
+# pylint: disable=R1720
+# pylint: disable=C0121
+# pylint: disable=W0612
+# pylint: disable=C0103
+# pylint: disable=C0115
+# pylint: disable=C0114
 import logging
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
@@ -220,7 +226,6 @@ class Hydrocron_Table:
         for key, value in kwargs.items():
             item_dict[key] = value
 
-        item_id = item_dict[self.partition_key_name]
         try:
             self.table.put_item(
                 Item=item_dict
@@ -249,7 +254,7 @@ class Hydrocron_Table:
             The item.
 
         """
-        if sort_key == None:
+        if sort_key is None:
 
             try:
                 response = self.table.query(
