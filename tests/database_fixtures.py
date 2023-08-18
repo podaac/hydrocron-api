@@ -39,13 +39,17 @@ def data_table_timeseries(data_table):
 
     item_attrs = {}
     for index, row in shp_file.iterrows():
-        item_attrs = json.loads(row.to_json(default_handler=str), parse_float=Decimal)
-        print(item_attrs)
+        attributes = json.loads(row.to_json(default_handler=str), parse_float=Decimal)
+        print(attributes)
+        for k,v in attributes.items():
+            item_attrs[k] = {'S': str(v)}
         item_attrs['PK'] = row['reach_id']
         item_attrs['SK'] = row['reach_id']
-        item_attrs['reach_id'] = {'S': '71224100223'}
-        item_attrs['geometry'] = {'S': str(row['geometry'])}
-        item_attrs['time'] = {'S': str(row['time'])}
-        item_attrs['wse'] = {'S': str(row['wse'])}
-        item_attrs['slope'] = {'S': str(row['slope'])}
+        print(item_attrs)
+
+        #item_attrs['reach_id'] = {'S': '71224100223'}
+        #item_attrs['geometry'] = {'S': str(row['geometry'])}
+        #item_attrs['time'] = {'S': str(row['time'])}
+        #item_attrs['wse'] = {'S': str(row['wse'])}
+        #item_attrs['slope'] = {'S': str(row['slope'])}
         table.put_item(Item=item_attrs)
