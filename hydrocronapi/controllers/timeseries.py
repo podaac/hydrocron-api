@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from typing import Generator
 
-from hydrocronapi.controllers.db import db
+from hydrocronapi.controllers.db import db_local as db
 
 logger = logging.getLogger()
 
