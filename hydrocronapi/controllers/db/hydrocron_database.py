@@ -1,9 +1,6 @@
-# pylint: disable=R1720
-# pylint: disable=C0121
-# pylint: disable=W0612
-# pylint: disable=C0103
-# pylint: disable=C0115
-# pylint: disable=C0114
+"""
+Hydrocron Database module
+"""
 import logging
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
@@ -11,7 +8,27 @@ from boto3.dynamodb.conditions import Key
 logger = logging.getLogger(__name__)
 
 
-class Hydrocron_DB:
+class DynamoKeys:
+    """
+    Represents the partition and sort keys for a dynamoDB table
+    """
+    def __init__(
+            self,
+            partition_key,
+            partition_key_type,
+            sort_key,
+            sort_key_type):
+
+        self.partition_key = partition_key
+        self.partition_key_type = partition_key_type
+        self.sort_key = sort_key
+        self.sort_key_type = sort_key_type
+
+
+class HydrocronDB:
+    """
+    Hydrocron database class.
+    """
     def __init__(self, dyn_resource):
         """
         Parameters
@@ -49,14 +66,16 @@ class Hydrocron_DB:
                 logger.error(
                     "Couldn't check for existence of %s. %s: %s",
                     table_name,
-                    err.response['Error']['Code'], err.response['Error']['Message'])
+                    err.response['Error']['Code'],
+                    err.response['Error']['Message'])
                 raise
 
         return exists
 
-    def create_table(self, table_name, partition_key, partition_key_type, sort_key, sort_key_type):
+    def create_table(self, table_name, dynamo_keys):
         """
-        Creates an Amazon DynamoDB table to store SWOT River Reach, Node, or Lake data for the Hydrocron API.
+        Creates an Amazon DynamoDB table to store SWOT River Reach,
+        Node, or Lake data for the Hydrocron API.
 
         Parameters
         ---------
@@ -69,17 +88,21 @@ class Hydrocron_DB:
             The newly created table.
         """
         try:
-            new_table = Hydrocron_Table(self.dyn_resource,
-                                        table_name,
-                                        partition_key, partition_key_type,
-                                        sort_key, sort_key_type)
+            new_table = HydrocronTable(
+                self.dyn_resource,
+                table_name,
+                dynamo_keys.partition_key,
+                dynamo_keys.partition_key_type,
+                dynamo_keys.sort_key,
+                dynamo_keys.sort_key_type)
 
             self.tables.append(new_table.table_name)
 
         except ClientError as err:
             logger.error(
                 "Couldn't create table %s. %s: %s", table_name,
-                err.response['Error']['Code'], err.response['Error']['Message'])
+                err.response['Error']['Code'],
+                err.response['Error']['Message'])
             raise
         else:
             return new_table
@@ -105,7 +128,8 @@ class Hydrocron_DB:
         except ClientError as err:
             logger.error(
                 "Couldn't load table %s. %s: %s", table_name,
-                err.response['Error']['Code'], err.response['Error']['Message'])
+                err.response['Error']['Code'],
+                err.response['Error']['Message'])
             raise
         else:
             return table
@@ -126,7 +150,8 @@ class Hydrocron_DB:
         except ClientError as err:
             logger.error(
                 "Couldn't list tables. %s: %s",
-                err.response['Error']['Code'], err.response['Error']['Message'])
+                err.response['Error']['Code'],
+                err.response['Error']['Message'])
             raise
         else:
             return self.tables
@@ -145,11 +170,15 @@ class Hydrocron_DB:
         except ClientError as err:
             logger.error(
                 "Couldn't delete table. %s: %s",
-                err.response['Error']['Code'], err.response['Error']['Message'])
+                err.response['Error']['Code'],
+                err.response['Error']['Message'])
             raise
 
 
-class Hydrocron_Table:
+class HydrocronTable:
+    """
+    class docstring
+    """
     def __init__(self, dyn_resource,
                  table_name,
                  partition_key_name, partition_key_type,
@@ -183,8 +212,8 @@ class Hydrocron_Table:
 
     def create_table(self):
         """
-        Creates an Amazon DynamoDB table to store SWOT River Reach, Node, or Lake data for the Hydrocron API.
-
+        Creates an Amazon DynamoDB table to store SWOT River Reach,
+        Node, or Lake data for the Hydrocron API.
 
         Returns
         -------
@@ -195,19 +224,25 @@ class Hydrocron_Table:
             self.table = self.dyn_resource.create_table(
                 TableName=self.table_name,
                 KeySchema=[
-                    {'AttributeName': self.partition_key_name, 'KeyType': 'HASH'},  # Partition key
-                    {'AttributeName': self.sort_key_name, 'KeyType': 'RANGE'}  # Sort key
+                    {'AttributeName': self.partition_key_name,
+                     'KeyType': 'HASH'},  # Partition key
+                    {'AttributeName': self.sort_key_name,
+                     'KeyType': 'RANGE'}  # Sort key
                 ],
                 AttributeDefinitions=[
-                    {'AttributeName': self.partition_key_name, 'AttributeType': self.partition_key_type},
-                    {'AttributeName': self.sort_key_name, 'AttributeType': self.sort_key_type}
+                    {'AttributeName': self.partition_key_name,
+                     'AttributeType': self.partition_key_type},
+                    {'AttributeName': self.sort_key_name,
+                     'AttributeType': self.sort_key_type}
                 ],
-                ProvisionedThroughput={'ReadCapacityUnits': 10, 'WriteCapacityUnits': 10})
+                ProvisionedThroughput={'ReadCapacityUnits': 10,
+                                       'WriteCapacityUnits': 10})
             self.table.wait_until_exists()
         except ClientError as err:
             logger.error(
                 "Couldn't create table %s. %s: %s", self.table_name,
-                err.response['Error']['Code'], err.response['Error']['Message'])
+                err.response['Error']['Code'],
+                err.response['Error']['Message'])
             raise
         else:
             return self.table
@@ -218,7 +253,7 @@ class Hydrocron_Table:
 
         Parameters
         ---------
-        **kwargs: All attributes to add to the item. Must include partition and sort keys
+        **kwargs: All attributes to add to the item. Must include partition and sort keys # noqa
         """
 
         item_dict = {}
@@ -234,7 +269,8 @@ class Hydrocron_Table:
             logger.error(
                 "Couldn't add item %s to table %s. Here's why: %s: %s",
                 self.partition_key_name, self.table.name,
-                err.response['Error']['Code'], err.response['Error']['Message'])
+                err.response['Error']['Code'],
+                err.response['Error']['Message'])
             raise
 
     def run_query(self, partition_key, sort_key=None):
@@ -258,11 +294,14 @@ class Hydrocron_Table:
 
             try:
                 response = self.table.query(
-                    KeyConditionExpression=(Key(self.partition_key_name).eq(partition_key)))
+                    KeyConditionExpression=(
+                        Key(self.partition_key_name).eq(partition_key)
+                    ))
             except ClientError as err:
                 logger.error(
                     "Couldn't query for items: %s: %s",
-                    err.response['Error']['Code'], err.response['Error']['Message'])
+                    err.response['Error']['Code'],
+                    err.response['Error']['Message'])
                 raise
             else:
                 return response['Items']
@@ -270,12 +309,15 @@ class Hydrocron_Table:
         else:
             try:
                 response = self.table.query(
-                    KeyConditionExpression=(Key(self.partition_key_name).eq(partition_key) &
-                                            Key(self.sort_key_name).eq(sort_key)))
+                    KeyConditionExpression=(
+                        Key(self.partition_key_name).eq(partition_key) &
+                        Key(self.sort_key_name).eq(sort_key)
+                        ))
             except ClientError as err:
                 logger.error(
                     "Couldn't query for items: %s: %s",
-                    err.response['Error']['Code'], err.response['Error']['Message'])
+                    err.response['Error']['Code'],
+                    err.response['Error']['Message'])
                 raise
             else:
                 return response['Items']
@@ -292,9 +334,11 @@ class Hydrocron_Table:
             The timestamp of the item to delete.
         """
         try:
-            self.table.delete_item(Key={self.partition_key_name: partition_key, self.sort_key_name: sort_key})
+            self.table.delete_item(Key={self.partition_key_name: partition_key,
+                                        self.sort_key_name: sort_key})
         except ClientError as err:
             logger.error(
                 "Couldn't delete item %s. %s: %s", partition_key,
-                err.response['Error']['Code'], err.response['Error']['Message'])
+                err.response['Error']['Code'],
+                err.response['Error']['Message'])
             raise

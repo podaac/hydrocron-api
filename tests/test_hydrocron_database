@@ -1,0 +1,82 @@
+"""
+==============
+test_create_table.py
+==============
+Test creating a Hydrocron dynamodb table.
+
+Unit tests for creating tables and adding items to the Hydrocron Database.
+Requires a local install of DynamoDB to be running.
+See https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html # noqa
+
+"""
+import json
+from decimal import Decimal
+import geopandas as gpd
+import requests
+
+from hydrocronapi.controllers.db.hydrocron_database import DynamoKeys
+import connexion
+from flask_testing import TestCase
+
+
+TEST_SHAPEFILE_PATH = (
+    "tests/data/"
+    "SWOT_L2_HR_RiverSP_Reach_548_011_NA_"
+    "20230610T193337_20230610T193344_PIA1_01/"
+    "SWOT_L2_HR_RiverSP_Reach_548_011_NA_"
+    "20230610T193337_20230610T193344_PIA1_01.shp")
+
+TEST_TABLE_NAME = 'hydrocron_swot_reaches_test'
+TEST_PARTITION_KEY_NAME = 'reach_id'
+TEST_SORT_KEY_NAME = 'time'
+
+DYNAMO_KEYS = DynamoKeys(
+            partition_key=TEST_PARTITION_KEY_NAME,
+            partition_key_type='S',
+            sort_key=TEST_SORT_KEY_NAME,
+            sort_key_type='N')
+
+
+def test_timeseries_get(hydrocron_dynamo_instance):
+
+    if hydrocron_dynamo_instance.table_exists(TEST_TABLE_NAME):
+        hydrocron_dynamo_instance.delete_table(TEST_TABLE_NAME)
+
+    hydrocron_test_table = hydrocron_dynamo_instance.create_table(
+        TEST_TABLE_NAME,
+        DYNAMO_KEYS)
+
+    # read shapefile into geopandas dataframe
+    shp_file = gpd.read_file(TEST_SHAPEFILE_PATH)
+
+    item_attrs = {}
+    i=0
+    for _index, row in shp_file.iterrows():
+        if i==0:
+            # convert each reach into a dictionary of attributes
+            item_attrs = json.loads(row.to_json(
+                default_handler=str), parse_float=Decimal)
+
+            # write to the table
+            hydrocron_test_table.add_data(**item_attrs)
+            i+=1
+
+    items = hydrocron_test_table.run_query(partition_key='71224100223')
+    #print(items)
+
+
+    app = connexion.App("Hydrocron_test", specification_dir='hydrocronapi/swagger/')
+    app.add_api('swagger.yaml',
+                arguments={'title': 'Get time series data from SWOT observations for reaches, nodes, and/or lakes'},
+                pythonic_params=True)
+    app.run(port='8081')
+
+
+    query_string = [('feature', 'Reach'),
+                    ('feature_id', '73254700251'),
+                    ('format', 'csv'),
+                    ('start_time', '2022-08-04T00:00:00+00:00'),
+                    ('end_time', '2022-08-23T00:00:00+00:00')]
+    response = requests.get('https://localhost:8081/hydrocron/HydroAPI/1.0.0/timeseries?feature=Reach&reach_id=71224100223&start_time=2022-08-04T00:00:00+00:00&end_time=2022-08-23T00:00:00+00:00&output=geojson&fields=feature_id,time_str,wse,geometry')
+    print(response)
+    assert response == 'Response body is : ' + response.data.decode('utf-8')

@@ -6,16 +6,16 @@ import json
 from decimal import Decimal
 import geopandas as gpd
 
-from hydrocronapi.controllers.db.hydrocron_database import Hydrocron_DB
+from hydrocronapi.controllers.db.hydrocron_database import HydrocronDB
 
 session = boto3.session.Session(aws_access_key_id='a',
                                 aws_secret_access_key='a',
                                 aws_session_token='fake_session_token',
                                 region_name='us-west-2')
 
-dyndb_resource = session.resource('dynamodb', endpoint_url='http://localhost:8000')
+dyndb_resource = session.resource('dynamodb', endpoint_url='http://localhost:8001')
 
-dynamo_instance = Hydrocron_DB(dyn_resource=dyndb_resource)
+dynamo_instance = HydrocronDB(dyn_resource=dyndb_resource)
 
 
 table_name = 'hydrocron_swot_reaches_test'
