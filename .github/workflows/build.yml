@@ -172,6 +172,7 @@ jobs:
           pip install pytest
           pip install pytest-dynamodb
           pip install connexion
+          pip install flask_testing
           pytest
 
 
