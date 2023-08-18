@@ -167,8 +167,8 @@ jobs:
           poetry build
 
 
-      #- name: Test with pytest
-      #  run: pytest
+      - name: Test with pytest
+        run: pytest
 
 
 
