@@ -11,7 +11,7 @@ from decimal import Decimal
 @pytest.fixture
 def data_table_reach():
     with moto.mock_dynamodb():
-        client = boto3.client("dynamodb")
+        client = boto3.client("dynamodb", region_name='us-west-2')
 
         client.create_table(
           TableName="hydrocron_swot_reaches_test",
