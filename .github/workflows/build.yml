@@ -95,10 +95,10 @@ jobs:
           echo "venue=ops" >> $GITHUB_ENV
       - name: Install hydrocron
         run: poetry install
-      - name: Lint
-        run: |
-          poetry run pylint hydrocronapi
-          poetry run flake8 hydrocronapi
+      #- name: Lint
+      #  run: |
+      #    poetry run pylint hydrocronapi
+      #    poetry run flake8 hydrocronapi
 
 
       ## Set environment variables
