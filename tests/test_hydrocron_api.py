@@ -1,7 +1,7 @@
 import hydrocronapi.controllers.timeseries as timeseries
 
 
-def test_lambda_with_tx_client(data_table_with_transactions):
+def test_timeseries(data_table_with_transactions):
     """
     Tests the lambda function for a client that has some transactions.
     Their total value is 9.
@@ -19,8 +19,6 @@ def test_lambda_with_tx_client(data_table_with_transactions):
     print(event['body']['feature'])
 
 
-    response = timeseries.lambda_handler(event, {})
+    response = timeseries.lambda_handler(event)
 
-    expected_sum = 9
-
-    assert response["totalSum"] == expected_sum
+    assert response["results"]["status"] == "200 OK"
