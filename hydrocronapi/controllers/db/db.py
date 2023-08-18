@@ -54,11 +54,11 @@ def get_node_series(start_time: datetime, end_time: datetime) -> Generator:
     return response
 
 
-def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_time: datetime) -> Generator:
+def get_reach_series_by_feature_id(reach_id: str, start_time: datetime, end_time: datetime) -> Generator:
     """Get Timeseries for a particular Reach filtering by ID and time range
 
-    :param feature_id: Identifier of the feature
-    :type feature_id: str
+    :param reach_id: Identifier of the feature
+    :type reach_id: str
     :param start_time: Start time of the timeseries
     :type start_time: str
     :param end_time: End time of the timeseries
@@ -70,16 +70,16 @@ def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_ti
     table = dynamodb.Table('hydrocron_swot_reaches_test')
     response = table.query(
         KeyConditionExpression= \
-            conditions.Key("PK").eq(feature_id)
+            conditions.Key("PK").eq(reach_id)
     )
     return response
 
 
-def get_node_series_by_feature_id(feature_id, start_time, end_time):
+def get_node_series_by_feature_id(node_id, start_time, end_time):
     """Get Timeseries for a particular Node filtering by ID and time range
 
-    :param feature_id: Identifier of the feature
-    :type feature_id: str
+    :param node_id: Identifier of the feature
+    :type node_id: str
     :param start_time: Start time of the timeseries
     :type start_time: str
     :param end_time: End time of the timeseries
@@ -91,7 +91,7 @@ def get_node_series_by_feature_id(feature_id, start_time, end_time):
     response = dynamodb.get_item(
         TableName=table_name,
         Key={
-            'node_id': {'S': feature_id}
+            'node_id': {'S': node_id}
         }
     )
     return response

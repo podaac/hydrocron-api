@@ -28,7 +28,7 @@ def data_table():
         yield 'hydrocron_swot_reaches_test'
 
 @pytest.fixture
-def data_table_with_transactions(data_table):
+def data_table_timeseries(data_table):
     """  """
 
     table = boto3.resource("dynamodb").Table(data_table)
