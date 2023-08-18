@@ -47,9 +47,11 @@ def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_ti
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('reach_id').eq(feature_id))
     data = {}
     print(items)
-    for k, v in items.items():
+    print("---")
+    for k, v in items['Items'][0].items():
         data[k] = {'S': str(v)}
     print(data)
+    print("---")
     return data
 
 
