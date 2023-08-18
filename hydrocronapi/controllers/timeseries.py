@@ -171,7 +171,7 @@ def format_csv(results: Generator, feature_id, fields):
     return csv
 
 
-def lambda_handler(event):
+def lambda_handler(event, context):
     """
     This function queries the database for relevant results
     """

@@ -9,7 +9,7 @@ import json
 from decimal import Decimal
 
 @pytest.fixture
-def data_table():
+def data_table_reach():
     with moto.mock_dynamodb():
         client = boto3.client("dynamodb")
         client.create_table(
@@ -28,10 +28,10 @@ def data_table():
         yield 'hydrocron_swot_reaches_test'
 
 @pytest.fixture
-def data_table_timeseries(data_table):
+def data_table_reach_lambda(data_table_reach):
     """  """
 
-    table = boto3.resource("dynamodb").Table(data_table)
+    table = boto3.resource("dynamodb").Table(data_table_reach)
 
     test_shapefile_path = 'tests/data/SWOT_L2_HR_RiverSP_Reach_548_011_NA_20230610T193337_20230610T193344_PIA1_01/SWOT_L2_HR_RiverSP_Reach_548_011_NA_20230610T193337_20230610T193344_PIA1_01.shp'
 
@@ -47,9 +47,6 @@ def data_table_timeseries(data_table):
         item_attrs['SK'] = row['reach_id']
         print(item_attrs)
 
-        #item_attrs['reach_id'] = {'S': '71224100223'}
-        #item_attrs['geometry'] = {'S': str(row['geometry'])}
-        #item_attrs['time'] = {'S': str(row['time'])}
-        #item_attrs['wse'] = {'S': str(row['wse'])}
-        #item_attrs['slope'] = {'S': str(row['slope'])}
         table.put_item(Item=item_attrs)
+
+

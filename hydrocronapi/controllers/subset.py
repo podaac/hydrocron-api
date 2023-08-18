@@ -188,7 +188,7 @@ def format_subset_csv(results: Generator, polygon, fields):
     return csv
 
 
-def lambda_handler(event):
+def lambda_handler(event, context):
     """
     This function queries the database for relevant results
     """
