@@ -19,7 +19,7 @@ def test_timeseries(data_table_reach_lambda):
     print(event['body']['feature'])
 
 
-    response = timeseries.lambda_handler(event)
+    response = timeseries.lambda_handler(event, {})
 
     assert response["results"]["status"] == "200 OK"
 
@@ -42,6 +42,6 @@ def test_subset(data_table_reach_lambda):
     print(event['body']['feature'])
 
 
-    response = subset.lambda_handler(event)
+    response = subset.lambda_handler(event, {})
 
     assert response["results"]["status"] == "200 OK"

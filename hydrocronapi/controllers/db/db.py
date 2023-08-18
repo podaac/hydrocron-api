@@ -5,11 +5,10 @@
 import logging
 from datetime import datetime
 from typing import Generator
-import boto3.dynamodb.conditions as conditions
 
 import boto3
 
-dynamodb = boto3.resource('dynamodb')
+dynamodb = boto3.client('dynamodb')
 
 logger = logging.getLogger()
 
@@ -24,6 +23,7 @@ def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
 
     :rtype: None
     """
+
 
     response = dynamodb.get_item(
         TableName='hydrocron_swot_reaches_test',
@@ -67,10 +67,20 @@ def get_reach_series_by_feature_id(reach_id: str, start_time: datetime, end_time
     :rtype: None
     """
 
+    """
     table = dynamodb.Table('hydrocron_swot_reaches_test')
     response = table.query(
         KeyConditionExpression= \
             conditions.Key("PK").eq(reach_id)
+    )
+    """
+
+
+    response = dynamodb.get_item(
+        TableName='hydrocron_swot_reaches_test',
+        Key={
+            'reach_id': {'S': '71224100223'}
+        }
     )
     return response
 
