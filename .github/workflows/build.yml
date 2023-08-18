@@ -168,8 +168,6 @@ jobs:
 
 
 
-
-
       # Setup Terraform to Deploy
 
       - name: Configure AWS Credentials as Environment Variables
