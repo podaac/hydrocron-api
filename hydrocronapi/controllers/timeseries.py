@@ -1,4 +1,5 @@
 # pylint: disable=duplicate-code
+# pylint: disable=W0613
 """Module defining Lambda workflow for subset endpoint."""
 
 import logging
@@ -50,7 +51,7 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
     if output == 'geojson':
         data = format_json(results, feature_id, round((end - start) * 1000, 3))
     if output == 'csv':
-        data = format_csv(results, feature_id, fields)
+        data = format_csv(results, feature_id, fields, round((end - start) * 1000, 3))
 
     return data
 
@@ -70,9 +71,9 @@ def format_json(results: Generator, feature_id, elapsed_time):
     """
     # Fetch all results
     if 'Items' in results:
-        res = results['Items'][0]
+        results = results['Items']
     else:
-        res = results['Item']
+        results = [results['Item']]
 
     data = {}
 
@@ -89,41 +90,40 @@ def format_json(results: Generator, feature_id, elapsed_time):
         data['features'] = []
         i = 0
 
-        if res['time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
-            feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
-            feature['geometry']['coordinates'] = []
-            feature_type = ''
-            if 'POINT' in res['geometry']['S']:
-                geometry = res['geometry']['S'].replace('POINT (', '').replace(')', '')
-                geometry = geometry.replace('"', '')
-                geometry = geometry.replace("'", "")
-                feature_type = 'Point'
-            if 'LINESTRING' in res['geometry']['S']:
-                geometry = res['geometry']['S'].replace('LINESTRING (', '').replace(')', '')
-                geometry = geometry.replace('"', '')
-                geometry = geometry.replace("'", "")
-                feature_type = 'LineString'
-            feature['geometry']['type'] = feature_type
-            for pol in geometry.split(", "):
-                (var_x, var_y) = pol.split(" ")
-                if feature_type == 'LineString':
-                    feature['geometry']['coordinates'].append([float(var_x), float(var_y)])
-                if feature_type == 'Point':
-                    feature['geometry']['coordinates'] = [float(var_x), float(var_y)]
-            i += 1
-            feature['properties']['time'] = datetime.fromtimestamp(float(res['time']['S']) + 946710000).strftime(
-                "%Y-%m-%d %H:%M:%S")
-            feature['properties']['reach_id'] = float(res['reach_id']['S'])
-            feature['properties']['wse'] = float(res['wse']['S'])
-            feature['properties']['slope'] = float(res['slope']['S'])
-            data['features'].append(feature)
-
+        for res in results:
+            if res['time']['S'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+                feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
+                feature['geometry']['coordinates'] = []
+                feature_type = ''
+                if 'POINT' in res['geometry']['S']:
+                    geometry = res['geometry']['S'].replace('POINT (', '').replace(')', '')
+                    geometry = geometry.replace('"', '')
+                    geometry = geometry.replace("'", "")
+                    feature_type = 'Point'
+                if 'LINESTRING' in res['geometry']['S']:
+                    geometry = res['geometry']['S'].replace('LINESTRING (', '').replace(')', '')
+                    geometry = geometry.replace('"', '')
+                    geometry = geometry.replace("'", "")
+                    feature_type = 'LineString'
+                feature['geometry']['type'] = feature_type
+                for pol in geometry.split(", "):
+                    (var_x, var_y) = pol.split(" ")
+                    if feature_type == 'LineString':
+                        feature['geometry']['coordinates'].append([float(var_x), float(var_y)])
+                    if feature_type == 'Point':
+                        feature['geometry']['coordinates'] = [float(var_x), float(var_y)]
+                i += 1
+                feature['properties']['time'] = datetime.fromtimestamp(float(res['time']['S']) + 946710000).strftime(
+                    "%Y-%m-%d %H:%M:%S")
+                feature['properties']['reach_id'] = float(res['reach_id']['S'])
+                feature['properties']['wse'] = float(res['wse']['S'])
+                feature['properties']['slope'] = float(res['slope']['S'])
+                data['features'].append(feature)
         data['hits'] = i
-
     return data
 
 
-def format_csv(results: Generator, feature_id, fields):
+def format_csv(results: Generator, feature_id, fields, elapsed_time):
     """
 
     Parameters
@@ -138,9 +138,9 @@ def format_csv(results: Generator, feature_id, fields):
     """
     # Fetch all results
     if 'Items' in results:
-        res = results['Items'][0]
+        results = results['Items']
     else:
-        res = results['Item']
+        results = [results['Item']]
 
     data = {}
 
@@ -150,25 +150,31 @@ def format_csv(results: Generator, feature_id, fields):
         data['error'] = f'413: Query exceeds 6MB with {len(results)} hits.'
 
     else:
+        data['status'] = "200 OK"
+        data['time'] = str(elapsed_time) + " ms."
+        # data['search on'] = {"reach_id": feature_id}
+        data['type'] = "FeatureCollection"
+        data['features'] = []
+        i = 0
         csv = fields + '\n'
         fields_set = fields.split(", ")
-        for res in res:
-            if res['time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+        for res in results:
+            if res['time']['S'] != '-999999999999':  # and (res['width'] != '-999999999999')):
                 if 'reach_id' in fields_set:
-                    csv += res['reach_id']
+                    csv += res['reach_id']['S']
                     csv += ','
                 if 'time_str' in fields_set:
-                    csv += res['time_str']
+                    csv += res['time_str']['S']
                     csv += ','
                 if 'wse' in fields_set:
-                    csv += str(res['wse'])
+                    csv += str(res['wse']['S'])
                     csv += ','
                 if 'geometry' in fields_set:
                     csv += res['geometry']['S'].replace('; ', ', ')
                     csv += ','
                 csv += '\n'
-
-    return csv
+        data['hits'] = i
+    return data
 
 
 def lambda_handler(event, context):

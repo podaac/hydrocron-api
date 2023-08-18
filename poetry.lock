@@ -952,6 +952,16 @@ files = [
 ]
 
 [[package]]
+name = "urlencoder"
+version = "1.1"
+description = "Public lib for encoding text and URLs into valid ASCII charset for web-browsing"
+optional = false
+python-versions = "*"
+files = [
+    {file = "URLEncoder-1.1.tar.gz", hash = "sha256:ec464a9f2eab44fcfe4890b35ec5a2e1a7d32dd4c29b7a03f0a281c2d85527a9"},
+]
+
+[[package]]
 name = "urllib3"
 version = "1.26.16"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -1082,4 +1092,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "2108c2dcc79d09ff85484850f31b6c649d25c37c1a88ec98b28f7e8c2c923784"
+content-hash = "69062f1025dff5747b644644671b4b10355ba2ad738e988c1f30fb0469210d84"

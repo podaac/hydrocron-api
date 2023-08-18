@@ -24,7 +24,6 @@ def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
     :rtype: None
     """
 
-
     response = dynamodb.get_item(
         TableName='hydrocron_swot_reaches_test',
         Key={
@@ -66,15 +65,6 @@ def get_reach_series_by_feature_id(reach_id: str, start_time: datetime, end_time
 
     :rtype: None
     """
-
-    """
-    table = dynamodb.Table('hydrocron_swot_reaches_test')
-    response = table.query(
-        KeyConditionExpression= \
-            conditions.Key("PK").eq(reach_id)
-    )
-    """
-
 
     response = dynamodb.get_item(
         TableName='hydrocron_swot_reaches_test',

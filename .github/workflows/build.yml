@@ -95,10 +95,10 @@ jobs:
           echo "venue=ops" >> $GITHUB_ENV
       - name: Install hydrocron
         run: poetry install
-      #- name: Lint
-      #  run: |
-      #    poetry run pylint hydrocronapi
-      #    poetry run flake8 hydrocronapi
+      - name: Lint
+        run: |
+          poetry run pylint hydrocronapi
+          poetry run flake8 hydrocronapi
 
 
       ## Set environment variables
@@ -167,8 +167,11 @@ jobs:
           poetry build
 
 
-      #- name: Test with pytest
-      #  run: pytest
+      - name: Test with pytest
+        run: |
+          pip install pytest
+          pip install pytest-dynamodb
+          pytest
 
 
 
