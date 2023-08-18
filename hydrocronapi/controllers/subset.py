@@ -72,7 +72,7 @@ def format_subset_json(results: Generator, polygon, elapsed_time):
 
     """
     # Fetch all results from query
-    if hasattr(results, 'Items'):
+    if 'Items' in results:
         res = results['Items'][0]
     else:
         res = results['Item']
@@ -152,7 +152,7 @@ def format_subset_csv(results: Generator, polygon, fields):
 
     """
     # Fetch all results from query
-    if hasattr(results, 'Items'):
+    if 'Items' in results:
         res = results['Items'][0]
     else:
         res = results['Item']

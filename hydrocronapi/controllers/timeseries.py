@@ -69,7 +69,7 @@ def format_json(results: Generator, feature_id, elapsed_time):
 
     """
     # Fetch all results
-    if hasattr(results, 'Items'):
+    if 'Items' in results:
         res = results['Items'][0]
     else:
         res = results['Item']
@@ -137,7 +137,7 @@ def format_csv(results: Generator, feature_id, fields):
 
     """
     # Fetch all results
-    if hasattr(results, 'Items'):
+    if 'Items' in results:
         res = results['Items'][0]
     else:
         res = results['Item']
@@ -171,7 +171,7 @@ def format_csv(results: Generator, feature_id, fields):
     return csv
 
 
-def lambda_handler(event, context):
+def lambda_handler(event):
     """
     This function queries the database for relevant results
     """
