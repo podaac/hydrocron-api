@@ -167,19 +167,6 @@ jobs:
           poetry build
 
 
-      - name: Test with pytest
-        run: |
-          pip install pytest
-          pip install pytest-dynamodb
-          pip install connexion
-          pip install flask_testing
-          pip install moto
-          pip install geopandas
-          export AWS_DEFAULT_REGION=us-west-2
-          export AWS_ACCESS_KEY="aws_access_key"
-          export AWS_SECRET_KEY="aws_secret_key"
-          pytest
-
 
 
 
@@ -198,6 +185,18 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
       - run: aws sts get-caller-identity
+
+
+      - name: Test with pytest
+        run: |
+          pip install pytest
+          pip install pytest-dynamodb
+          pip install connexion
+          pip install flask_testing
+          pip install moto
+          pip install geopandas
+          pytest
+
 
       - uses: hashicorp/setup-terraform@v2.0.3
         with:
