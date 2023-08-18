@@ -175,6 +175,7 @@ jobs:
           pip install flask_testing
           pip install moto
           pip install geopandas
+          export AWS_DEFAULT_REGION=us-west-2
           pytest
 
 

@@ -8,7 +8,7 @@ from typing import Generator
 
 import boto3
 
-dynamodb = boto3.client('dynamodb', region_name='us-west-2')
+dynamodb = boto3.client('dynamodb')
 
 logger = logging.getLogger()
 
