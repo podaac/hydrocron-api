@@ -171,6 +171,7 @@ jobs:
         run: |
           pip install pytest
           pip install pytest-dynamodb
+          pip install connexion
           pytest
 
 
