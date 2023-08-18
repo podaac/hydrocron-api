@@ -173,6 +173,7 @@ jobs:
           pip install pytest-dynamodb
           pip install connexion
           pip install flask_testing
+          pip install moto
           pytest
 
 
