@@ -46,7 +46,8 @@ def get_reach_series_by_feature_id(feature_id: str, start_time: datetime, end_ti
     hydrocron_reach_table = dynamo_instance.load_table(table_name)
     items = hydrocron_reach_table.query(KeyConditionExpression=Key('reach_id').eq(feature_id))
     data = {}
-    for k, v in items['Items'].items():
+    print(items)
+    for k, v in items.items():
         data[k] = {'S': str(v)}
     print(data)
     return data
