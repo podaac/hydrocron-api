@@ -3,6 +3,7 @@
 # pylint: disable=W0613
 # pylint: disable=E0401
 # pylint: disable=R0912
+# pylint: disable=R0915
 """Module defining Lambda workflow for subset endpoint."""
 
 import json
