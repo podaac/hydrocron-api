@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from typing import Generator
 
-from hydrocronapi.controllers.db import db_local as db
+from hydrocronapi.controllers.db import db
 
 logger = logging.getLogger()
 
@@ -39,12 +39,8 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
     end_time = datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
 
     start = time.time()
-    if feature.lower() == 'reach':
-        results = db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
-    elif feature.lower() == 'node':
-        results = db.get_node_series_by_feature_id(feature_id, start_time, end_time)
-    else:
-        return {}
+    results = db.get_series_by_feature_id(feature.lower(), feature_id, start_time, end_time)
+
     end = time.time()
 
     data = ""
@@ -91,18 +87,17 @@ def format_json(results: Generator, feature_id, elapsed_time):
         i = 0
 
         for res in results:
-            print(res)
-            if res['time']['S'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+            if res['time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
                 feature['geometry']['coordinates'] = []
                 feature_type = ''
-                if 'POINT' in res['geometry']['S']:
-                    geometry = res['geometry']['S'].replace('POINT (', '').replace(')', '')
+                if 'POINT' in res['geometry']:
+                    geometry = res['geometry'].replace('POINT (', '').replace(')', '')
                     geometry = geometry.replace('"', '')
                     geometry = geometry.replace("'", "")
                     feature_type = 'Point'
-                if 'LINESTRING' in res['geometry']['S']:
-                    geometry = res['geometry']['S'].replace('LINESTRING (', '').replace(')', '')
+                if 'LINESTRING' in res['geometry']:
+                    geometry = res['geometry'].replace('LINESTRING (', '').replace(')', '')
                     geometry = geometry.replace('"', '')
                     geometry = geometry.replace("'", "")
                     feature_type = 'LineString'
@@ -114,13 +109,14 @@ def format_json(results: Generator, feature_id, elapsed_time):
                     if feature_type == 'Point':
                         feature['geometry']['coordinates'] = [float(var_x), float(var_y)]
                 i += 1
-                feature['properties']['time'] = datetime.fromtimestamp(float(res['time']['S']) + 946710000).strftime(
+                feature['properties']['time'] = datetime.fromtimestamp(float(res['time']) + 946710000).strftime(
                     "%Y-%m-%d %H:%M:%S")
-                feature['properties']['reach_id'] = float(res['reach_id']['S'])
-                feature['properties']['wse'] = float(res['wse']['S'])
-                feature['properties']['slope'] = float(res['slope']['S'])
+                feature['properties']['reach_id'] = float(res['reach_id'])
+                feature['properties']['wse'] = float(res['wse'])
+                feature['properties']['slope'] = float(res['slope'])
                 data['features'].append(feature)
         data['hits'] = i
+        print(data)
     return data
 
 
@@ -160,22 +156,23 @@ def format_csv(results: Generator, feature_id, fields, elapsed_time):
         csv = fields + '\n'
         fields_set = fields.split(", ")
         for res in results:
-            if res['time']['S'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+            if res['time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
                 if 'reach_id' in fields_set:
-                    csv += res['reach_id']['S']
+                    csv += res['reach_id']
                     csv += ','
                 if 'time_str' in fields_set:
-                    csv += res['time_str']['S']
+                    csv += res['time_str']
                     csv += ','
                 if 'wse' in fields_set:
-                    csv += str(res['wse']['S'])
+                    csv += str(res['wse'])
                     csv += ','
                 if 'geometry' in fields_set:
-                    csv += res['geometry']['S'].replace('; ', ', ')
+                    csv += res['geometry'].replace('; ', ', ')
                     csv += ','
                 csv += '\n'
         data['hits'] = i
-    return data
+        data['features'] = csv
+    return csv
 
 
 def lambda_handler(event, context):

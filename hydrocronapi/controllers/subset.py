@@ -43,12 +43,8 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
     end_time = datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S")
 
     start = time.time()
-    if feature.lower() == 'reach':
-        results = db.get_reach_series(start_time, end_time)
-    elif feature.lower() == 'node':
-        results = db.get_node_series(start_time, end_time)
-    else:
-        return {}
+    results = db.get_series(feature.lower(), start_time, end_time)
+
     end = time.time()
 
     data = ""
@@ -93,23 +89,23 @@ def format_subset_json(results: Generator, polygon, elapsed_time):
         data['features'] = []
         i = 0
         for res in results:
-            if res['time']['S'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+            if res['time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
                 feature = {}
                 feature['properties'] = {}
                 feature['geometry'] = {}
                 feature['type'] = "Feature"
                 feature['geometry']['coordinates'] = []
 
-                point = Point(float(res['p_lon']['S']), float(res['p_lat']['S']))
+                point = Point(float(res['p_lon']), float(res['p_lat']))
                 if polygon.contains(point):
                     feature_type = ''
-                    if 'POINT' in res['geometry']['S']:
-                        geometry = res['geometry']['S'].replace('POINT (', '').replace(')', '')
+                    if 'POINT' in res['geometry']:
+                        geometry = res['geometry'].replace('POINT (', '').replace(')', '')
                         geometry = geometry.replace('"', '')
                         geometry = geometry.replace("'", "")
                         feature_type = 'Point'
-                    if 'LINESTRING' in res['geometry']['S']:
-                        geometry = res['geometry']['S'].replace('LINESTRING (', '').replace(')', '')
+                    if 'LINESTRING' in res['geometry']:
+                        geometry = res['geometry'].replace('LINESTRING (', '').replace(')', '')
                         geometry = geometry.replace('"', '')
                         geometry = geometry.replace("'", "")
                         feature_type = 'LineString'
@@ -120,13 +116,13 @@ def format_subset_json(results: Generator, polygon, elapsed_time):
                             (var_x, var_y) = pol.split(" ")
                             feature['geometry']['coordinates'].append([float(var_x), float(var_y)])
                             feature['properties']['time'] = datetime.fromtimestamp(
-                                float(res['time']['S']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
-                            feature['properties']['reach_id'] = float(res['reach_id']['S'])
-                            feature['properties']['wse'] = float(res['wse']['S'])
+                                float(res['time']) + 946710000).strftime("%Y-%m-%d %H:%M:%S")
+                            feature['properties']['reach_id'] = float(res['reach_id'])
+                            feature['properties']['wse'] = float(res['wse'])
 
                     if feature_type == 'Point':
                         feature['geometry']['coordinates'] = [float(res['p_lon']), float(res['p_lat'])]
-                        feature['properties']['time'] = datetime.fromtimestamp(float(res['time']['S']) + 946710000).strftime(
+                        feature['properties']['time'] = datetime.fromtimestamp(float(res['time']) + 946710000).strftime(
                             "%Y-%m-%d %H:%M:%S")
                         feature['properties']['reach_id'] = float(res['reach_id'])
                         feature['properties']['wse'] = float(res['wse'])
@@ -134,6 +130,7 @@ def format_subset_json(results: Generator, polygon, elapsed_time):
                     data['features'].append(feature)
                     i += 1
         data['hits'] = i
+        print(data)
     return data
 
 
@@ -174,24 +171,25 @@ def format_subset_csv(results: Generator, polygon, fields, elapsed_time):
         csv = fields + '\n'
         fields_set = fields.split(", ")
         for res in results:
-            if res['time']['S'] != '-999999999999':  # and (res['width'] != '-999999999999')):
-                point = Point(float(res['p_lon']['S']), float(res['p_lat']['S']))
+            if res['time'] != '-999999999999':  # and (res['width'] != '-999999999999')):
+                point = Point(float(res['p_lon']), float(res['p_lat']))
                 if polygon.contains(point):
                     if 'reach_id' in fields_set:
-                        csv += res['reach_id']['S']
+                        csv += res['reach_id']
                         csv += ','
                     if 'time_str' in fields_set:
-                        csv += res['time_str']['S']
+                        csv += res['time_str']
                         csv += ','
                     if 'wse' in fields_set:
-                        csv += str(res['wse']['S'])
+                        csv += str(res['wse'])
                         csv += ','
                     if 'geometry' in fields_set:
-                        csv += res['geometry']['S'].replace('; ', ', ')
+                        csv += res['geometry'].replace('; ', ', ')
                         csv += ','
                     csv += '\n'
         data['hits'] = i
-    return data
+        data['features'] = csv
+    return csv
 
 
 def lambda_handler(event, context):

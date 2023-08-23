@@ -5,93 +5,31 @@
 import logging
 from datetime import datetime
 from typing import Generator
-
+from boto3.dynamodb.conditions import Key
 import boto3
 
 dynamodb = boto3.client('dynamodb')
+dynamodb_resource = boto3.resource('dynamodb')
+table = dynamodb_resource.Table('hydrocron_swot_reaches_test')
 
 logger = logging.getLogger()
 
 
-def get_reach_series(start_time: datetime, end_time: datetime) -> Generator:
-    """Get Timeseries for a particular Reach filtering by time range
+def get_series(feature: str, start_time: datetime, end_time: datetime) -> Generator:
+    """Method to fetch series filtered by date range"""
 
-    :param start_time: Start time of the timeseries
-    :type start_time: str
-    :param end_time: End time of the timeseries
-    :type end_time: str
-
-    :rtype: None
-    """
-
-    response = dynamodb.get_item(
-        TableName='hydrocron_swot_reaches_test',
-        Key={
-            'reach_id': {'S': '71224100223'}
-        }
+    key = feature+'_id'
+    response = table.query(
+        KeyConditionExpression=Key(key).eq('*') & Key('time_str').gt(str(start_time)) & Key('time_str').lt(str(end_time))
     )
     return response
 
 
-def get_node_series(start_time: datetime, end_time: datetime) -> Generator:
-    """Get Timeseries for a particular Node filtering by time range
+def get_series_by_feature_id(feature: str, feature_id: str, start_time: datetime, end_time: datetime) -> Generator:
+    """Method to fetch series filtered by id and date range"""
 
-    :param start_time: Start time of the timeseries
-    :type start_time: str
-    :param end_time: End time of the timeseries
-    :type end_time: str
-
-    :rtype: None
-    """
-
-    response = dynamodb.get_item(
-        TableName='hydrocron_swot_reaches_test',
-        Key={
-            'node_id': {'S': '71224100223'}
-        }
-    )
-    return response
-
-
-def get_reach_series_by_feature_id(reach_id: str, start_time: datetime, end_time: datetime) -> Generator:
-    """Get Timeseries for a particular Reach filtering by ID and time range
-
-    :param reach_id: Identifier of the feature
-    :type reach_id: str
-    :param start_time: Start time of the timeseries
-    :type start_time: str
-    :param end_time: End time of the timeseries
-    :type end_time: str
-
-    :rtype: None
-    """
-
-    response = dynamodb.get_item(
-        TableName='hydrocron_swot_reaches_test',
-        Key={
-            'reach_id': {'S': '71224100223'}
-        }
-    )
-    return response
-
-
-def get_node_series_by_feature_id(node_id, start_time, end_time):
-    """Get Timeseries for a particular Node filtering by ID and time range
-
-    :param node_id: Identifier of the feature
-    :type node_id: str
-    :param start_time: Start time of the timeseries
-    :type start_time: str
-    :param end_time: End time of the timeseries
-    :type end_time: str
-
-    :rtype: None
-    """
-    table_name = 'hydrocron_swot_reaches_test'
-    response = dynamodb.get_item(
-        TableName=table_name,
-        Key={
-            'node_id': {'S': node_id}
-        }
+    key = feature+'_id'
+    response = table.query(
+        KeyConditionExpression=Key(key).eq(feature_id) & Key('time_str').gt(str(start_time)) & Key('time_str').lt(str(end_time))
     )
     return response

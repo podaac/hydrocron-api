@@ -73,8 +73,8 @@ paths:
         explode: true
         schema:
           type: string
-          default: feature_id, time_str, wse, geometry
-        example: feature_id, time_str, wse, geometry
+          default: reach_id, time_str, wse, geometry
+        example: reach_id, time_str, wse, geometry
       responses:
         "200":
           description: OK
@@ -173,8 +173,8 @@ paths:
         explode: true
         schema:
           type: string
-          default: feature_id, time_str, wse, geometry
-        example: feature_id, time_str, wse, geometry
+          default: reach_id, time_str, wse, geometry
+        example: reach_id, time_str, wse, geometry
       responses:
         "200":
           description: OK
