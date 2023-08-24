@@ -16,7 +16,7 @@ logger = logging.getLogger()
 
 
 def get_series(feature: str, start_time: datetime, end_time: datetime) -> Generator:
-    """Method to fetch series filtered by date range"""
+    """Method to fetch series filtered by date range """
 
     key = feature+'_id'
     response = table.query(
@@ -26,7 +26,7 @@ def get_series(feature: str, start_time: datetime, end_time: datetime) -> Genera
 
 
 def get_series_by_feature_id(feature: str, feature_id: str, start_time: datetime, end_time: datetime) -> Generator:
-    """Method to fetch series filtered by id and date range"""
+    """Method to fetch series filtered by id and date range """
 
     key = feature+'_id'
     response = table.query(
