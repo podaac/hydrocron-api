@@ -19,9 +19,8 @@ def get_series(feature: str, start_time: datetime, end_time: datetime) -> Genera
     """Method to fetch series filtered by date range """
 
     key = feature+'_id'
-    response = table.query(
-        KeyConditionExpression=Key(key).eq('*') #& Key('time_str').lt(str(start_time)) & Key('time_str').gt(str(end_time))
-    )
+    response = table.query(KeyConditionExpression=Key(key).eq('*'))
+    # & Key('time_str').lt(str(start_time)) & Key('time_str').gt(str(end_time)))
     return response
 
 
@@ -29,7 +28,6 @@ def get_series_by_feature_id(feature: str, feature_id: str, start_time: datetime
     """Method to fetch series filtered by id and date range """
 
     key = feature+'_id'
-    response = table.query(
-        KeyConditionExpression=Key(key).eq(feature_id) #& Key('time_str').lt(str(start_time)) & Key('time_str').gt(str(end_time))
-    )
+    response = table.query(KeyConditionExpression=Key(key).eq(feature_id))
+    # & Key('time_str').lt(str(start_time)) & Key('time_str').gt(str(end_time)))
     return response
