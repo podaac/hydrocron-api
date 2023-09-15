@@ -3,10 +3,9 @@ import logging
 import time
 from datetime import datetime
 from typing import Generator
+from hydrocronapi import hydrocron
 
 from shapely import Polygon, Point
-
-import tests.db
 
 logger = logging.getLogger()
 
@@ -37,9 +36,9 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
 
     start = time.time()
     if feature.lower() == 'reach':
-        results = tests.db.get_reach_series(start_time, end_time)
+        results = hydrocron.data_repository.get_reach_series_by_feature_id(feature, start_time, end_time)
     elif feature.lower() == 'node':
-        results = tests.db.get_node_series(start_time, end_time)
+        results = hydrocron.data_repository.get_node_series_by_feature_id(feature, start_time, end_time)
     else:
         return {}
     end = time.time()

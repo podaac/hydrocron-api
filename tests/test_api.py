@@ -1,8 +1,10 @@
 # coding: utf-8
+import pytest
 
 from tests import BaseTestCase
 
 
+@pytest.mark.usefixtures("hydrocron_dynamo_instance")
 class TestDefaultController(BaseTestCase):
     """DefaultController integration test stubs"""
 
@@ -24,7 +26,6 @@ class TestDefaultController(BaseTestCase):
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
-
 
     def test_gettimeseries_get(self):
         """Test case for gettimeseries_get
