@@ -21,10 +21,14 @@ pandas = "^2.0.3"
 shapely = "^2.0.1"
 connexion = {version = "^2.14.2", extras = ["swagger-ui"]}
 cryptography = "^41.0.2"
+hydrocron-db = {git = "https://github.com/podaac/hydrocron-db.git", rev = "develop"}
+python-dotenv = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 flask-testing = "^0.8.1"
+hydrocron-db = {git = "https://github.com/podaac/hydrocron-db.git", rev = "develop"}
+pytest-dynamodb = "^2.2.3"
 
 [tool.poetry.scripts]
 hydrocronapi = "hydrocronapi.__main__:__main__"

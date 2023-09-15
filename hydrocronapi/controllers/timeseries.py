@@ -2,8 +2,7 @@ import logging
 import time
 from datetime import datetime
 from typing import Generator
-
-import hydrocronapi.data_access.db
+from hydrocronapi import hydrocron
 
 logger = logging.getLogger()
 
@@ -29,18 +28,6 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
     :rtype: None
     """
 
-    # If I'm too lazy to type in the UI
-    '''
-    if (feature_id == "CBBTTTSNNNNNN"):
-        feature_id = "73254700251"
-    if (feature == "Reach"): 
-        feature = "reach"
-    if (start_time == "2022-08-04T00:00:00+00:00"):
-        start_time = "2022-08-04 10:15:33"
-    if (end_time == "2022-08-22T12:59:59+00:00"):
-        end_time = "2022-08-22 10:16:38"
-    '''
-
     start_time = start_time.replace("T", " ")[0:19]
     end_time = end_time.replace("T", " ")[0:19]
     start_time = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
@@ -48,23 +35,23 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
 
     start = time.time()
     if feature.lower() == 'reach':
-        results = hydrocronapi.data_access.db.get_reach_series_by_feature_id(feature_id, start_time, end_time)
+        results = hydrocron.data_repository.get_reach_series_by_feature_id(feature_id, start_time, end_time)
     elif feature.lower() == 'node':
-        results = hydrocronapi.data_access.db.get_node_series_by_feature_id(feature_id, start_time, end_time)
+        results = hydrocron.data_repository.get_node_series_by_feature_id(feature_id, start_time, end_time)
     else:
         return {}
     end = time.time()
 
     data = ""
     if output == 'geojson':
-        data = format_json(results, feature_id, True, round((end - start) * 1000, 3))
+        data = format_json(results, feature_id, start_time, end_time, True, round((end - start) * 1000, 3))
     if output == 'csv':
         data = format_csv(results, feature_id, True, round((end - start) * 1000, 3), fields)
 
     return data
 
 
-def format_json(results: Generator, feature_id, exact, time):
+def format_json(results: Generator, feature_id, start_time, end_time, exact, time):
     """
 
     Parameters
@@ -79,7 +66,7 @@ def format_json(results: Generator, feature_id, exact, time):
 
     """
     # Fetch all results
-    results = list(results)
+    results = results['Items']
 
     data = {}
 
@@ -91,13 +78,18 @@ def format_json(results: Generator, feature_id, exact, time):
     else:
         data['status'] = "200 OK"
         data['time'] = str(time) + " ms."
-        # data['search on'] = {"featureID": feature_id}
+        # data['search on'] = {"feature_id": feature_id}
         data['type'] = "FeatureCollection"
         data['features'] = []
         i = 0
-        print(len(results))
+        #st = float(time.mktime(start_time.timetuple()) - 946710000)
+        #et = float(time.mktime(end_time.timetuple()) - 946710000)
+        #TODO: process type of feature_id (i.e. reach_id or node_id)
+
+
         for t in results:
-            if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
+            #TODO: Coordinate to filter in the database instance: if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
+            if t['reach_id'] == feature_id and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
                 feature['geometry']['coordinates'] = []
                 feature_type = ''
@@ -107,13 +99,12 @@ def format_json(results: Generator, feature_id, exact, time):
                     geometry = geometry.replace("'", "")
                     feature_type = 'Point'
                 if 'LINESTRING' in t['geometry']:
-                    geometry = t['geometry'].replace('"LINESTRING (', '').replace(')"', '')
+                    geometry = t['geometry'].replace('LINESTRING (', '').replace(')', '')
                     geometry = geometry.replace('"', '')
                     geometry = geometry.replace("'", "")
                     feature_type = 'LineString'
                 feature['geometry']['type'] = feature_type
-                print(geometry)
-                for p in geometry.split("; "):
+                for p in geometry.split(", "):
                     (x, y) = p.split(" ")
                     if feature_type == 'LineString':
                         feature['geometry']['coordinates'].append([float(x), float(y)])
@@ -147,11 +138,10 @@ def format_csv(results: Generator, feature_id, exact, time, fields):
 
     """
     # Fetch all results
-    results = list(results)
+    results = results['Items']
 
     data = {}
 
-    print(fields)
     if results is None:
         data['error'] = f"404: Results with the specified Feature ID {feature_id} were not found."
     elif len(results) > 5750000:
@@ -161,30 +151,20 @@ def format_csv(results: Generator, feature_id, exact, time, fields):
         # csv = "feature_id, time_str, wse, geometry\n"
         csv = fields + '\n'
         fieldsSet = fields.split(", ")
-        print(fieldsSet)
-        if 'time_str' in fieldsSet:
-            print('yes1 time_str')
         for t in results:
             if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 if 'reach_id' in fieldsSet:
-                    print('yes feature_id')
                     csv += t['reach_id']
                     csv += ','
-                    print(csv)
                 if 'time_str' in fieldsSet:
-                    print('yes time_str')
                     csv += t['time_str']
                     csv += ','
-                    print(csv)
                 if 'wse' in fieldsSet:
-                    csv += t['wse']
+                    csv += str(t['wse'])
                     csv += ','
-                    print(csv)
                 if 'geometry' in fieldsSet:
                     csv += t['geometry'].replace('; ', ', ')
                     csv += ','
-                    print(csv)
                 csv += '\n'
-                print(csv)
 
     return csv

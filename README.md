@@ -9,10 +9,21 @@ as CSV and geoJSON.
 Python 3.10+
 
 ## Usage
-Before starting the server you must first start a local database instance. The easiest method is to use docker
+Before starting the server you must first start a local database instance. The easiest method is to use docker. 
+First, make sure you have installed Docker and AWS CLI. To configure AWS local variables:
 
 ```
-docker run --name hydrocrondb -e MYSQL_DATABASE=test -e MYSQL_ROOT_HOST='%' -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -v $(pwd)/mysql/20230601_test.sql:/docker-entrypoint-initdb.d/20230601_test.sql -d --rm mysql:latest
+aws configure
+    AWS Access Key ID: a
+    AWS Secret Acces Key: a
+    Default region name: us-west-2
+    Default output format: None
+```
+
+Next step is to run docker compose up:
+
+```
+docker compose up
 ```
 
 To run the server, please execute the following from the root directory:
