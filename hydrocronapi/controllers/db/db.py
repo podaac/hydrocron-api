@@ -7,9 +7,17 @@ from datetime import datetime
 from typing import Generator
 from boto3.dynamodb.conditions import Key
 import boto3
+import os
 
-dynamodb = boto3.client('dynamodb')
-dynamodb_resource = boto3.resource('dynamodb')
+if os.environ['environment'] == 'local':
+    dynamodb_resource = boto3.resource('dynamodb',
+                              aws_access_key_id="a",
+                              aws_secret_access_key="a",
+                              region_name="us-west-2",
+                              endpoint_url="http://localhost:8000")
+else:
+    dynamodb_resource = boto3.resource('dynamodb')
+
 table = dynamodb_resource.Table('hydrocron_swot_reaches_test')
 
 logger = logging.getLogger()
