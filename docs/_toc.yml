@@ -1,0 +1,17 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+defaults:
+  titlesonly: true
+root: intro
+parts:
+- caption: GETTING STARTED
+  chapters:
+  - file: overview
+  - file: time
+  - file: examples
+- caption: API ENDPOINTS
+  chapters:
+  - file: timeseries
+  - file: subset
