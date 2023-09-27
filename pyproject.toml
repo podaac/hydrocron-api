@@ -27,6 +27,7 @@ python-dotenv = "^1.0.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 flask-testing = "^0.8.1"
+hydrocron-db = {git = "https://github.com/podaac/hydrocron-db.git", rev = "develop"}
 pytest-dynamodb = "^2.2.3"
 pylint = "^2.15.8"
 flake8 = "^6.0.0"

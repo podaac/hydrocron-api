@@ -186,6 +186,8 @@ jobs:
 
 
       - name: Test with pytest
+        if: |
+          github.ref == 'test'
         run: |
           pip install pytest
           pip install pytest-dynamodb
