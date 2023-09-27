@@ -1,3 +1,8 @@
+"""
+Hydrocron API timeseries controller
+"""
+# pylint: disable=R0801
+# pylint: disable=C0103
 import logging
 import time
 from datetime import datetime
@@ -51,7 +56,7 @@ def gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
     return data
 
 
-def format_json(results: Generator, feature_id, start_time, end_time, exact, time):
+def format_json(results: Generator, feature_id, start_time, end_time, exact, dataTime):  # noqa: E501 # pylint: disable=W0613
     """
 
     Parameters
@@ -77,18 +82,18 @@ def format_json(results: Generator, feature_id, start_time, end_time, exact, tim
 
     else:
         data['status'] = "200 OK"
-        data['time'] = str(time) + " ms."
+        data['time'] = str(dataTime) + " ms."
         # data['search on'] = {"feature_id": feature_id}
         data['type'] = "FeatureCollection"
         data['features'] = []
         i = 0
-        #st = float(time.mktime(start_time.timetuple()) - 946710000)
-        #et = float(time.mktime(end_time.timetuple()) - 946710000)
-        #TODO: process type of feature_id (i.e. reach_id or node_id)
-
+        # st = float(time.mktime(start_time.timetuple()) - 946710000)
+        # et = float(time.mktime(end_time.timetuple()) - 946710000)
+        # TODO: process type of feature_id (i.e. reach_id or node_id)
 
         for t in results:
-            #TODO: Coordinate to filter in the database instance: if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
+            # TODO: Coordinate to filter in the database instance:
+            # if t['reach_id'] == feature_id and t['time'] > start_time and t['time'] < end_time and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
             if t['reach_id'] == feature_id and t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 feature = {'properties': {}, 'geometry': {}, 'type': "Feature"}
                 feature['geometry']['coordinates'] = []
@@ -123,7 +128,7 @@ def format_json(results: Generator, feature_id, start_time, end_time, exact, tim
     return data
 
 
-def format_csv(results: Generator, feature_id, exact, time, fields):
+def format_csv(results: Generator, feature_id, exact, dataTime, fields):  # noqa: E501 # pylint: disable=W0613
     """
 
     Parameters
@@ -150,21 +155,55 @@ def format_csv(results: Generator, feature_id, exact, time, fields):
     else:
         # csv = "feature_id, time_str, wse, geometry\n"
         csv = fields + '\n'
-        fieldsSet = fields.split(", ")
+        fields_set = fields.split(", ")
         for t in results:
             if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
-                if 'reach_id' in fieldsSet:
+                if 'reach_id' in fields_set:
                     csv += t['reach_id']
                     csv += ','
-                if 'time_str' in fieldsSet:
+                if 'time_str' in fields_set:
                     csv += t['time_str']
                     csv += ','
-                if 'wse' in fieldsSet:
+                if 'wse' in fields_set:
                     csv += str(t['wse'])
                     csv += ','
-                if 'geometry' in fieldsSet:
+                if 'geometry' in fields_set:
                     csv += t['geometry'].replace('; ', ', ')
                     csv += ','
                 csv += '\n'
 
     return csv
+
+
+def lambda_handler(event, context):  # noqa: E501 # pylint: disable=W0613
+    """
+    This function queries the database for relevant results
+    """
+
+    feature = event['body']['feature']
+    feature_id = event['body']['reach_id']
+    start_time = event['body']['start_time']
+    end_time = event['body']['end_time']
+    output = event['body']['output']
+    fields = event['body']['fields']
+
+    results = gettimeseries_get(feature, feature_id, start_time, end_time, output, fields)
+
+    data = {}
+
+    status = "200 OK"
+
+    data['status'] = status
+    data['time'] = str(10) + " ms."
+    data['hits'] = 10
+
+    data['search on'] = {
+        "parameter": "identifier",
+        "exact": "exact",
+        "page_number": 0,
+        "page_size": 20
+    }
+
+    data['results'] = results
+
+    return data

@@ -1,4 +1,6 @@
-import logging.config
+"""
+Hydrocron API context module
+"""
 import os
 import sys
 from types import ModuleType
@@ -6,12 +8,14 @@ from typing import Callable
 
 import boto3
 import connexion
-from hydrocron_db.hydrocron_database import HydrocronDB
 
 from hydrocronapi.data_access.db import DynamoDataRepository
 
 
 class Context(ModuleType):
+    """
+    Hydrocron API context class
+    """
     APP_NAME = 'hydrocron'
     SSM_PATH = f'/service/{APP_NAME}'
 
@@ -52,6 +56,10 @@ class Context(ModuleType):
 
     @property
     def flask_app(self) -> connexion.App:
+        """
+
+        @return:
+        """
         if not self._app:
             app = connexion.App(
                 'hydrocron',
@@ -65,12 +73,20 @@ class Context(ModuleType):
 
     @property
     def data_repository(self) -> DynamoDataRepository:
+        """
+
+        @return:
+        """
         if not self._db:
             self._db = self.construct_repository()
 
         return self._db
 
     def construct_repository(self):
+        """
+
+        @return:
+        """
         session = boto3.session.Session()
 
         if endpoint_url := self.get_param('dynamodb_endpoint_url'):
