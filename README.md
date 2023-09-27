@@ -29,7 +29,7 @@ docker compose up
 To run the server, please execute the following from the root directory:
 
 ```
-python3 -m hydrocronapi
+HYDROCRON_ENV=dev python -m hydrocronapi
 ```
 
 and open your browser to here:
