@@ -44,7 +44,7 @@ Your Swagger definition lives here:
 http://localhost:8080/hydrocron/HydroAPI/1.0.0/swagger.json
 ```
 
-## Running with Docker
+## Running with Docker 
 
 To run the server on a Docker container, please execute the following from the root directory:
 
