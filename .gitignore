@@ -72,3 +72,4 @@ hydrocronapi/controllers/__pycache__/
 docker/dynamodb
 
 tests/dynamodb_local/
+node_modules/
