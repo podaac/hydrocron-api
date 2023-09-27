@@ -188,3 +188,38 @@ jobs:
           pip install git+https://github.com/podaac/hydrocron-db.git
           pytest tests/test_api.py -k 'test_gettimeseries_get'
           pytest tests/test_api.py -k 'test_getsubset_get'
+
+
+
+      - uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: 1.0.3
+
+
+      #   -- Build --
+      - name: Build lambda package
+        run: ./build.sh
+      - name: Upload packaged zip
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: dist
+          path: dist/*.zip
+
+      - name: Deploy Terraform
+        #if: |
+        #  github.ref == 'refs/heads/develop' ||
+        #  github.ref == 'refs/heads/main'    ||
+        #  startsWith(github.ref, 'refs/heads/release') ||
+        #  github.event.head_commit.message == '/deploy sit' ||
+        #  github.event.head_commit.message == '/deploy uat'
+        working-directory: terraform/
+        env:
+          AWS_ACCESS_KEY_ID:       ${{ secrets[format('AWS_ACCESS_KEY_ID_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
+          AWS_SECRET_ACCESS_KEY:   ${{ secrets[format('AWS_SECRET_ACCESS_KEY_SERVICES_{0}', env.TARGET_ENV_UPPERCASE)] }}
+          AWS_DEFAULT_REGION:      us-west-2
+
+        run: |
+          source bin/config.sh ${{ env.THE_ENV }}
+          terraform init -reconfigure -backend-config="bucket=podaac-services-${{ env.THE_ENV }}-terraform" -backend-config="region=us-west-2"
+          terraform plan -var-file=tfvars/"${{ env.THE_ENV }}".tfvars -var="app_version=${{ env.THE_VERSION }}" -out="tfplan"
+          terraform apply -auto-approve tfplan
