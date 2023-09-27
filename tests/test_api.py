@@ -25,7 +25,7 @@ class TestDefaultController(BaseTestCase):
             method='GET',
             query_string=query_string)
         self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
+                       'Response body is :  ' + response.data.decode('utf-8'))
 
     def test_gettimeseries_get(self):
         """Test case for gettimeseries_get
