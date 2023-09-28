@@ -57,7 +57,7 @@ resource "aws_security_group_rule" "allow_app_in" {
 }
 
 
-resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment" {
+resource "aws_api_gateway_deployment" "hydrocron-api-gateway-deployment-test" {
   rest_api_id = aws_api_gateway_rest_api.hydrocron-api-gateway-test.id
   stage_name  = "default"
   depends_on = [aws_api_gateway_rest_api.hydrocron-api-gateway-test]
