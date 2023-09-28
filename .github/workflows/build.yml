@@ -163,7 +163,7 @@ jobs:
           sharedDb: # undefined by default
           delayTransientStatuses: # undefined by default
           optimizeDbBeforeStartup: # undefined by default
-          port: 8000
+          port: 8003
 
       - name: Test with pytest
         run: |
