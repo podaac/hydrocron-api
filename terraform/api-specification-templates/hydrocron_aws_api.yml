@@ -78,18 +78,40 @@ paths:
           default: feature_id, time_str, wse, geometry
         example: feature_id, time_str, wse, geometry
       responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
+        "200":
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: "400 error. The specified URL is invalid (does not exist)."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "404":
+          description: "404 error. An entry with the specified region was not found."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "413":
+          description: "413 error. Your query has returned is too large."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
       x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn_timeseries_test}
+        uri: ${hydrocronapi_v001_lambda_arn}
         responses:
           default:
             statusCode: "200"
@@ -128,25 +150,7 @@ paths:
                 {
                   "error" : "$input.path('$.errorMessage')"
                 }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "feature":"$input.params('feature')",
-                "reach_id":"$input.params('reach_id')",
-                "start_time":"$input.params('start_time')",
-                "end_time":"$input.params('end_time')",
-                "output": "$input.params('output')",
-                "fields": "$input.params('fields')",
-                "exact":"$input.params('exact')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" 
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
+      x-openapi-router-controller: hydrocronapi.controllers.timeseries
   /timeseriesSubset:
     get:
       summary: Subset by time series for a given spatial region
@@ -214,18 +218,40 @@ paths:
           default: feature_id, time_str, wse, geometry
         example: feature_id, time_str, wse, geometry
       responses:
-        '200':
-          $ref: '#/components/responses/Success'
-        '400':
-          $ref: '#/components/responses/ClientError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '413':
-          $ref: '#/components/responses/ClientError'
-        '500':
-          $ref: '#/components/responses/ServerError'
+        "200":
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "400":
+          description: "400 error. The specified URL is invalid (does not exist)."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "404":
+          description: "404 error. An entry with the specified region was not found."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
+        "413":
+          description: "413 error. Your query has returned is too large."
+          content:
+            text/csv:
+              schema:
+                type: array
+                items:
+                  type: string
       x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_lambda_arn_subset_test}
+        uri: ${hydrocronapi_v001_lambda_arn}
         responses:
           default:
             statusCode: "200"
@@ -264,90 +290,5 @@ paths:
                 {
                   "error" : "$input.path('$.errorMessage')"
                 }
-        requestTemplates:
-          application/json: |-
-            {
-              "body": {
-                "feature":"$input.params('feature')",
-                "subsetpolygon":"$input.params('subsetpolygon')",
-                "start_time":"$input.params('start_time')",
-                "end_time":"$input.params('end_time')",
-                "output": "$input.params('output')",
-                "fields": "$input.params('fields')",
-                "exact":"$input.params('exact')",
-                "page_number": "$input.params('page_number')" ,
-                "page_size": "$input.params('page_size')" 
-              }
-            }
-        passthroughBehavior: when_no_templates
-        httpMethod: POST
-        contentHandling: CONVERT_TO_TEXT
-        type: aws
-components:
-  responses:
-    Success:
-      description: Success Response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/SuccessResponse'
-    ClientError:
-      description: 400 response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: 404 response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    ServerError:
-      description: 500 response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  schemas:
-    Empty:
-      title: Empty Schema
-      type: object
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-    SuccessResponse:
-      title: Success Response Body
-      type: object
-      properties:
-        status:
-          type: string
-          description: HTTP Status code returned by backend
-        time:
-          type: string
-          description: Time in milliseconds to complete request
-        hits:
-          type: integer
-          description: Total number of results
-        results_count:
-          type: integer
-          description: Number of result entries returned in this request. Only appears if hits > page_size
-        results:
-          type: object
-          description: Single object where each property of the object is a result
-x-amazon-apigateway-policy:
-  Version: '2012-10-17'
-  Statement:
-    - Effect: Allow
-      Principal: '*'
-      Action: 'execute-api:Invoke'
-      Resource: '*'
-    - Effect: Deny
-      Principal: '*'
-      Action: 'execute-api:Invoke'
-      Resource: '*'
-      Condition:
-        StringNotEquals:
-          'aws:SourceVpc': ${vpc_id}
+      x-openapi-router-controller: hydrocronapi.controllers.subset
+

@@ -1,3 +1,11 @@
+# configure the S3 backend for storing state. This allows different
+# team members to control and update terraform state.
+terraform {
+  backend "s3" {
+    key    = "services/hydrocron/terraform.tfstate"
+    region = "us-west-2"
+  }
+}
 
 provider "aws" {
   region = "us-west-2"
@@ -9,19 +17,10 @@ provider "aws" {
   }
 }
 
-data "local_file" "pyproject_toml" {
-  filename = abspath("${path.root}/../pyproject.toml")
-}
-
 locals {
-  name        = regex("name = \"(\\S*)\"", data.local_file.pyproject_toml.content)[0]
-  version     = regex("version = \"(\\S*)\"", data.local_file.pyproject_toml.content)[0]
+  name        = var.app_name
   environment = var.stage
 
-  app_prefix      = "service-${var.app_name}-${local.environment}"
-  service_prefix  = "service-${var.app_name}-${local.environment}-${var.service_name}"
-  service_path    = "/service/${var.app_name}/${var.service_name}"
-  
   account_id = data.aws_caller_identity.current.account_id
 
   # This is the convention we use to know what belongs to each other
@@ -31,12 +30,11 @@ locals {
   hydrocrondb_resource_name = "service-${var.db_app_name}-${local.environment}"
 
   default_tags = length(var.default_tags) == 0 ? {
-    team = "TVA"
-    application = local.app_prefix
-    version     = local.version
-    Environment = local.environment
+    team: "TVA",
+    application: local.ec2_resources_name,
+    Environment = var.stage
+    Version = var.docker_tag
   } : var.default_tags
 }
 
 data "aws_caller_identity" "current" {}
-

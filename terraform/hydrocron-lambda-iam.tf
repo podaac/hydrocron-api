@@ -1,12 +1,12 @@
-#  IAM roles
+#IAM roles
 
-resource "aws_iam_instance_profile" "hydrocron-service-profile-test" {
-  name = aws_iam_role.hydrocron-service-role-test.name
-  role = aws_iam_role.hydrocron-service-role-test.name
+resource "aws_iam_instance_profile" "hydrocron-service-profile" {
+  name = "${local.ec2_resources_name}-instance-profile"
+  role = aws_iam_role.hydrocron-service-role.name
 }
 
-resource "aws_iam_policy" "hydrocron-service-policy-test" {
-  name = "${local.ec2_resources_name}-service-policy-test"
+resource "aws_iam_policy" "hydrocron-service-policy" {
+  name = "${local.ec2_resources_name}-service-policy"
   path = "/"
   policy = <<POLICY
 {
@@ -23,18 +23,7 @@ resource "aws_iam_policy" "hydrocron-service-policy-test" {
             "ssm:GetParameter",
             "ec2:CreateNetworkInterface",
             "ec2:DescribeNetworkInterfaces",
-            "ec2:DeleteNetworkInterface",
-            "dynamodb:BatchGet*",
-            "dynamodb:DescribeStream",
-            "dynamodb:DescribeTable",
-            "dynamodb:Get*",
-            "dynamodb:Query",
-            "dynamodb:Scan",
-            "dynamodb:BatchWrite*",
-            "dynamodb:CreateTable",
-            "dynamodb:Delete*",
-            "dynamodb:Update*",
-            "dynamodb:PutItem"
+            "ec2:DeleteNetworkInterface"
           ],
           "Resource": "*"
       },
@@ -52,8 +41,8 @@ resource "aws_iam_policy" "hydrocron-service-policy-test" {
               "s3:ListBucket*"
           ],
           "Resource": [
-                  "arn:aws:s3:::podaac-${var.stage}-service-work",
-                  "arn:aws:s3:::podaac-${var.stage}-service-work/*"
+                  "arn:aws:s3:::podaac-hydrocron-${var.stage}-service-work",
+                  "arn:aws:s3:::podaac-hydrocron-${var.stage}-service-work/*"
           ]
       },
       {
@@ -67,7 +56,7 @@ resource "aws_iam_policy" "hydrocron-service-policy-test" {
               "s3:DeleteObjectVersion"
           ],
           "Resource": [
-              "arn:aws:s3:::podaac-${var.stage}-service-work",
+              "arn:aws:s3:::podaac-hydrocron-${var.stage}-service-work",
               "arn:aws:s3:::podaac-${var.stage}-service-work/*"
           ]
       },
@@ -83,8 +72,8 @@ resource "aws_iam_policy" "hydrocron-service-policy-test" {
 POLICY
 }
 
-resource "aws_iam_role" "hydrocron-service-role-test" {
-  name = "${local.ec2_resources_name}-service-role-test"
+resource "aws_iam_role" "hydrocron-service-role" {
+  name = "${local.ec2_resources_name}-service-role"
 
   permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/NGAPShRoleBoundary"
   assume_role_policy = <<EOF
@@ -104,8 +93,8 @@ resource "aws_iam_role" "hydrocron-service-role-test" {
 EOF
 }
 
-resource "aws_iam_policy_attachment" "hydrocron-service-attach-test" {
-  name       = "${local.ec2_resources_name}-attachment-test"
-  roles      = [aws_iam_role.hydrocron-service-role-test.id]
-  policy_arn = aws_iam_policy.hydrocron-service-policy-test.arn
+resource "aws_iam_policy_attachment" "hydrocron-service-attach" {
+  name       = "${local.ec2_resources_name}-attachment"
+  roles      = [aws_iam_role.hydrocron-service-role.id]
+  policy_arn = aws_iam_policy.hydrocron-service-policy.arn
 }
