@@ -8,7 +8,7 @@ import pytest
 from pytest_dynamodb import factories
 
 dynamo_test_proc = factories.dynamodb_proc(
-    dynamodb_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'dynamodb_local1'),
+    dynamodb_dir=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'dynamodb_local'),
     port=8000)
 
 
