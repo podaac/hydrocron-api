@@ -101,7 +101,7 @@ paths:
                 items:
                   type: string
         "413":
-          description: "413 error. Your query has returned is too large."
+          description: "413 error. Your query has returned is too large. "
           content:
             text/csv:
               schema:
