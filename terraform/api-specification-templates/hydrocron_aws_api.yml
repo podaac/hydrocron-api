@@ -1,15 +1,13 @@
-openapi: 3.0.1
+openapi: 3.0.0
 info:
-  title: podaac-hydrocron
+  title: "Get time series data from SWOT observations for reaches, nodes, and/or lakes"
+  description: "Get time series data from SWOT observations for reaches, nodes, and/or\
+    \ lakes"
   version: 1.0.0
-  license:
-    name: Apache 2.0
-    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - url: 'https://hydrocron.podaac.earthdata.nasa.gov/'
-    description: Production
-  - url: 'https://hydrocron.podaac.uat.earthdata.nasa.gov/'
-    description: User Acceptance
+- url: https://virtserver.swaggerhub.com/hydrocron/HydroAPI/1.0.0
+  description: "Get time series data from SWOT observations for reaches, nodes, and/or\
+    \ lakes"
 paths:
   /timeseries:
     get:
@@ -110,46 +108,6 @@ paths:
                 type: array
                 items:
                   type: string
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v001_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
       x-openapi-router-controller: hydrocronapi.controllers.timeseries
   /timeseriesSubset:
     get:
@@ -250,45 +208,4 @@ paths:
                 type: array
                 items:
                   type: string
-      x-amazon-apigateway-integration:
-        uri: ${hydrocronapi_v001_lambda_arn}
-        responses:
-          default:
-            statusCode: "200"
-            responseTemplates:
-              application/json: |
-                #set($inputRoot = $input.path('$'))
-                #if($inputRoot.toString().contains('206 PARTIAL CONTENT'))
-                  #set($context.responseOverride.status = 206)
-                #end
-                $input.json('$')
-          ^400.*:
-            statusCode: "400"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^404.*:
-            statusCode: "404"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^413.*:
-            statusCode: "413"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
-          ^[^1-5].*:
-            statusCode: "500"
-            responseTemplates:
-              application/json: |-
-                {
-                  "error" : "$input.path('$.errorMessage')"
-                }
       x-openapi-router-controller: hydrocronapi.controllers.subset
-
