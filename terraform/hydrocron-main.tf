@@ -39,11 +39,6 @@ output_path = "${path.module}/hydrocron-timeseries.zip"
 }
 
 
-data "archive_file" "zip_the_python_code_subset" {
-type        = "zip"
-source_dir  = "${path.module}/"
-output_path = "${path.module}/hydrocron-subset.zip"
-}
 
 resource "aws_lambda_function" "hydrocron_api_lambda_timeseries_test" {
   function_name = "${local.ec2_resources_name}-function-timeseries-test"
@@ -71,30 +66,6 @@ resource "aws_lambda_function" "hydrocron_api_lambda_timeseries_test" {
 }
 
 
-resource "aws_lambda_function" "hydrocron_api_lambda_subset_test" {
-  function_name = "${local.ec2_resources_name}-function-subset-test"
-  role          = aws_iam_role.hydrocron-service-role-test.arn
-  filename      = "${path.module}/hydrocron-subset.zip"
-  timeout       = 5
-  handler       = "hydrocronapi.controllers.subset.lambda_handler"
-  runtime       = "python3.8"
-
-  vpc_config {
-    subnet_ids = var.private_subnets
-    security_group_ids = [var.default_vpc_sg]
-  }
-
-  environment {
-    variables = {
-      DB_HOST=data.aws_ssm_parameter.hydrocron-db-host.value
-      DB_NAME=data.aws_ssm_parameter.hydrocron-db-name.value
-      DB_USERNAME=data.aws_ssm_parameter.hydrocron-db-user.value
-      DB_PASSWORD_SSM_NAME=data.aws_ssm_parameter.hydrocron-db-user-pass.name
-    }
-  }
-
-  tags = var.default_tags
-}
 
 resource "aws_lambda_permission" "allow_hydrocron-timeseries-test" {
   statement_id  = "AllowAPIGatewayInvoke"
@@ -107,18 +78,6 @@ resource "aws_lambda_permission" "allow_hydrocron-timeseries-test" {
   source_arn = "${aws_api_gateway_rest_api.hydrocron-api-gateway-test.execution_arn}/*/*/*"
 }
 
-resource "aws_lambda_permission" "allow_hydrocron-subset-test" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hydrocron_api_lambda_subset_test.function_name
-  principal     = "apigateway.amazonaws.com"
-
-  # The "/*/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.hydrocron-api-gateway-test.execution_arn}/*/*/*"
-}
-
-
 
 #  API Gateway
 resource "aws_api_gateway_rest_api" "hydrocron-api-gateway-test" {
@@ -128,7 +87,6 @@ resource "aws_api_gateway_rest_api" "hydrocron-api-gateway-test" {
                   "${path.module}/api-specification-templates/hydrocron_aws_api.yml",
                   {
                     hydrocronapi_lambda_arn_timeseries_test = aws_lambda_function.hydrocron_api_lambda_timeseries_test.invoke_arn
-                    hydrocronapi_lambda_arn_subset_test = aws_lambda_function.hydrocron_api_lambda_subset_test.invoke_arn
                     vpc_id = var.vpc_id
                   })
   parameters = {
