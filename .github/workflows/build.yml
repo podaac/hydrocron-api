@@ -160,13 +160,6 @@ jobs:
         if: |
           github.ref == 'test'
         run: |
-          pip install pytest
-          pip install pytest-dynamodb
-          pip install connexion
-          pip install flask_testing
-          pip install moto
-          pip install geopandas
-          pip install git+https://github.com/podaac/hydrocron-db.git
           pytest tests/test_api.py -k 'test_gettimeseries_get'
           pytest tests/test_api.py -k 'test_getsubset_get'
 

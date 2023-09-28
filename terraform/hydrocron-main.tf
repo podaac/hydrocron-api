@@ -43,7 +43,8 @@ output_path = "${path.module}/hydrocron-timeseries.zip"
 resource "aws_lambda_function" "hydrocron_api_lambda_timeseries_test" {
   function_name = "${local.ec2_resources_name}-function-timeseries-test"
   role          = aws_iam_role.hydrocron-service-role-test.arn
-  filename      = "${path.module}/hydrocron-timeseries.zip"
+  package_type = "Image"
+  image_uri     = "${local.account_id}.dkr.ecr.us-west-2.amazonaws.com/${var.docker_tag}"
   timeout       = 5
   handler       = "hydrocronapi.controllers.timeseries.lambda_handler"
   runtime       = "python3.8"
