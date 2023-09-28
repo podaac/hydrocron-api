@@ -58,6 +58,7 @@ resource "aws_lambda_function" "hydrocron_api_lambda_timeseries_test" {
       DB_PASSWORD_SSM_NAME=data.aws_ssm_parameter.hydrocron-db-user-pass.name
     }
   }
+
   tags = var.default_tags
 }
 
