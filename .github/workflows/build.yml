@@ -155,3 +155,8 @@ jobs:
       - name: Build Python Artifact
         run: |
           poetry build
+
+      - name: Test with pytest
+        run: |
+          poetry run pytest tests/test_api.py -k 'test_gettimeseries_get'
+          poetry run pytest tests/test_api.py -k 'test_getsubset_get'
