@@ -1,11 +1,15 @@
+"""
+Hydrocron API subset controller
+"""
+# pylint: disable=C0103
 import json
 import logging
 import time
 from datetime import datetime
 from typing import Generator
+from shapely import Polygon, Point
 from hydrocronapi import hydrocron
 
-from shapely import Polygon, Point
 
 logger = logging.getLogger()
 
@@ -52,15 +56,15 @@ def getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields):
     return data
 
 
-def format_subset_json(results: Generator, polygon, exact, time):
+def format_subset_json(results: Generator, polygon, exact, dataTime):  # noqa: E501 # pylint: disable=W0613
     """
 
     Parameters
     ----------
-    cur
-    swot_id
+    results
+    polygon
     exact
-    time
+    dataTime
 
     Returns
     -------
@@ -79,34 +83,18 @@ def format_subset_json(results: Generator, polygon, exact, time):
     else:
 
         data['status'] = "200 OK"
-        data['time'] = str(time) + " ms."
+        data['time'] = str(dataTime) + " ms."
         # data['search on'] = {"feature_id": feature_id}
         data['type'] = "FeatureCollection"
         data['features'] = []
         i = 0
-        total = len(results)
         for t in results:
-            flag_polygon = False
-            if ((t['time'] != '-999999999999')):  # and (t['width'] != '-999999999999')):
+            if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 feature = {}
                 feature['properties'] = {}
                 feature['geometry'] = {}
                 feature['type'] = "Feature"
                 feature['geometry']['coordinates'] = []
-                '''
-                geometry = t['geometry'].replace('"LINESTRING (','').replace(')"','')
-                for p in geometry.split("; "):
-                    (x, y) = p.split(" ")
-                    point = Point(x, y)
-                    if (polygon.contains(point)):
-                        feature['geometry']['coordinates'].append([float(x),float(y)])
-                        feature['properties']['time'] = datetime.fromtimestamp(float(t['time'])+946710000).strftime("%Y-%m-%d %H:%M:%S")
-                        feature['properties']['reach_id'] = float(t['reach_id'])
-                        feature['properties']['wse'] = float(t['wse'])
-                        feature['properties']['slope'] = float(t['slope'])
-                        flag_polygon = True
-                if (flag_polygon):
-                '''
                 point = Point(float(t['p_lon']), float(t['p_lat']))
                 if polygon.contains(point):
                     feature_type = ''
@@ -146,7 +134,7 @@ def format_subset_json(results: Generator, polygon, exact, time):
     return data
 
 
-def format_subset_csv(results: Generator, polygon, exact, time, fields):
+def format_subset_csv(results: Generator, polygon, exact, dataTime, fields):  # noqa: E501 # pylint: disable=W0613
     """
 
     Parameters
@@ -154,7 +142,7 @@ def format_subset_csv(results: Generator, polygon, exact, time, fields):
     results
     swot_id
     exact
-    time
+    dataTime
 
     Returns
     -------
@@ -174,7 +162,6 @@ def format_subset_csv(results: Generator, polygon, exact, time, fields):
         csv = fields + '\n'
         fields_set = fields.split(", ")
         for t in results:
-            flag_polygon = False
             if t['time'] != '-999999999999':  # and (t['width'] != '-999999999999')):
                 point = Point(float(t['p_lon']), float(t['p_lat']))
                 if polygon.contains(point):
@@ -193,3 +180,37 @@ def format_subset_csv(results: Generator, polygon, exact, time, fields):
                     csv += '\n'
 
     return csv
+
+
+def lambda_handler(event, context):  # noqa: E501 # pylint: disable=W0613
+    """
+    This function queries the database for relevant results
+    """
+
+    feature = event['body']['feature']
+    subsetpolygon = event['body']['subsetpolygon']
+    start_time = event['body']['start_time']
+    end_time = event['body']['end_time']
+    output = event['body']['output']
+    fields = event['body']['fields']
+
+    results = getsubset_get(feature, subsetpolygon, start_time, end_time, output, fields)
+
+    data = {}
+
+    status = "200 OK"
+
+    data['status'] = status
+    data['time'] = str(10) + " ms."
+    data['hits'] = 10
+
+    data['search on'] = {
+        "parameter": "identifier",
+        "exact": "exact",
+        "page_number": 0,
+        "page_size": 20
+    }
+
+    data['results'] = results
+
+    return data

@@ -5,7 +5,7 @@ __pycache__/
 *.pyc
 
 # C extensions
-*.so
+#*.so
 
 # Distribution / packaging
 .Python
@@ -70,3 +70,5 @@ hydrocronapi/controllers/__pycache__/
 .idea
 .env
 docker/dynamodb
+
+node_modules/

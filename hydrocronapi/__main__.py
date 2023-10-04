@@ -1,7 +1,14 @@
-#!/usr/bin/env python3
+"""
+Hydrocron API module
+"""
+# !/usr/bin/env python3
+
 
 def main():
-    from hydrocronapi import hydrocron
+    """
+    Main function to run flask app in port 8080
+    """
+    from hydrocronapi import hydrocron  # noqa: E501 # pylint: disable=import-outside-toplevel
     hydrocron.flask_app.run(port=8080)
 
 

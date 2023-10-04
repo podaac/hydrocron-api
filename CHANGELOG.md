@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
     - Issue 8 - Hydrocron API implementation with mysql local database
+    - Issue 23 - Added github actions with Snyk, pylint, flake8
 ### Changed 
     - Issue 8 - Hydrocron API implementation with dynamodb local database
     - Issue 8 - Rearrange database code

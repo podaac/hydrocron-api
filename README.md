@@ -29,7 +29,7 @@ docker compose up
 To run the server, please execute the following from the root directory:
 
 ```
-python3 -m hydrocronapi
+HYDROCRON_ENV=dev python -m hydrocronapi
 ```
 
 and open your browser to here:
@@ -44,7 +44,7 @@ Your Swagger definition lives here:
 http://localhost:8080/hydrocron/HydroAPI/1.0.0/swagger.json
 ```
 
-## Running with Docker
+## Running with Docker 
 
 To run the server on a Docker container, please execute the following from the root directory:
 
