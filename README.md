@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> The code in this repository has been moved to https://github.com/podaac/hydrocron.
+
 ## Overview
 Hydrocron API is a new tool that implements functionalities that will allow 
 hydrologists to have direct access to filtered data from our newest satellites. 
